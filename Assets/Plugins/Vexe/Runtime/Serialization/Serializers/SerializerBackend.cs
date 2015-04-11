@@ -43,7 +43,8 @@ namespace Vexe.Runtime.Serialization
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("Error serializing {0}: {1}. Stacktrace: {2}".FormatWith(member.Name, e.Message, e.StackTrace));
+                    Debug.LogError("Error serializing member {0} in {1}: {2}. Stacktrace: {3}"
+                         .FormatWith(member.Name, target, e.Message, e.StackTrace));
                 }
             }
         }
@@ -68,7 +69,8 @@ namespace Vexe.Runtime.Serialization
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("Error deserializing member {0}: {1}. Stacktrace: {2}".FormatWith(member.Name, e.Message, e.StackTrace));
+                    Debug.LogError("Error deserializing member {0} in {1}: {2}. Stacktrace: {3}"
+                         .FormatWith(member.Name, target, e.Message, e.StackTrace));
                 }
             }
         }
