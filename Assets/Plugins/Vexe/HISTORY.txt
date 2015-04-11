@@ -1,0 +1,335 @@
+_______________
+-- VFW 1.0.1 --
+FIX: A deserialization bug in FullSerializer's UnityObjectConverter when deserializing objects as references
+FIX: A bug in DataMember creation when the target is null
+Mod: Renamed SeqOptions to Seq
+_______________
+-- VFW 1.0.2 --
+Improvements/Changes:
+- Selection window for recursive drawer is now disabled if the object has only 1 or no children/implementers
+- BetterPrefs now inherits BetterScriptableObject which lets it have 'sane' dictionaries to store its data. BetterPrefs.cs is located now under Vexe/Editor/Other. You can see the prefs data at Vexe/Editor/ScriptableAssets/BetterPrefs.asset
+- RequiredAttribute will now add a new GameObject with the required component type if Add was true if the field/property value was null
+- Category members are now ordered by their display order, datatype then by name
+
+Bug fixes:
+- Categories: Fixed a bug with category members not being displayed in correct categories
+- Categories: Empty nested categories didn't show up
+- Fixed a bug with AnimVar not updating the variable string when it's null
+- Fixed a bug when working with prefab instances. target wasn't being set dirty to tell the editor to save its value
+
+New/Additions:
+- Added InputAxisAttribute that gives you a popup of the available Input axes (Horizontal, etc)
+- Added rotation, localRotation, localPosition, eulerAngles, localEulerAngles and properties in BetterBehaviour
+- Added [Re]Set trigger to BetterAnimator
+- Added a 'debug' variable to BetterBehaviour/ScriptableObject and dbgLog that only write logs if 'debug' was true. You can set the variable from the editor (a toggle when you collapse the script header)
+_______________
+-- VFW 1.0.3 --
+Improvements/Changes:
+- Delelgate drawer now has the adding gameobject field be between the add button and invoke so you can add without having to collapse the add foldout
+- Empty categories will not appear now. I don't know what I was thinking when I made them do so in the last update
+- Ordered RecursiveDrawer members by datatype name then by name
+- List/array drawing are now separated into two drawers (ListDrawer and ArrayDrawer), yielded better performance and fixed some bugs I had.
+- MinimalView also shows script field, with the serializer and serialization data etc.
+- Modified the GUI API to *not* be dependent on delegates anymore. This was a slowdown and having too many closures eventually slowed things down a bit. GLWrapper is much similar to GUILayout now
+- Serialization happens less often now, only when values change and when you enter playmode. Unlike before, very rapidly.
+
+Bug fixes:
+- Fixed a bug in sequence drawer when dealing with interfaces sequences
+- Fixed a bug in DataMember not caching the setter/getter delegates
+- Fixed the slowness of the editor when dealing with relatively a medium amount of members. Perf is up by about 40% now, and editor garbage is down to almost half. So the editor experience should be better now.
+
+New/Additions:
+- Added AutoMatch to AnimVarAttribute, so it can automatically try to assign your variable field using a match that you specify. See AnimVarExample
+- Added the ability to choose prefabs when applying SelectObj and in the interfaces selection button (note: prefab must be loaded
+- Added BetterPrefs for runtime and renamed old prefs to BetterEditorPrefs. You can use BetterPrefs instead of PlayerPrefs, it has dictionaries for most used data types, ints, floats, strings, bools, vectors, colors, as well as lists for those. See Vexe/Runtime/Types/Other/BetterPrefs.cs
+- Added Readonly support to dictionaries. Just mark them with [Readonly]
+- Added Smooth Foundations package as a DLL. Helped a bit reduce some editor garbage
+_______________
+-- VFW 1.0.4 --
+Improvements/Changes:
+- Changed project hierarchy and made use of the Plugins and Plugins/Editor folder for better compilation times
+- Renamed the Drawers scene to Attributes
+
+New/Additions:
+- Added FilterEnumAttribute and FilterTagsAttribute (scrshot)
+- Added ParagraphAttribute (analogous to MultilineAttribute) and [Int|Float]Slider (analogous to RangeAttribute)
+- Added SelectSceneAttribute and a SceneTransition convenient script that takes advantage of that attribute to load the selected scene (useful if you want to load a scene remotely when a certain event is triggered, ex: UI button etc) - Added to SelectionsExample.cs (scrshot)
+- Added DefaultAttribute: lets you have default values for your fields/properties. It currently works for simple types (int, float, string, bool, enums, Vector2/3, Color and arrays (not lists) of int/bool/float/string - See DefaultValueExample.cs
+
+_______________
+-- VFW 1.0.5 --
+Improvements/Changes:
+- Moved DataMember implementation out from Fasterflect DLL to Plugins/Vexe/Runtime/Types/Others
+- EventManager: Changed GameEvent to be an interface IGameEvent allowing for more flexibility (using structs as game events for ex)
+
+Bug Fixes:
+- The ClearCache static MenuItem method in MemberDrawersHandler was only clearing attribute drawers cache, it should clear all caches.
+- Fixed the issue with detecting drawers in an assembly not visible to Plugins/Editor (thanks to @vangojames for spotting and reporting that)
+- Member field initialization is now supported back! This makes the DefaultAttribute introduced in previous version obsolete for fields, but still usable and useful for properties
+
+_______________
+-- VFW 1.0.6 --
+
+Bug Fixes:
+- Fixed a deserialization bug in FullSerializer when serializing IEnumerable objects. ex a List<TestEnum> where TestEnum has TestValue1, TestValue2 - removing TestValue1 will cause all list's values to be trashed. The serializer will now move on to deserialize the reset of the elements. Many thanks to user @vangojames for his help again! He reported the bug, and took the time to find it.
+- Fixed a bug in DataMember Set method where it it was getting called multiple times even if the value is the same cause unwanted behaviours (like instantiating objects in a property setter)
+
+________________
+-- VFW 1.1.0 --
+
+New/Additions:
+- Finally the awaited and promised faster and clear GUILayout alternative: RabbitGUI is here! bringing drastic editor performance gains!
+- Added HandleEvent<T> to EventManager to handle game events that needs handling by a single handler. Saves a lot of the [Un]Subscribe code in On[Enable|Disable]. It's simple, have an event that needs to be handled in one location? use HandleEvent<T>
+
+Improvements/Changes:
+- With the introduction of RabbitGUI, the GUI API has now changed to be cleaner, shorter and easier.
+
+Bug Fixes:
+- Fixed a bug introduced by the previous update. Where setting data member values at runtime (serialization) was raising exceptions.
+- Misc bug fixes and editor improvements
+
+Rabbit Notes:
+- FlexibleSpace is not implemented inside a vertical block
+- [Min|Max][Width|Height] and Expand[Width|Height] are not implemented yet.
+_______________
+-- VFW 1.1.2 --
+
+New/Additions:
+- GUI system: Added "Layer" (analogous to LayerField)
+- GUI system: Added "Prefix" (analogous to PrefixLabel)
+
+Bug Fixes:
+- Fixed inline drawing for rabbit
+- Fixed vector drawing when the inspector is narrow
+- Fixed BeginBlock not updating its style when changing the style parameter
+_______________
+-- VFW 1.1.4 --
+
+New/Additions:
+- Added an editor window example showing how you use attributes in editor windows. (Plugins/Editor/Vexe/Examples)
+
+Improvements/Changes:
+- MethodDrawer now just shows a button with the method name in it, press it -> method gets invoked. If the method takes arguments you'll see a foldout besides the button to input arguments.
+- Members within a single category are ordered by: FieldsThenPropertiesThenMethods, then by member data type name (so (f)loat comes before (i)nt), then by member name
+- RecursiveDrawer doesn't use a foldout anymore for its field, but instead just a Text field with a ">" or "^" symbol. You toggle the foldout by just clicking on the label. This addresses the alignment issue with other fields.
+
+Bug Fixes:
+- Rabbit: Some controls don't get the right width in vertical blocks
+- Rabbit: Prefix preserved space even if the label (text/content) was empty
+- Rabbit: HelpBox didn't get enough height to fit all its contents. (Note: if you want a newline to appear in HelpBox insert \n in your help message)
+- SequenceDrawer: Drag-dropping game objects adds a null element
+- Fixed cases of editor sluggishness when a game object is selected with more than one BetterBehavoiur
+- Fixed the bug that was in GUIHelper.RegisterFieldForDrag where if you had more than one field registered for drop only the first one gets the drop content (this in turn fixes the issue that was in PathAttribute)
+_____________
+-- VFW 1.2 --
+
+Bug fixes:
+- Fixed dictionary bugs and a huge GC spikes that occur when reading/writing
+- Fixed an infinite loop bug in RecursiveDrawer when drawing cyclic structures (objects that reference themselves) (Thanks to Nedim for personally reporting it)
+- Fixed members not displaying sometimes in the right order in system objects
+- Fixed ReadonlyAttribute functioning incorrectly when applied to dictionaries
+
+Additions:
+- DisplayOrderAttribute
+- Assignable
+- Format[Member|Pair]Attribute.
+- RuntimeOnlyAttribute: disables the drawers on your member in editor and activate them only in playmode
+- IgnoreOnTypesAttribute: apply it on a drawer to explicitly ignore that drawer on certain types
+- DataMember.EnumerateCached(Type): a memoized version of DataMember.Enumerate
+- BetterWindow: a base window class that uses rabbit gui. Inherit from if you want to write windows using RabbitGUI
+
+Modifications/improvements:
+- Added a clear button to dictionary drawer header
+- Moved clear button to header in sequence drawer instead of having to access it via the advanced chkbox
+- Clipboard class now has more than just a vector2/3Value
+- Cleaned up namespaces: mainly removed the word "Framework" so instead of Vexe.Editor.Framework.Drawers you now say Vexe.Editor.Drawers, Vexe.Editor.GUIs, Vexe.Editor.Windows, Vexe.Editor.Editors (for custom editors)
+- (Breaking change): changed the serialziation key for members to be: MemberType: DataTypeFriendlyName MemberNiceName instead of MemberType: DataTypeFullName MemberNiceName, as List<int> is more readable and easier to understand than System.Collections.Generic.List`1[System.Int32]
+- Removed the need to annotate types with System.Serializable in order to make them serializable, as
+FullSerializer doesn't require any special attributes on types
+- Moved drag-drop registration of fields from GUIHelper to BaseGUI controls so you can access them from a BaseGUI instance
+- Prevented the assignment of scene objects into object fields in prefabs/scriptable object object assets
+
+Removed:
+- Removed BetterEditorPrefs and used BetterPrefs instead with an EditorInstance
+- Removed extra serializers. FullSerializer does everything I wanted in this framework, I really don't see any need for the extra serializers. Gonna leave the 1.1.4 build in case anyone wants to see how to integrate extra serializers.
+- Removed Smooth foundations dll.
+_______________
+-- VFW 1.2.4 --
+- Editor: misc bug fixes in DelegateDrawer when combined with SequenceDrawer
+- Editor: improved delegate drawer. now we can drag any unity object into the adding area
+- Editor: fixed a bug where the drawers cache returns the wrong drawer in some cases
+- Editor: misc bug fixes and improvements in DictionaryDrawer
+- Editor: MethodDrawer displays argument types in a more friendly manner
+- Editor: removed abstract types from appearing system types tab in RecursiveDrawer
+- Editor: fixed a bug when creating system object instances of interfaces
+- Editor: MethoDrawer now remembers basic basic method args (int, float, string) between editor
+sessions
+- Editor: fixed polymorphic types custom drawing issue. Where if you had an interface X and a
+a non abstract impelmentor Y with a custom drawer Z, Z wouldn't be chosen as the drawer to
+draw Y
+- Editor: removed the notion of coreOnly and just sticked with ignoreComposition
+- Editor: simplified the member drawing API where now the API only deals with fields/properties.
+and method drawing is handled seperately. as a result the editor side is more robust and less
+sophisticated.
+- Runtime Dlls: introduced Tuple<A, B> in Vexe.Runtime.Types
+- Runtime Dlls: added extension methods to memoize functions with 3 args
+- Runtime: added childCount rectTransform to BetterBehaviour
+- Runtime: serializable private fields in base classes are visible in the inspector now for
+children types too
+- Runtime: added Serializer.Copy(object) which serializes the input then returns the
+deserialized result
+- Attributes: added "Method" property to FormatPair to format the dictionary pair with a give method
+- GUI: indentation is now amount based, instead of level based
+- GUI: added Begin/EndToggleGroup and ToggleLeft
+- Renamed: DataMember to RuntimeMember and added EditorMember as an editor implementation
+- Renamed: dmValue to memberValue and dataMember to member
+
+_______________
+-- VFW 1.2.5 --
+- Editor: fixed a bug in drawing system where drawers get disabled when re selecting the gameObject
+- Editor: removed the underscore prefix when showing members. i.e. "_myValue" will show as "My Value"
+- Editor: renamed OnInitialized in BaseDrawer to OnSingleInitialized which gets called only once when you drawer is created and added OnMultipleInitialized that gets called everytime before your drawers OnGUI methods
+- Runtime: fixed a bug in the serializable delegates where GetUnityTarget returns null even if the target was indeed a UnityEngine.Object
+- Runtime: readonly properties (properties with only a getter) can be exposed now with [Show] as well
+- Serialization: added static serialization (for both fields and auto properties)
+- Attributes: Removed RuntimeOnlyAttribute
+- Attributes: PopupAttributes accepts population methods with list return and not just arrays (i.e. both List<string> and string[])
+- Attributes: added AlwaysUpdate flag to PopupAttribute to determine whether or not to always execute the population method. Keep this false (its default value) unless you have a good reason not to. Why? cause always updating the popup will result in more editor allocations.
+- Examples: Added StaticsExample and ReadonlyFieldsExamples under the Serialization examples 
+
+_______________
+-- VFW 1.2.6 --
+Editor: Fixed a bug where the unityTarget reference for drawers is not null, but when comparing it to null the result is true
+Editor: Fixed a bug that sometimes causes the editor foldouts to lose their values when restarting unity
+Editor: Decreased the horizontal space reserved for RabbitGUI in inspector so that no horizontal bar appears at the bottom
+Editor: Implemented drag-drop for fields drawn with RecursiveDrawer (interfaces, abstract system objects, etc)
+Editor: RecursiveDrawer's selection button will only show "MonoBehavoiurs" as opposed to "Unity objects"
+		\ because if we're drawing an interface and we had a ScriptableObject implementing it,
+		\ it doesn't make much sense to create an instance of the ScriptableObject,
+		\ because usually there should be an asset associated with it.
+		\ If you want to drop a ScriptableObject to your interface, create an asset for your SO and drag-drop it to the interface field
+
+_______________
+-- VFW 1.2.7 --
+- Drawers: added MeshRenderer and Camera support to InlineAttributeDrawer
+- Drawers: RecurisveDrawer can now take an optional array of member names to specificy exactly what
+  members to be drawn in a given target (used by InlineAttributeDrawer)
+- Drawers: fixed Popup not setting member to value at index 0 initially
+- Drawers: OnChanged wasn't able to pick static methods to call when the member value changes
+- Runtime Serialization: Added support for iOS!
+- BetterBehaviour Logging: added sLog and changed Log to be a member method passing in gameObject to Debug.Log
+  to ping the go when clicking on log entry in console
+
+_______________
+-- VFW 1.2.8c --
+- Removed SaveSystem source code. I didn't mean to include it in previous version. It's not complete yet. If you're interested, check it out in 1.2.7
+- GUI: RabbitGUI HelpBox height fix
+- Attributes: DisplayOrder works inside System.Object classes as well
+- Attributes: Popup upgrade (see PopupsExample.cs for more details)
+	- you can now use fields and properties to populate the strings in the Popup, not just methods
+	- can populate from unity target
+	- has a button to manually repopulate the popup values (no more automatic update)
+	- removed int/float support. only works with strings now (string[]/List<string>)
+	- the ability to specify case sensitivity for the populate member
+	- the ability to populate from a static member in a type
+- Made Reset method in BetterBehaviour/ScriptableObject virtual
+- Drawers: SequenceDrawer shows 0 as line number for the first element
+- Drawers: Redesigned dictionary drawer:
+	- removed adding area
+	- you can now add as much pairs as you want, when done you click a button to write the values
+	- the button becomes orange when the dictionary is modified and so you should write, and red
+	  if you have duplicate key values
+- Drawers: Fixed a very annoying bug in MethodDrawer where target wasn't being updated. Caused weird
+  bugs due to leaks
+- Drawers: Fixed a DictionaryDrawer bug (out of range) when adding items after exiting playmode
+- Drawers/Attributes: Attributes are now applicable on method parameters!
+- Drawers: RecursiveDrawer:
+	- drawer doesn't automatically instantiate an instance for your member if it's null
+	- you won't see the type name in prens for your member text display if it implements ToString
+- New Type: Added uDelegate:
+	- a delegate that could hook up methods of arbitrary parameter type/count
+	- you setup the invocation values in the editor, the values are serialized
+	- when you then invoke it, it uses those values as arguments to pass to the handlers (methods)
+- Editor: Added a EditorView int in BetterEditor.cs that you could use to specify the default view for
+  your behaviours. 1 means always use BasicView, 2 means always MinimalView, 0 (the default) means categorized
+  view, unless annotated with BasicView or MinimalView
+- Runtime/Drawers: Requirements resolution isn't dependent anymore to drawers (previously you had to select the
+  gameObject to instantiate the drawers to resolve your members) - now, resolving requirements
+  can run automatically and resolve requirements for the whole scene, or manual and resolve
+  certain targets (see the source for Requirements.cs under Vexe/Runtime/Types/Other - and
+  RequirementsExample.cs for more details)
+
+_______________
+-- VFW 1.2.9 --
+
+- Seperated the examples out in a different package
+- Editor: Structs inspection fixed! woot!
+- Attributes: Added VisibleWhen: Annotate members with this attribute to make then visible only when a certain condition is met 
+- Drawers: Right click in RecursiveDrawer selection button creates instance of the type if it wasn't abstract
+- Removed: ColorDuoDrawer, BetterUndo, TransformEditor, VisibleMember, BetterEditor
+- Moved ColorDuo and StyleDuo from DLLs to GUIHelper
+- Moved SelectionMemorizer out from the DLLs to Plugins/Editor/Vexe/Other.
+	Remember: back: Ctrl+Shift+- forward: Ctrl+Shift+=
+- Cleaned up Dlls. We now have vRuntime and vEditor instead of RuntimeHelpers/Extensions and
+  EditorHelpers/Extensions (no effect on namespaces)
+
+_______________
+-- VFW 1.2.9p1 --
+- Changing script field in BetterBehaviours will actually change the script now
+- Improved members order. No more ordering by name. The ordering is now only by
+  FieldsThenPropertiesThenMethods. So if you had f1, p2, f2, m1, p1 (in that order - f1/2 are fields, p1/2 are
+  properties and m1 is a visible method) you will get f1, f2, p2, p1, m1 in the inspector
+- The default editor view is now BasicView. If you want a categorized view annotate with FullView
+- Corrected 'back' vector mistake in BetterBehaviour
+- Removed 'active' property in BetterBehaviour
+- Removed vector getters (forward, up etc) from BetterBehaviour and added them to a new
+  CachedBehaviour under Runtime/Types/Other. If you were using those properties make sure you
+  now inherit CachedBehaviour
+- Added min/max number of lines to ParagraphAttribute. It now has a scroll bar too
+- Fixed errors getting animator variables and helpBox GUIStyle for Unity 5 users
+- Renamed OnBetterGUI in BaseEditor to OnGUI
+
+_______________
+-- VFW 1.3. --
+
+Source Control:
+- VFW is now on github!
+Editor Fixes:
+- Fixed a RabbitGUI layout issue where the editor disappears when changing playmode. Things
+  should now look persistent.
+- Fixed wasted extra space beside scrollbar. RabbitGUI now plays well with the inspector
+  vertical scrollbar!
+Delegates:
+- handler target could now be any System.Object! (still no support for lambdas with captures)
+- handler method is now MethodInfo instead of just a string. which means methods overloads are
+  now supported in the editor
+Serialization:
+- Updated FullSerializer and included its source code. Which in turn seemed to address most the
+  serializaiton issues a lot of users started having after Unity 4.6.3
+- Renamed BetterSerializer to SerializerBackend with the FullSerializer related stuff
+  implemented in FullSerializeBackend (as there will soon be a 'FastSerializerBackend' ;)
+New:
+- Dynamic reflection system! (included within vRuntime.dll) - you can buy the source code if you're interested (see)
+- Inline support for AudioSource
+- DoubleDrawer to handle drawing System.Double
+- VFWSettings asset for global settings that get applied to newly instantiated behaviours.
+  found under Plugins/Editor/Vexe/ScriptableAssets or hit the menu Tools/Vexe/VFWSettings
+- More customization options on how your behaviour looks:
+a) more options in the 'Display' popup when collapsing the script header
+b) a spacing field to change members' indentation
+Removed:
+- Basic/Full/MinimalViewAttributes. Things are always categorized now, everything is customized
+  the in display options now!
+- IgnoreCategoriesAttribute
+- GUICode method in BaseEditor and replaced it with OnGUI. That way you could totally override
+  OnGUI. If you want to call 'base', you can just call it...
+- Fasterflect
+- colorValue from DefaultAttribute
+- vEditor.dll (it was only a couple of files which are now under Plugins/Editor/Vexe/Helpers)
+- Dbg category string constant from Base behaviour classes. Want one? good, let it in your own scripts
+- The plural stuff (Lists of lists) from BetterPrefs
+Renamed:
+- renamed styles to Styles (previously, Unity refused to compile when I did that!)
+Improvements/Modifications:
+- DictionaryDrawer now works with any IDictionary
+- Seperated visibility attributes/logic from serialization attributes/logic
