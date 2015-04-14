@@ -8,7 +8,7 @@ namespace Vexe.Runtime.Types
         {
             var bb = target as BetterBehaviour;
             if (bb != null)
-                return bb.ID;
+                return bb.Id;
 
             var bso = target as BetterScriptableObject;
             if (bso != null)

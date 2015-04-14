@@ -28,15 +28,15 @@ namespace Vexe.Runtime.Types
         /// Could be used at runtime as well if you have any usages of a unique id
         /// </summary>
         [SerializeField, HideInInspector]
-        private int id = -1;
+        private int _id = -1;
         static int counter;
-        public int ID
+        public int Id
         {
             get
             {
-                if (id == -1)
-                    id = counter++;
-                return id;
+                if (_id == -1)
+                    _id = counter++;
+                return _id;
             }
         }
 
