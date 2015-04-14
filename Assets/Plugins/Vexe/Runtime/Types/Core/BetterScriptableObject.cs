@@ -13,7 +13,7 @@ namespace Vexe.Runtime.Types
     {
         [SerializeField]
         private SerializationData _serializationData;
-        private SerializationData SerializationData
+        public SerializationData ObjectData
         {
             get { return _serializationData ?? (_serializationData = new SerializationData()); }
         }
@@ -21,14 +21,13 @@ namespace Vexe.Runtime.Types
         private static SerializerBackend _serializer;
         public static SerializerBackend Serializer
         {
-            //get { return _serializer ?? (_serializer = new vFastSerializer()); }
             get { return _serializer ?? (_serializer = new FullSerializerBackend()); }
         }
 
         static int counter;
         [SerializeField, HideInInspector]
         private int id = -1;
-        public int ID
+        public int Id
         {
             get
             {
@@ -43,8 +42,8 @@ namespace Vexe.Runtime.Types
 #if DBG
             Log("Saving " + GetType().Name);
 #endif
-            SerializationData.Clear();
-            Serializer.SerializeTargetIntoData(this, SerializationData);
+            ObjectData.Clear();
+            Serializer.SerializeTargetIntoData(this, ObjectData);
         }
 
         public void OnAfterDeserialize()
@@ -52,7 +51,7 @@ namespace Vexe.Runtime.Types
 #if DBG
             Log("Loading " + GetType().Name);
 #endif
-            Serializer.DeserializeDataIntoTarget(this, SerializationData);
+            Serializer.DeserializeDataIntoTarget(this, ObjectData);
         }
 
         // Logging

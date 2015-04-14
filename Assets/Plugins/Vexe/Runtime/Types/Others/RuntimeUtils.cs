@@ -12,7 +12,7 @@ namespace Vexe.Runtime.Types
 
             var bso = target as BetterScriptableObject;
             if (bso != null)
-                return bso.ID;
+                return bso.Id;
 
             return target.GetHashCode();
         }

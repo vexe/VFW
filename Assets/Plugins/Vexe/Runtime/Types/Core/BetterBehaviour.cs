@@ -12,9 +12,10 @@ namespace Vexe.Runtime.Types
     {
         [SerializeField]
         private SerializationData _serializationData;
-        public SerializationData SerializationData
+        public SerializationData BehaviourData
         {
             get { return _serializationData ?? (_serializationData = new SerializationData()); }
+            set { _serializationData = value; }
         }
 
         static SerializerBackend _serializer;
@@ -45,8 +46,8 @@ namespace Vexe.Runtime.Types
 #if DBG
             Log("Serializing " + GetType().Name);
 #endif
-            SerializationData.Clear();
-            Serializer.SerializeTargetIntoData(this, SerializationData);
+            BehaviourData.Clear();
+            Serializer.SerializeTargetIntoData(this, BehaviourData);
         }
 
         public void OnAfterDeserialize()
@@ -54,7 +55,7 @@ namespace Vexe.Runtime.Types
 #if DBG
             Log("Deserializing " + GetType().Name);
 #endif
-            Serializer.DeserializeDataIntoTarget(this, SerializationData);
+            Serializer.DeserializeDataIntoTarget(this, BehaviourData);
         }
 
         // Logging

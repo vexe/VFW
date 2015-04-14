@@ -8,13 +8,13 @@ namespace Vexe.Runtime.Serialization
 { 
     public class FullSerializerBackend : SerializerBackend
     {
-        private fsSerializer serializer;
+        public readonly fsSerializer Serializer;
 
         public FullSerializerBackend()
         {
-            serializer = new fsSerializer();
-            serializer.AddConverter(new UnityObjectConverter());
-            serializer.AddConverter(new MethodInfoConverter());
+            Serializer = new fsSerializer();
+            Serializer.AddConverter(new UnityObjectConverter());
+            Serializer.AddConverter(new MethodInfoConverter());
 
             Logic = VFWSerializationLogic.Instance;
 
@@ -24,10 +24,10 @@ namespace Vexe.Runtime.Serialization
 
         public override string Serialize(Type type, object graph, object context)
         {
-            serializer.Context.Set(context as List<UnityObject>);
+            Serializer.Context.Set(context as List<UnityObject>);
 
             fsData data;
-            var fail = serializer.TrySerialize(type, graph, out data);
+            var fail = Serializer.TrySerialize(type, graph, out data);
             if (fail.Failed) throw new Exception(fail.FormattedMessages);
 
             return fsJsonPrinter.CompressedJson(data);
@@ -39,10 +39,10 @@ namespace Vexe.Runtime.Serialization
             fsResult status = fsJsonParser.Parse(serializedState, out data);
             if (status.Failed) throw new Exception(status.FormattedMessages);
 
-            serializer.Context.Set(context as List<UnityObject>);
+            Serializer.Context.Set(context as List<UnityObject>);
 
             object deserialized = null;
-            status = serializer.TryDeserialize(data, type, ref deserialized);
+            status = Serializer.TryDeserialize(data, type, ref deserialized);
             if (status.Failed) throw new Exception(status.FormattedMessages);
             return deserialized;
         }
