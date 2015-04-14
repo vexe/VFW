@@ -17,7 +17,7 @@ Temp.meta
 *.mdb
 *.mdb.meta
 
-*BetterPrefs.asset*
+*BetterEditorPrefs.asset*
 ProjectSettings*
 Assets/Plugins/Editor/ConsolePro*
 Assets/Plugins/Editor/UnityVS*
