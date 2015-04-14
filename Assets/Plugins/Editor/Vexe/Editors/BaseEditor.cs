@@ -88,49 +88,16 @@ namespace Vexe.Editor.Editors
         private void OnEnable()
         {
             _previousGUI = useUnityGUI;
-            gui = _previousGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI();
+            gui = _previousGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI(id);
 
             Initialize();
 
-            //addresses the disappearing of the editor when changing playmode
-            var rabbit = gui as RabbitGUI;
-            if (rabbit != null)
-            {
-                if (!rabbit.validRect.HasValue)
-                { 
-                    var key = RTHelper.CombineHashCodes(id, "rabbit_coords");
-                    Vector3 prevCoords;
-                    if (prefs.Vector3s.TryGetValue(key, out prevCoords))
-                    {
-                        //Log("Seems we changed play modes and rabbit doesn't have a coord. but we have in store a prev coord from a previous editor session that should work");
-                        var rect = new Rect();
-                        rect.x = prevCoords.x;
-                        rect.y = prevCoords.y;
-                        rabbit.validRect = rect;
-                    }
-                }
-            }
-
-            EditorApplication.playmodeStateChanged += StoreGUICoords;
+            gui.OnEnable();
         }
 
         void OnDisable()
         {
-            EditorApplication.playmodeStateChanged -= StoreGUICoords;
-        }
-
-        private void StoreGUICoords()
-        {
-            //Log("Playmode changed");
-            var rabbit = gui as RabbitGUI;
-            if (rabbit != null)
-            {
-                if (rabbit.validRect.HasValue)
-                {
-                    var key = RTHelper.CombineHashCodes(id, "rabbit_coords");
-                    prefs.Vector3s[key] = new Vector3(rabbit.validRect.Value.x, rabbit.validRect.Value.y);
-                }
-            }
+            gui.OnDisable();
         }
 
         /// <summary>
@@ -148,13 +115,13 @@ namespace Vexe.Editor.Editors
             if (_previousGUI != useUnityGUI)
             {
                 _previousGUI = useUnityGUI;
-                gui = _previousGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI();
+                gui = _previousGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI(id);
             }
 
             if (_onGUIFunction == null) // creating the delegate once, reducing allocation
                 _onGUIFunction = OnGUI;
 
-            gui.OnGUI(_onGUIFunction, new Vector2(0f, 18f));
+            gui.OnGUI(_onGUIFunction, new Vector2(0f, 25f));
 
             // addresses somes cases of editor slugishness when selecting gameObjects
             if (_repaintCount < 2)
@@ -301,7 +268,7 @@ namespace Vexe.Editor.Editors
 #endif
             if (ShowScriptHeader)
             {
-                var scriptKey = id + "script".GetHashCode();
+                var scriptKey = RTHelper.CombineHashCodes(id, "script".GetHashCode());
                 gui.Space(3f);
                 using (gui.Horizontal(EditorStyles.toolbarButton))
                 {
@@ -400,6 +367,7 @@ namespace Vexe.Editor.Editors
 
             EditorGUI.BeginChangeCheck();
             _script.objectReferenceValue = gui.Object("Script", _script.objectReferenceValue, typeof(MonoScript), false);
+            gui.Space(5f);
             if (EditorGUI.EndChangeCheck())
             {
                 var sel = Selection.objects;

@@ -6,7 +6,18 @@ namespace Vexe.Editor.Windows
 {
 	public abstract class BetterWindow : EditorWindow
 	{
-		public RabbitGUI gui = new RabbitGUI();
+		public RabbitGUI gui;
+
+        protected virtual int id
+        {
+            get { return GetType().GetHashCode(); }
+        }
+
+        protected virtual void OnEnable()
+        {
+            if (gui == null)
+                gui = new RabbitGUI(id);
+        }
 
 		public void OnGUI()
 		{

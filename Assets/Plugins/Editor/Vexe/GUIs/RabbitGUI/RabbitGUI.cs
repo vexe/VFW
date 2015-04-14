@@ -8,6 +8,8 @@ using UnityEditor;
 using UnityEngine;
 using Vexe.Editor.Helpers;
 using Vexe.Runtime.Extensions;
+using Vexe.Runtime.Helpers;
+using Vexe.Runtime.Types;
 using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Editor.GUIs
@@ -46,14 +48,17 @@ namespace Vexe.Editor.GUIs
         private List<GUIBlock> _blocks;
         private Stack<GUIBlock> _blockStack;
         private Rect _startRect;
+        private Rect? _validRect;
         private int _nextControlIdx;
         private int _nextBlockIdx;
         private float _prevInspectorWidth;
         private bool _pendingLayoutRequest;
         private bool _allocatedMemory;
-        private Rect _prevRect;
-        private float scrollbarOffset;
-        public Rect? validRect;
+        //private Rect? _prevRect;
+        private readonly int _id;
+        private readonly BetterPrefs _prefs;
+        //private Rect? _prevRect;
+        private float _scrollbarOffset;
 
         #if dbg_level_1
             private bool _pendingResetRequest;
@@ -63,7 +68,7 @@ namespace Vexe.Editor.GUIs
                 set
                 {
                     if (value)
-                    { 
+                    {
                         Debug.Log("Setting pending reset to true");
                         LogCallStack();
                     }
@@ -86,20 +91,33 @@ namespace Vexe.Editor.GUIs
         }
         #endif
 
-
-        void HandlePlaymodeTransition()
+        void OnPlaymodeChanged()
         {
-            _pendingLayoutRequest = true;
+            //Debug.Log("Playmode changed");
+            if (_validRect.HasValue)
+            {
+                var key = RTHelper.CombineHashCodes(_id, "rabbit_coords");
+                _prefs.Vector3s[key] = new Vector3(_validRect.Value.x, _validRect.Value.y);
+            }
+
+            //if (_prevRect.HasValue)
+            //{
+                //var prevKey = RTHelper.CombineHashCodes(_id, "prevRect");
+                //var x = _prevRect.Value.x;
+                //var y = _prevRect.Value.y;
+                //_prefs.Vector3s[prevKey] = new Vector3(x, y);
+                //Debug.Log("Saved: " + x + " " + y);
+            //}
         }
 
-        public RabbitGUI()
+        public RabbitGUI(int targetId)
         {
-            EditorApplication.playmodeStateChanged += HandlePlaymodeTransition;
-
+            _id           = targetId;
             _currentPhase = GUIPhase.Layout;
             _controls     = new List<GUIControl>();
             _blocks       = new List<GUIBlock>();
             _blockStack   = new Stack<GUIBlock>();
+            _prefs        = BetterPrefs.EditorInstance;
 
             #if dbg_level_1
                 Debug.Log("Instantiated Rabbit");
@@ -108,41 +126,80 @@ namespace Vexe.Editor.GUIs
 
         public override void OnGUI(Action guiCode, Vector2 padding)
         {
-            var rect = GUILayoutUtility.GetRect(0f, 0f);
+            var prefs = BetterPrefs.EditorInstance;
+
+            if (!_validRect.HasValue)
+            {
+                var key = RTHelper.CombineHashCodes(_id, "rabbit_coords");
+                Vector3 prevCoords;
+                if (prefs.Vector3s.TryGetValue(key, out prevCoords))
+                {
+                    //Log("Seems we changed play modes and rabbit doesn't have a coord. but we have in store a prev coord from a previous editor session that should work");
+                    var tmp = new Rect();
+                    tmp.x = prevCoords.x;
+                    tmp.y = prevCoords.y;
+                    _validRect = tmp;
+                }
+            }
+
+            var unityRect = GUILayoutUtility.GetRect(0f, 0f);
 
             if (Event.current.type == EventType.Repaint)
             {
-                var bar = GUI.skin.verticalScrollbar;
-                var offset = bar.fixedWidth + bar.margin.left;
-                if (rect.width == _prevRect.width + offset)
-                { 
-                    //Debug.Log("Scrollbar off");
-                    _prevRect.width -= offset;
-                    validRect = _prevRect;
-                    scrollbarOffset = 0;
-                    _pendingLayoutRequest = true;
-                }
-                else if (rect.width == _prevRect.width - offset)
-                { 
-                    //Debug.Log("Scrollbar on");
-                    _prevRect.width += offset;
-                    validRect = _prevRect;
-                    _pendingLayoutRequest = true;
-                    scrollbarOffset = offset - 2;
-                }
-                else if (!validRect.HasValue || validRect.Value.y != rect.y)
+                if (!_validRect.HasValue || _validRect.Value.y != unityRect.y)
                 {
-                    validRect = rect;
+                    _validRect = unityRect;
                     _pendingLayoutRequest = true;
                 }
 
-                _prevRect = rect;
+                //var bar = GUI.skin.verticalScrollbar;
+                //var offset = bar.fixedWidth + bar.margin.left;
+                //var bools = prefs.Bools;
+                //var prevKey = RTHelper.CombineHashCodes(_id, "prevRect");
+                //if (!_prevRect.HasValue)
+                //{
+                //    Debug.Log("pr has no value. reading from prefs");
+                //    float result;
+                //    _prefs.Floats.TryGetValue(prevKey, out result);
+                //    var tmp = new Rect();
+                //    tmp.width = result;
+                //    _prevRect = tmp;
+                //    Debug.Log("read: " + result);
+                //}
+                //if (unityRect.width == _prevRect.Value.width - offset)
+                //{
+                //    //Debug.Log("Scrollbar on");
+                //    _prefs.Floats[prevKey] = _prevRect.Value.width;
+                //    var tmp = _prevRect.Value;
+                //    tmp.width += offset;
+                //    _prevRect = tmp;
+                //    _validRect = _prevRect;
+                //    _pendingLayoutRequest = true;
+                //    _scrollbarOffset = offset - 2;
+                //}
+                //else if (unityRect.width == _prevRect.Value.width + offset)
+                //{
+                //    //Debug.Log("Scrollbar off");
+                //    _prefs.Floats[prevKey] = _prevRect.Value.width;
+                //    var tmp = _prevRect.Value;
+                //    tmp.width -= offset;
+                //    _prevRect = tmp;
+                //    _validRect = _prevRect;
+                //    _scrollbarOffset = 0;
+                //    _pendingLayoutRequest = true;
+                //}
+                //else if (!_validRect.HasValue || _validRect.Value.y != unityRect.y)
+                //{
+                //    _validRect = unityRect;
+                //    _pendingLayoutRequest = true;
+                //}
+                //_prevRect = unityRect;
             }
 
-            if (validRect.HasValue)
+            if (_validRect.HasValue)
             {
-                var start = new Rect(validRect.Value.x + padding.x, validRect.Value.y,
-                    EditorGUIUtility.currentViewWidth - padding.y - scrollbarOffset, validRect.Value.height);
+                var start = new Rect(_validRect.Value.x + padding.x, _validRect.Value.y,
+                    EditorGUIUtility.currentViewWidth - padding.y - _scrollbarOffset, _validRect.Value.height);
 
                 using (Begin(start))
                     guiCode();
@@ -172,18 +229,21 @@ namespace Vexe.Editor.GUIs
             return this;
         }
 
+        public override void OnEnable()
+        {
+            EditorApplication.playmodeStateChanged += OnPlaymodeChanged;
+        }
+
+        public override void OnDisable()
+        {
+            EditorApplication.playmodeStateChanged -= OnPlaymodeChanged;
+        }
+
         private void End()
         {
             _allocatedMemory = true;
             var main = _blocks[0];
             main.Dispose();
-
-            //if (_toggledVerticalScrollbar)
-            //{
-            //    _toggledVerticalScrollbar = false;
-            //    Debug.Log("Toggled bar, repainting...");
-            //    EditorHelper.RepaintAllInspectors();
-            //}
 
             if (_currentPhase == GUIPhase.Layout)
             {
@@ -467,7 +527,7 @@ namespace Vexe.Editor.GUIs
             if (pressed)
                 return true;
             return false;
-#else 
+#else
             return GUI.Button(position, content, style);
 #endif
         }

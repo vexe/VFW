@@ -78,6 +78,9 @@ namespace Vexe.Editor.GUIs
 		protected abstract void EndVertical();
 		public abstract void OnGUI(Action guiCode, Vector2 padding);
 
+        public virtual void OnEnable() { }
+        public virtual void OnDisable() { }
+
 		public void BeginCheck()
 		{
 			EditorGUI.BeginChangeCheck();
