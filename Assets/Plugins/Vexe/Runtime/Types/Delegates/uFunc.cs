@@ -155,4 +155,42 @@ namespace Vexe.Runtime.Types
 			return handler.Target;
 		}
 	}
+
+	public class uFunc<T0, T1, T2, T3, TReturn> : uBaseDelegate<Func<T0, T1, T2, T3, TReturn>>
+	{
+		public override Type[] ParamTypes
+		{
+			get { return new[] { typeof(T0), typeof(T1), typeof(T2), typeof(T3) }; }
+		}
+
+		public override Type ReturnType
+		{
+			get { return typeof(TReturn); }
+		}
+
+		public TReturn Invoke(T0 arg0, T1 arg1, T2 arg2, T3 arg3)
+		{
+			return Value.SafeInvoke(arg0, arg1, arg2, arg3);
+		}
+
+		protected override void DirectAdd(Func<T0, T1, T2, T3, TReturn> handler)
+		{
+			directValue += handler;
+		}
+
+		protected override void DirectRemove(Func<T0, T1, T2, T3, TReturn> handler)
+		{
+			directValue -= handler;
+		}
+
+		protected override MethodInfo GetHandlerMethod(Func<T0, T1, T2, T3, TReturn> handler)
+		{
+			return handler.Method;
+		}
+
+		protected override object GetHandlerTarget(Func<T0, T1, T2, T3, TReturn> handler)
+		{
+			return handler.Target;
+		}
+	}
 }

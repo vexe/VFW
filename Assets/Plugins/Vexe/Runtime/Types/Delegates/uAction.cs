@@ -155,4 +155,42 @@ namespace Vexe.Runtime.Types
 			return handler.Target;
 		}
 	}
+
+	public class uAction<T0, T1, T2, T3> : uBaseDelegate<Action<T0, T1, T2, T3>>
+	{
+		public override Type[] ParamTypes
+		{
+			get { return new[] { typeof(T0), typeof(T1), typeof(T2), typeof(T3) }; }
+		}
+
+		public override Type ReturnType
+		{
+			get { return typeof(void); }
+		}
+
+		public void Invoke(T0 arg0, T1 arg1, T2 arg2, T3 arg3)
+		{
+			Value.SafeInvoke(arg0, arg1, arg2, arg3);
+		}
+
+		protected override void DirectAdd(Action<T0, T1, T2, T3> handler)
+		{
+			directValue += handler;
+		}
+
+		protected override void DirectRemove(Action<T0, T1, T2, T3> handler)
+		{
+			directValue -= handler;
+		}
+
+		protected override MethodInfo GetHandlerMethod(Action<T0, T1, T2, T3> handler)
+		{
+			return handler.Method;
+		}
+
+		protected override object GetHandlerTarget(Action<T0, T1, T2, T3> handler)
+		{
+			return handler.Target;
+		}
+	}
 }
