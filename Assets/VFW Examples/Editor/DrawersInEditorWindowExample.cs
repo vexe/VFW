@@ -27,6 +27,8 @@ public class DrawersInEditorWindowExample : EditorWindow
 
 	public Component[] targets;
 
+    private int id;
+
 	[Show] void SomeMethod()
 	{
 		Debug.Log("SomeMethod");
@@ -34,6 +36,7 @@ public class DrawersInEditorWindowExample : EditorWindow
 
 	private void OnEnable()
 	{
+        id = Guid.NewGuid().GetHashCode();
 		members = VFWVisibilityLogic.GetCachedVisibleMembers.Invoke(GetType());
 	}
 
@@ -45,12 +48,11 @@ public class DrawersInEditorWindowExample : EditorWindow
 			Repaint();
 		}
 
-		gui.OnGUI(GUICode, new Vector2(5f, 5f)); // the vector is just padding (or border offsets). x coord is left, y is right
+		gui.OnGUI(GUICode, new Vector2(5f, 5f), id); // the vector is just padding (or border offsets). x coord is left, y is right
 	}
 
 	private void GUICode()
 	{
-		var id = GetType().GetHashCode();
 		foreach (var member in members)
 			gui.Member(
 				member, // the member that we're drawing

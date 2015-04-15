@@ -88,7 +88,7 @@ namespace Vexe.Editor.Editors
         private void OnEnable()
         {
             _previousGUI = useUnityGUI;
-            gui = _previousGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI(id);
+            gui = _previousGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI();
 
             Initialize();
 
@@ -115,13 +115,13 @@ namespace Vexe.Editor.Editors
             if (_previousGUI != useUnityGUI)
             {
                 _previousGUI = useUnityGUI;
-                gui = _previousGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI(id);
+                gui = _previousGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI();
             }
 
             if (_onGUIFunction == null) // creating the delegate once, reducing allocation
                 _onGUIFunction = OnGUI;
 
-            gui.OnGUI(_onGUIFunction, new Vector2(0f, 25f));
+            gui.OnGUI(_onGUIFunction, new Vector2(0f, 25f), id);
 
             // addresses somes cases of editor slugishness when selecting gameObjects
             if (_repaintCount < 2)

@@ -16,7 +16,7 @@ namespace Vexe.Editor.Windows
         protected virtual void OnEnable()
         {
             if (gui == null)
-                gui = new RabbitGUI(id);
+                gui = new RabbitGUI();
         }
 
 		public void OnGUI()

@@ -54,11 +54,10 @@ namespace Vexe.Editor.GUIs
         private float _prevInspectorWidth;
         private bool _pendingLayoutRequest;
         private bool _allocatedMemory;
-        //private Rect? _prevRect;
-        private readonly int _id;
-        private readonly BetterPrefs _prefs;
-        //private Rect? _prevRect;
+        private int _id;
+        private BetterPrefs _prefs;
         private float _scrollbarOffset;
+        //private Rect? _prevRect;
 
         #if dbg_level_1
             private bool _pendingResetRequest;
@@ -110,9 +109,8 @@ namespace Vexe.Editor.GUIs
             //}
         }
 
-        public RabbitGUI(int targetId)
+        public RabbitGUI()
         {
-            _id           = targetId;
             _currentPhase = GUIPhase.Layout;
             _controls     = new List<GUIControl>();
             _blocks       = new List<GUIBlock>();
@@ -124,8 +122,10 @@ namespace Vexe.Editor.GUIs
             #endif
         }
 
-        public override void OnGUI(Action guiCode, Vector2 padding)
+        public override void OnGUI(Action guiCode, Vector2 padding, int targetId)
         {
+            _id = targetId;
+
             var prefs = BetterPrefs.EditorInstance;
 
             if (!_validRect.HasValue)

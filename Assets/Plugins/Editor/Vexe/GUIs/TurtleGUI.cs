@@ -16,7 +16,7 @@ namespace Vexe.Editor.GUIs
             get { return GUILayoutUtility.GetLastRect(); }
         }
 
-        public override void OnGUI(Action code, Vector2 padding)
+        public override void OnGUI(Action code, Vector2 padding, int targetId)
         {
             code();
         }
