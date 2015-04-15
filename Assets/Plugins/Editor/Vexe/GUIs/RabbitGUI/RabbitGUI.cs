@@ -56,7 +56,7 @@ namespace Vexe.Editor.GUIs
         private bool _allocatedMemory;
         private int _id;
         private BetterPrefs _prefs;
-        private float _scrollbarOffset;
+        //private float _scrollbarOffset;
         //private Rect? _prevRect;
 
         #if dbg_level_1
@@ -199,7 +199,7 @@ namespace Vexe.Editor.GUIs
             if (_validRect.HasValue)
             {
                 var start = new Rect(_validRect.Value.x + padding.x, _validRect.Value.y,
-                    EditorGUIUtility.currentViewWidth - padding.y - _scrollbarOffset, _validRect.Value.height);
+                    EditorGUIUtility.currentViewWidth - padding.y, _validRect.Value.height);
 
                 using (Begin(start))
                     guiCode();
