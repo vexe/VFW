@@ -21,3 +21,4 @@ Temp.meta
 ProjectSettings*
 Assets/Plugins/Editor/ConsolePro*
 Assets/Plugins/Editor/UnityVS*
+*.meta
