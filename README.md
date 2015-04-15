@@ -51,7 +51,7 @@ The Vexe Framework (VFW) is both a runtime and editor extension that offers much
 1. **Categories**: *DefineCategory*: defines a member category and lets you categorize your behavior members according to custom rules and filters. *Category*: annotate members with this, to include them in a certain category. IgnoreCategories: Ignore (hide) previously defined categories. *BasicView*: displays your behavior in an uncategorized style. *MinimalView*: even more basic than the previous.
 1. **Collections**: *Seq*: lets you customize the way your sequence (array/list) looks. *PerItem*: indicated that you want your composite attributes to be drawn on each element of a sequence (array/list). *PerKey/PerValue*: indicates that you want to apply your custom attributes on each key/value of a dictionary.
 
-###6- Screenshots:
+###5- Screenshots:
 - [UnityTypes](http://i.imgur.com/O5klA26.png)
 - [ShowType](http://i.imgur.com/WlLhnXn.png)
 - [Sequences](http://i.imgur.com/vtPe4SN.png)
@@ -71,7 +71,7 @@ The Vexe Framework (VFW) is both a runtime and editor extension that offers much
 - [Attributes in EditorWindow](http://i.imgur.com/2b8YOJu.png)
 - [Assignable](http://i.imgur.com/MzIPxVD.png)
 
-### 7- Tutorials/Videos (read the video description to see what it covers):
+###6- Tutorials/Videos (read the video description to see what it covers):
 1. [Intro / API Overview](https://www.youtube.com/watch?v=9AnTNGKjAK0)
 1. [Attributes 1](https://www.youtube.com/watch?v=jsNXBY2VJ6g)
 1. [Attributes 2](https://www.youtube.com/watch?v=y3XJKnOCrcU)
@@ -83,25 +83,25 @@ The Vexe Framework (VFW) is both a runtime and editor extension that offers much
 1. [Full Serializer Integration](https://www.youtube.com/watch?v=7V4vIBBq03g)
 1. [EventSystem & BetterAnimator](https://www.youtube.com/watch?v=c3SJ0vWSIjs)
 
-###8- Known Issues:
+###7- Known Issues:
 1. Undo isn't 100% perfect still, (although it has been improved in 1.3)
 1. Not everything is documented yet
 1. No multi-object editing support yet
 
-###9- Acknowledgments: 
+###8- Acknowledgments: 
 1. Please understand that this is a one-man job, I try my best to make everything work, but I can't make everything perfect. I try to do my best isolating my code and writing unit tests for it to make everything's working OK, but a bug or two could easily slip in... If you want to write a program without bugs, then don't write it.
 1. Apologies in advance if you come across a frustrating bug or any inconvenience due to using this framework, if you do, make sure you let met know.
 1. For help, improvements/suggestions, bug reports: you could post here, pm me or email me at askvexe@gmail.com. I will try to reply ASAP and help as best as I can.
 1. I always use the latest version of Unity for development. Before you report an issue, please make sure you're using the latest version too. If the issue is still there, report it.
 
-###10- FAQ: 
+###9- FAQ: 
 1. **Q**: License? **A**: [MIT](http://choosealicense.com/licenses/mit/).
 1. **Q**: Does this require Unity Pro? **A**: No.
 1. **Q**: Does this support AOT platforms? **A**: Yes. It has been verified to work on iOS. While not manually verified on Android, but it should work.
 1. **Q**: Why free? **A**: 1- Because I believe I can build a base "standard" framework that anyone could use in his own personal projects to benefit from and build upon. The current state in almost all asset developers is that they all come up with 'their' own solutions to the same problems over and over again. This makes it difficult for assets from different publishers to play nice with each other because their backbone is different. For ex say you purchased a property drawers asset that you'd like to use in say, Node Canvas. Well you can't because NC and the drawers asset use a different base for their codes thus making them incompatible. 2- This stuff should be available to us out-of-the-box let alone free... don't let me start uRanting. 3- Open source is beautiful. Everyone could contribute to the improvement of the software, fixing bugs, etc.
 1. **Q**: How are my class members ordered in the inspector? **A**: **(from 1.2.9c onwards)** FieldsThenPropertiesThenMethods. Fields are sorted by their order of declaration, same for properties, and methods. For ex: if you had a class where you define f1, p1, f2, m1, p2 (in that order. where f:field, p:property, m:method) you would see f1, f2, p1, p2, m1 in the inspector. You can use [DisplayOrder(#)] to explicitly define the member order. Note that having all members show up in the order they're declared in is very tricky ([see](https://www.assetstore.unity3d.com/en/#!/content/31442)) (if you know of a simpler way than what was suggested, please let me know).
 
-### 12- Latest version release notes (history file is included in the package)
+### 10- Latest version release notes (history file is included in the package)
 
 **-- 1.3 --**
 
