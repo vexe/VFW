@@ -80,7 +80,7 @@ namespace Vexe.Runtime.Types
 
         protected void Log(object obj)
         {
-            LogFormat(obj.ToString(), null);
+            Debug.Log(obj, gameObject);
         }
 
         // static logs are useful when logging in nested system.object classes
