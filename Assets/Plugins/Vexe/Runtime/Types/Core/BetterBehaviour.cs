@@ -23,18 +23,19 @@ namespace Vexe.Runtime.Types
         }
 
         /// <summary>
-        /// A unique identifier used primarly from editor scripts to have editor data persist
+        /// A persistent identifier used primarly from editor scripts to have editor data persist
         /// Could be used at runtime as well if you have any usages of a unique id
+        /// Note this is not the same as GetInstanceID, as it seems to change when you reload scenes
+        /// This id gets assigned only once and then serialized.
         /// </summary>
         [SerializeField, HideInInspector]
         private int _id = -1;
-        static int counter;
         public int Id
         {
             get
             {
                 if (_id == -1)
-                    _id = counter++;
+                    _id = GetInstanceID();
                 return _id;
             }
         }
