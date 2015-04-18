@@ -24,8 +24,7 @@ namespace Vexe.Runtime.Types.Examples
 		[Serialize, Hide]
 		private TacticStrategy strategy;
 
-		[Show]
-		private void Perform()
+		[Show] void Perform()
 		{
 			strategy.Perform();
 		}
@@ -39,13 +38,11 @@ namespace Vexe.Runtime.Types.Examples
 			}
 		}
 
-		[Serializable]
 		public abstract class TacticStrategy
 		{
 			public abstract void Perform();
 		}
 
-		[Serializable]
 		public class DivideAndConquer : TacticStrategy
 		{
 			public override void Perform()
@@ -54,7 +51,6 @@ namespace Vexe.Runtime.Types.Examples
 			}
 		}
 
-		[Serializable]
 		public class FireAtWill : TacticStrategy
 		{
 			public override void Perform()
@@ -63,7 +59,6 @@ namespace Vexe.Runtime.Types.Examples
 			}
 		}
 
-		[Serializable]
 		public class HoldFire : TacticStrategy
 		{
 			public override void Perform()

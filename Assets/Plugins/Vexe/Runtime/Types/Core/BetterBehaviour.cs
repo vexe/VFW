@@ -1,6 +1,4 @@
-﻿//#define DBG
-
-using UnityEngine;
+﻿using UnityEngine;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Serialization;
 
@@ -43,18 +41,14 @@ namespace Vexe.Runtime.Types
 
         public void OnBeforeSerialize()
         {
-#if DBG
-            Log("Serializing " + GetType().Name);
-#endif
+            dLog("Serializing " + GetType().Name);
             BehaviourData.Clear();
             Serializer.SerializeTargetIntoData(this, BehaviourData);
         }
 
         public void OnAfterDeserialize()
         {
-#if DBG
-            Log("Deserializing " + GetType().Name);
-#endif
+            dLog("Deserializing " + GetType().Name);
             Serializer.DeserializeDataIntoTarget(this, BehaviourData);
         }
 
@@ -67,7 +61,7 @@ namespace Vexe.Runtime.Types
             if (dbg) LogFormat(msg, args);
         }
 
-        protected void dbgLog(object obj)
+        protected void dLog(object obj)
         {
             if (dbg) Log(obj);
         }

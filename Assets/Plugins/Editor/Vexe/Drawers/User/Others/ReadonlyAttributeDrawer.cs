@@ -6,25 +6,23 @@ using System.Collections.Generic;
 
 namespace Vexe.Editor.Drawers
 {
-	// TODO: Fix generic
-	//public class ReadonlyAttributeDrawer<T> : CompositeDrawer<T, ReadonlyAttribute>
-	[IgnoreOnTypes(typeof(Array), typeof(Dictionary<,>), typeof(List<>), typeof(Stack<>))]
-	public class ReadonlyAttributeDrawer : CompositeDrawer<object, ReadonlyAttribute>
-	{
-		private object previous;
+    [IgnoreOnTypes(typeof(Array), typeof(Dictionary<,>), typeof(List<>), typeof(Stack<>))]
+    public class ReadonlyAttributeDrawer : CompositeDrawer<object, ReadonlyAttribute>
+    {
+        private object previous;
 
-		protected override void OnSingleInitialization()
-		{
-			previous = memberValue;
-		}
+        protected override void OnSingleInitialization()
+        {
+            previous = memberValue;
+        }
 
-		public override void OnLowerGUI()
-		{
-			if (!Application.isPlaying && attribute.AssignAtEditTime)
-				return;
+        public override void OnLowerGUI()
+        {
+            if (!Application.isPlaying && attribute.AssignAtEditTime)
+                return;
 
-			if (!memberValue.GenericEqual(previous))
-				memberValue = previous;
-		}
-	}
+            if (!memberValue.GenericEqual(previous))
+                memberValue = previous;
+        }
+    }
 }

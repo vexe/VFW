@@ -126,13 +126,11 @@ namespace Vexe.Editor.GUIs
         {
             _id = targetId;
 
-            var prefs = BetterPrefs.EditorInstance;
-
             if (!_validRect.HasValue)
             {
                 var key = RTHelper.CombineHashCodes(_id, "rabbit_coords");
                 Vector3 prevCoords;
-                if (prefs.Vector3s.TryGetValue(key, out prevCoords))
+                if (_prefs.Vector3s.TryGetValue(key, out prevCoords))
                 {
                     //Log("Seems we changed play modes and rabbit doesn't have a coord. but we have in store a prev coord from a previous editor session that should work");
                     var tmp = new Rect();

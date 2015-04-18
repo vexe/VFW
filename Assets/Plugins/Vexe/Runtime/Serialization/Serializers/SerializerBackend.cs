@@ -1,6 +1,4 @@
-﻿//#define PROFILE
-
-using System;
+﻿using System;
 using UnityEngine;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
@@ -13,13 +11,7 @@ namespace Vexe.Runtime.Serialization
 
         public void SerializeTargetIntoData(object target, SerializationData data)
         {
-#if PROFILE
-            Profiler.BeginSample("Getting members for: " + target);
-#endif
             var members = Logic.GetCachedSerializableMembers(target.GetType());
-#if PROFILE
-            Profiler.EndSample();
-#endif
             for (int i = 0; i < members.Count; i++)
             {
                 var member    = members[i];
@@ -32,13 +24,7 @@ namespace Vexe.Runtime.Serialization
                 try
                 {
                     string memberKey = GetMemberKey(member);
-#if PROFILE
-                    Profiler.BeginSample("Serializing: " + member.Name);
-#endif
                     string serializedState = Serialize(member.Type, value, data.serializedObjects);
-#if PROFILE
-                    Profiler.EndSample();
-#endif
                     data.serializedStrings[memberKey] = serializedState;
                 }
                 catch (Exception e)

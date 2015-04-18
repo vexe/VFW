@@ -9,7 +9,7 @@ namespace Vexe.Runtime.Helpers
 {
     public static class ReflectionUtil
     {
-        public readonly static Func<Type, List<MemberInfo>> GetCachedMembers;
+        public readonly static Func<Type, List<MemberInfo>> CachedGetMembers;
 
         readonly static Func<Tuple<Type, string>, MemberInfo> _getCachedMember;
 
@@ -20,7 +20,7 @@ namespace Vexe.Runtime.Helpers
 
         static ReflectionUtil()
         {
-            GetCachedMembers = new Func<Type, List<MemberInfo>>(type =>
+            CachedGetMembers = new Func<Type, List<MemberInfo>>(type =>
                 GetMembers(type).ToList()).Memoize();
 
             _getCachedMember = new Func<Tuple<Type, string>, MemberInfo>(tup =>

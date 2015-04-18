@@ -18,9 +18,9 @@ namespace Vexe.Editor.Drawers
 			MemberField(member);
 		}
 
-		public void MemberField(EditorMember dm)
+		public void MemberField(EditorMember member)
 		{
-			gui.Member(dm, false);
+			gui.Member(member, false);
 		}
 
 		public sealed override void OnLeftGUI() { }

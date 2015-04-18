@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using FullSerializer;
-using UnityEngine;
 using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Runtime.Serialization
