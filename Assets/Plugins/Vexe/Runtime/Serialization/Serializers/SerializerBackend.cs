@@ -81,7 +81,7 @@ namespace Vexe.Runtime.Serialization
             if (_getMemberKey == null)
             {
                 _getMemberKey = new Func<RuntimeMember, string>(x =>
-                    string.Format("{0}: {1} {2}", x.MemberType.ToString(), x.TypeNiceName, x.Name)
+                    string.Format("{0}: {1} {2}", x.Info.MemberType.ToString(), x.TypeNiceName, x.Name)
                 ).Memoize();
             }
             return _getMemberKey(member);

@@ -72,7 +72,7 @@ namespace Vexe.Runtime.Types
 					continue;
 				}
 
-				var req = member.Attributes.GetAttribute<RequiredAttribute>();
+				var req = member.Info.GetCustomAttribute<RequiredAttribute>();
 				if (req == null)
 					continue;
 

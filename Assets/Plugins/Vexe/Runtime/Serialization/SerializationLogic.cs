@@ -51,18 +51,18 @@ namespace Vexe.Runtime.Serialization
                 GetSerializableMembers(type, null).ToList()).Memoize();
         }
 
-        public IEnumerable<RuntimeMember> GetSerializableMembers(Type type, object target)
+        public List<RuntimeMember> GetSerializableMembers(Type type, object target)
         {
-            var members = ReflectionUtil.GetCachedMembers(type);
-            var serializable = members.Where(IsSerializableMember);
-            var result = RuntimeMember.Enumerate(serializable, target);
+            var members = ReflectionUtil.CachedGetMembers(type);
+            var serializableMembers = members.Where(IsSerializableMember);
+            var result = RuntimeMember.WrapMembers(serializableMembers, target);
             return result;
         }
 
         public bool IsSerializableMember(RuntimeMember member)
         {
-            var field = (FieldInfo)member;
-            return field != null ? IsSerializableField(field) : IsSerializableProperty((PropertyInfo)member);
+            var field = member.Info as FieldInfo;
+            return field != null ? IsSerializableField(field) : IsSerializableProperty((PropertyInfo)member.Info);
         }
 
         public override bool IsSerializableType(Type type)

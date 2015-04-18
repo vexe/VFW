@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
@@ -14,136 +13,95 @@ namespace Vexe.Runtime.Types
     public class RuntimeMember
     {
 #if DYNAMIC_REFLECTION
-        private readonly MemberSetter<object, object> setter;
-        private readonly MemberGetter<object, object> getter;
+        private MemberSetter<object, object> _setter;
+        private MemberGetter<object, object> _getter;
 #else
-        private readonly Action<object, object> setter;
-        private readonly Func<object, object> getter;
+        private Action<object, object> _setter;
+        private Func<object, object> _getter;
 #endif
-
-        static Attribute[] Empty = new Attribute[0];
-
         public object Target;
-
-        public Type Type { get; protected set; }
-
-        public MemberInfo Info { get; private set; }
-
-        public readonly bool IsStatic;
-
-        public MemberTypes MemberType { get { return Info == null ? MemberTypes.Custom : Info.MemberType; } }
+        public readonly string Name;
+        public readonly string NiceName;
+        public readonly string TypeNiceName;
+        public readonly Type Type;
+        public readonly MemberInfo Info;
 
         public object Value
         {
-            get { return Get(); }
-            set { Set(value); }
-        }
-
-        protected Attribute[] attributes;
-        public Attribute[] Attributes
-        {
-            get { return attributes ?? (attributes = Info == null ? Empty : Info.GetCustomAttributes<Attribute>().ToArray()); }
-        }
-
-        private string typeNiceName;
-        public string TypeNiceName
-        {
-            get { return typeNiceName ?? (typeNiceName = Type.GetNiceName()); }
-        }
-
-        public string Name { get; protected set; }
-
-        private string niceName;
-        public string NiceName
-        {
-            get { return niceName ?? (niceName = Name.Replace("_", "").SplitPascalCase()); }
-        }
-
-        public RuntimeMember(MemberInfo member, object target)
-        {
-            if (member == null) return;
-
-            Name     = member.Name;
-            Info     = member;
-            IsStatic = Info.IsStatic();
-            Target   = target;
-
-            var field = member as FieldInfo;
-            if (field != null)
+            get
             {
-                if (field.IsLiteral)
-                    throw new InvalidOperationException("Can't wrap const fields " + field.Name);
-
-                Type = field.FieldType;
-
-#if DYNAMIC_REFLECTION
-                setter = field.DelegateForSet();
-                getter = field.DelegateForGet();
-#else
-                setter = field.SetValue;
-                getter = field.GetValue;
-#endif
+                return _getter(Target);
             }
-            else
+            set
             {
-                var property = member as PropertyInfo;
-                if (property == null)
-                    throw new InvalidOperationException("MemberInfo {0} is not supported. Only fields and readable properties are".FormatWith(member));
-
-                if (property.IsIndexer())
-                    throw new InvalidOperationException("Can't wrap member {0} because it is an indexer.".FormatWith(member));
-
-                if (!property.CanRead)
-                    throw new InvalidOperationException("Property needs at least a public getter method to be wrapped as a Runtime/EditorMember " + member.Name);
-
-
-                Type = property.PropertyType;
-
-                if (property.CanWrite)
-                {
 #if DYNAMIC_REFLECTION
-                    setter = property.DelegateForSet();
+                _setter(ref Target, value);
 #else
-                    setter = (x, y) => property.SetValue(x, y, null);
-#endif
-                }
-#if DYNAMIC_REFLECTION
-                else setter = delegate(ref object obj, object value) { };
-#else
-                else setter = (x, y) => { };
-#endif
-
-#if DYNAMIC_REFLECTION
-                getter = property.DelegateForGet();
-#else
-                getter = x => property.GetValue(x, null);
+                _setter(Target, value);
 #endif
             }
         }
 
-        public virtual object Get()
+        private RuntimeMember(MemberInfo memberInfo, Type memberType, object memberTarget)
         {
-            return getter(Target);
+            Info = memberInfo;
+            Type = memberType;
+            Target = memberTarget;
+            Name = memberInfo.Name;
+            NiceName = Name.Replace("_", "").SplitPascalCase();
+            TypeNiceName = memberType.GetNiceName();
         }
 
-        public T As<T>() where T : class
+        public static bool TryWrapField(FieldInfo field, object target, out RuntimeMember result)
         {
-            return Get() as T;
-        }
+            if (field.IsLiteral)
+            { 
+                result = null;
+                return false;
+            }
 
-        public void Set(object target, object value)
-        {
-            Target = target;
-            Set(value);
-        }
+            result = new RuntimeMember(field, field.FieldType, target);
 
-        public virtual void Set(object value)
-        {
 #if DYNAMIC_REFLECTION
-            setter(ref Target, value);
+            result._setter = field.DelegateForSet();
+            result._getter = field.DelegateForGet();
 #else
-            setter(Target, value);
+            result._setter = field.SetValue;
+            result._getter = field.GetValue;
 #endif
+            return true;
+        }
+
+        public static bool TryWrapProperty(PropertyInfo property, object target, out RuntimeMember result)
+        {
+            if (!property.CanRead || property.IsIndexer())
+            {
+                result = null;
+                return false;
+            }
+
+            result = new RuntimeMember(property, property.PropertyType, target);
+
+            if (property.CanWrite)
+            {
+#if DYNAMIC_REFLECTION
+                result._setter = property.DelegateForSet();
+#else
+                result._setter = (x, y) => property.SetValue(x, y, null);
+#endif
+            }
+#if DYNAMIC_REFLECTION
+            else result._setter = delegate(ref object obj, object value) { };
+#else
+            else result._setter = (x, y) => { };
+#endif
+
+#if DYNAMIC_REFLECTION
+            result._getter = property.DelegateForGet();
+#else
+            result._getter = x => property.GetValue(x, null);
+#endif
+            return true;
         }
 
         public override string ToString()
@@ -159,73 +117,45 @@ namespace Vexe.Runtime.Types
         public override bool Equals(object obj)
         {
             var member = obj as RuntimeMember;
-            return member != null && member.Info == Info;
+            return member != null && this.Info == member.Info;
         }
 
-        public static explicit operator FieldInfo(RuntimeMember member)
+        public static List<RuntimeMember> WrapMembers(IEnumerable<MemberInfo> members, object target)
         {
-            return member.Info as FieldInfo;
-        }
-
-        public static explicit operator PropertyInfo(RuntimeMember member)
-        {
-            return member.Info as PropertyInfo;
-        }
-
-        /// <summary>
-        /// Returns a lazy enumerable DataMember representation of the specified member infos
-        /// </summary>
-        public static IEnumerable<RuntimeMember> Enumerate(IEnumerable<MemberInfo> members, object target)
-        {
+            var result = new List<RuntimeMember>();
             foreach (var member in members)
             {
                 var field = member as FieldInfo;
                 if (field != null)
                 {
-                    if (field.IsLiteral)
-                        continue;
+                    RuntimeMember wrappedField;
+                    if (RuntimeMember.TryWrapField(field, target, out wrappedField))
+                        result.Add(wrappedField);
                 }
                 else
                 {
-                    var prop = member as PropertyInfo;
-                    if (prop == null || !prop.CanRead || prop.IsIndexer())
+                    var property = member as PropertyInfo;
+                    if (property == null)
                         continue;
+
+                    RuntimeMember wrappedProperty;
+                    if (RuntimeMember.TryWrapProperty(property, target, out wrappedProperty))
+                        result.Add(wrappedProperty);
                 }
-
-                yield return new RuntimeMember(member, target);
             }
+            return result;
         }
 
-        public static IEnumerable<RuntimeMember> Enumerate(Type type, object target, BindingFlags flags)
+        private static Func<Type, List<RuntimeMember>> _cachedWrapMembers;
+        public static List<RuntimeMember> CachedWrapMembers(Type type)
         {
-            Assert.ArgumentNotNull(type, "type");
-            return Enumerate(type.GetMembers(flags), target);
-        }
-
-        public static IEnumerable<RuntimeMember> Enumerate(Type type, object target)
-        {
-            var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-            return Enumerate(type, target, flags);
-        }
-
-        public static IEnumerable<RuntimeMember> Enumerate(Type type)
-        {
-            return Enumerate(type, null);
-        }
-
-        public static IEnumerable<RuntimeMember> Enumerate(object target, BindingFlags flags)
-        {
-            Assert.ArgumentNotNull(target, "target");
-            return Enumerate(target.GetType(), target, flags);
-        }
-
-        private static Func<Type, List<RuntimeMember>> enumerateCached;
-        public static Func<Type, List<RuntimeMember>> EnumerateCached
-        {
-            get {
-                return enumerateCached ?? (enumerateCached = new Func<Type, List<RuntimeMember>>(type =>
-                    RuntimeMember.Enumerate(type).ToList()).Memoize());
-            }
+            if (_cachedWrapMembers == null)
+                _cachedWrapMembers = new Func<Type, List<RuntimeMember>>(x =>
+                {
+                    var members = ReflectionUtil.CachedGetMembers(x);
+                    return RuntimeMember.WrapMembers(members, null);
+                }).Memoize();
+            return _cachedWrapMembers(type);
         }
     }
 }

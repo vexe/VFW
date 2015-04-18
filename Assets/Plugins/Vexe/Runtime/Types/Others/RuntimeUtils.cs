@@ -17,14 +17,13 @@ namespace Vexe.Runtime.Types
             return target.GetHashCode();
         }
 
-
 		public static void ResetTarget(object target)
 		{
 			var type = target.GetType();
 #if DBG
 			Log("Assigning default values if any to " + type.Name);
 #endif
-			var members = RuntimeMember.EnumerateCached(type);
+			var members = RuntimeMember.CachedWrapMembers(type);
 			for (int i = 0; i < members.Count; i++)
 			{
 				var member = members[i];
@@ -35,7 +34,7 @@ namespace Vexe.Runtime.Types
 					var value = defAttr.Value;
 					if (value == null && !member.Type.IsAbstract) // null means to instantiate a new instance
 						value = member.Type.ActivatorInstance();
-					member.Set(value);
+					member.Value = value;
 				}
 			}
 		}
