@@ -2,7 +2,6 @@
 
 using System;
 using System.Reflection;
-//using Fasterflect;
 using Vexe.Editor.GUIs;
 using Vexe.Editor.Types;
 using Vexe.Runtime.Extensions;
@@ -14,9 +13,8 @@ namespace Vexe.Editor.Drawers
 {
 	public class MethodDrawer
 	{
-		private ArgMember[] argMembers;
+		private EditorMember[] argMembers;
 		private MethodCaller<object, object> invoke;
-		private MethodInfo isVisibleInfo;
 		private object[] argValues;
 		private int[] argKeys;
 		private string niceName;
@@ -50,28 +48,27 @@ namespace Vexe.Editor.Drawers
 			int len      = argInfos.Length;
 			argValues    = new object[len];
 			argKeys      = new int[len];
-			argMembers   = new ArgMember[len];
+			argMembers   = new EditorMember[len];
 
 			for (int iLoop = 0; iLoop < len; iLoop++)
 			{
 				int i = iLoop;
 				var argInfo = argInfos[i];
-				var argType = argInfo.ParameterType;
 
-				argKeys[i] = RTHelper.CombineHashCodes(id, argType, argInfo);
+				argKeys[i] = RTHelper.CombineHashCodes(id, argInfo);
 
 				argValues[i] = ValueOrDefault(argInfos[i].ParameterType, argKeys[i]);
 
-				argMembers[i] = new ArgMember(
-						@getter      : () => argValues[i],
-						@setter      : x => argValues[i] = x,
-						@target	     : rawTarget,
-						@unityTarget : unityTarget,
-						@attributes  : argInfo.GetCustomAttributes(true) as Attribute[],
-						@name        : argInfo.Name,
-						@id          : argKeys[i],
-						@dataType    : argType
-					);
+                argMembers[i] = EditorMember.WrapGetSet(
+                        @get         : () => argValues[i],
+                        @set         : x => argValues[i] = x,
+                        @rawTarget   : rawTarget,
+                        @unityTarget : unityTarget,
+                        @attributes  : argInfo.GetCustomAttributes(true) as Attribute[],
+                        @name        : argInfo.Name,
+                        @id          : argKeys[i],
+                        @dataType    : argInfo.ParameterType
+                    );
 			}
 
 #if DBG

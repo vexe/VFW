@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
-using Vexe.Editor.Types;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Types;
@@ -10,49 +10,84 @@ using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Editor.Types
 {
-	public class EditorMember : RuntimeMember
+	public class EditorMember
 	{
+        public object RawTarget;
 		public UnityObject UnityTarget;
-		public int Id;
 
-		public EditorMember(MemberInfo member, object rawTarget, UnityObject unityTarget, int id) : base(member, rawTarget)
+		public readonly int Id;
+        public readonly string Name;
+        public readonly string NiceName;
+        public readonly string TypeNiceName;
+        public readonly Type Type;
+        public readonly MemberInfo Info;
+        public readonly Attribute[] Attributes;
+
+        public object Value
+        {
+            get { return Get(); }
+            set { Set(value); }
+        }
+
+        private Action<object> _set;
+        private Func<object> _get;
+
+        private MemberSetter<object, object> _memberSetter;
+        private MemberGetter<object, object> _memberGetter;
+
+		private IList _list;
+		private int _index;
+
+		private static BetterUndo _undo = new BetterUndo();
+		private double _undoTimer, _undoLastTime;
+        private const double kUndoTick = .5;
+		private SetVarOp<object> _setVar;
+
+        private EditorMember(MemberInfo memberInfo, Type memberType, string memberName, object rawTarget, UnityObject unityTarget, int targetId, Attribute[] attributes)
 		{
-			this.UnityTarget = unityTarget;
-			if (id != -1)
-				this.Id = RTHelper.CombineHashCodes(id, TypeNiceName, NiceName);
-
-			setVar = new SetVarOp<object>();
-			setVar.GetCurrent = () => this.Value;
-			setVar.SetValue = base.Set;
+            Info         = memberInfo;
+            Type         = memberType;
+            RawTarget    = rawTarget;
+            Name         = memberName;
+            NiceName     = Name.Replace("_", "").SplitPascalCase();
+            TypeNiceName = memberType.GetNiceName();
+			UnityTarget  = unityTarget;
+			Id           = RTHelper.CombineHashCodes(targetId, TypeNiceName, NiceName);
+            Attributes   = attributes;
 		}
 
-		protected static BetterUndo undo = new BetterUndo();
-		protected double undoTimer, undoLastTime, undoTick = .5f;
-		protected SetVarOp<object> setVar;
+        public object Get()
+        {
+           return _get();
+        }
 
-		public override void Set(object value)
-		{
-			bool sameValue = value.GenericEqual(this.Value);
+		public void Set(object value)
+        {
+			bool sameValue = value.GenericEqual(Get());
 			if (sameValue)
 				return;
 
-			HandleUndoAndSet(value, base.Set);
+			HandleUndoAndSet(value, _set);
 
 			if (UnityTarget != null)
 				EditorUtility.SetDirty(UnityTarget);
-		}
+        }
 
-		protected void HandleUndoAndSet(object value, Action<object> set)
+        public T As<T>() where T : class
+        {
+            return Get() as T;
+        }
+
+		private void HandleUndoAndSet(object value, Action<object> set)
 		{
-			undoTimer = EditorApplication.timeSinceStartup - undoLastTime;
-			if (undoTimer > undoTick)
+			_undoTimer = EditorApplication.timeSinceStartup - _undoLastTime;
+			if (_undoTimer > kUndoTick)
 			{
-				//Debug.Log("Registered undo");
-				undoTimer = 0f;
-				undoLastTime = EditorApplication.timeSinceStartup;
-				BetterUndo.MakeCurrent(ref undo);
-				setVar.ToValue = value;
-				undo.RegisterThenPerform(setVar);
+				_undoTimer = 0f;
+				_undoLastTime = EditorApplication.timeSinceStartup;
+				BetterUndo.MakeCurrent(ref _undo);
+				_setVar.ToValue = value;
+				_undo.RegisterThenPerform(_setVar);
 			}
 			else set(value);
 
@@ -60,16 +95,113 @@ namespace Vexe.Editor.Types
 				Undo.RecordObject(UnityTarget, "member set");
 		}
 
+        public override string ToString()
+        {
+            return TypeNiceName + " " + Name;
+        }
+
 		public override int GetHashCode()
 		{
-			return Id.GetHashCode();
+			return Id;
 		}
 
 		public override bool Equals(object obj)
 		{
 			var member = obj as EditorMember;
-			return member != null && member.Id == Id;
+			return member != null && this.Id == member.Id;
 		}
+
+        public static EditorMember WrapMember(MemberInfo memberInfo, object rawTarget, UnityObject unityTarget, int id)
+        {
+            var field = memberInfo as FieldInfo;
+            if (field != null)
+            { 
+                if (field.IsLiteral)
+                    throw new InvalidOperationException("Field is const, this is not supported: " + field);
+
+                var result = new EditorMember(field, field.FieldType, field.Name, rawTarget, unityTarget, id, field.GetAttributes());
+                result.InitGetSet(result.GetWrappedMemberValue, result.SetWrappedMemberValue);
+                result._memberGetter = field.DelegateForGet();
+                result._memberSetter = field.DelegateForSet();
+                return result;
+            }
+            else
+            {
+                var property = memberInfo as PropertyInfo;
+
+                if (property == null)
+                    throw new InvalidOperationException("Member " + memberInfo + " is not a field nor property.");
+
+                if (!property.CanRead)
+                    throw new InvalidOperationException("Property doesn't have a getter method: " + property);
+
+                if(property.IsIndexer())
+                    throw new InvalidOperationException("Property is an indexer, this is not supported: " + property);
+
+                var result = new EditorMember(property, property.PropertyType, property.Name, rawTarget, unityTarget, id, property.GetAttributes());
+                result.InitGetSet(result.GetWrappedMemberValue, result.SetWrappedMemberValue);
+
+                result._memberGetter = property.DelegateForGet();
+
+                if (property.CanWrite)
+                    result._memberSetter = property.DelegateForSet();
+                else
+                    result._memberSetter = delegate(ref object obj, object value) { };
+
+                return result;
+            }
+        }
+
+        public static EditorMember WrapGetSet(Func<object> get, Action<object> set, object rawTarget, UnityObject unityTarget, Type dataType, string name, int id, Attribute[] attributes)
+        {
+            var result = new EditorMember(null, dataType, name, rawTarget, unityTarget, id, attributes);
+            result.InitGetSet(get, set);
+            return result;
+        }
+	
+        public static EditorMember WrapIListElement(string elementName, Type elementType, int elementId, Attribute[] attributes)
+        {
+            var result = new EditorMember(null, elementType, elementName, null, null, elementId, attributes);
+            result.InitGetSet(result.GetListElement, result.SetListElement);
+            return result;
+        }
+
+		public void InitializeIList<T>(IList<T> list, int index, object rawTarget, UnityObject unityTarget)
+		{
+			_list = list as IList;
+			_index = index;
+			RawTarget = rawTarget;
+			UnityTarget = unityTarget;
+		}
+
+        private void InitGetSet(Func<object> get, Action<object> set)
+        {
+            _get = get;
+            _set = set;
+            _setVar = new SetVarOp<object>();
+			_setVar.GetCurrent = get;
+			_setVar.SetValue = set;
+        }
+
+		private object GetListElement()
+		{
+			return _list[_index];
+		}
+
+		private void SetListElement(object value)
+		{
+			_list[_index] = value;
+		}
+
+        private object GetWrappedMemberValue()
+        {
+            return _memberGetter(RawTarget);
+        }
+
+        private void SetWrappedMemberValue(object value)
+        {
+            _memberSetter(ref RawTarget, value);
+        }
 	}
 
 	public static class EditorMemberExtensions
@@ -78,81 +210,6 @@ namespace Vexe.Editor.Types
 		{
 			object value;
 			return (member == null || member.Equals(null)) || ((value = member.Value) == null || value.Equals(null));
-		}
-	}
-
-	public class ArgMember : EditorMember
-	{
-		private readonly Func<object> getter;
-		private readonly Action<object> setter;
-
-		public ArgMember(Func<object> getter, Action<object> setter, object target, UnityObject unityTarget, Type dataType, Attribute[] attributes, string name, int id)
-			: base(null, null, unityTarget, -1)
-		{
-			this.getter      = getter;
-			this.setter      = setter;
-			this.Target      = target;
-			this.attributes  = attributes;
-			this.Name        = name;
-			this.Type        = dataType;
-			this.Id			 = RTHelper.CombineHashCodes(id, name);
-
-			setVar.GetCurrent = Get;
-			setVar.SetValue = Set;
-		}
-
-		public override object Get()
-		{
-			return getter();
-		}
-
-		public override void Set(object value)
-		{
-			if (!value.GenericEqual(Get()))
-				HandleUndoAndSet(value, setter);
-		}
-	}
-
-	public class ElementMember<T> : ArgMember
-	{
-		public IList<T> List;
-		public int Index;
-		public bool Readonly;
-
-		public ElementMember(Attribute[] attributes, string name, int id)
-			: base(null, null, null, null, typeof(T), attributes, name, id)
-		{
-			setVar.GetCurrent = Get;
-			setVar.SetValue = x => List[Index] = (T)x;
-		}
-
-		public void Initialize(IList<T> list, int idx, object rawTarget, UnityObject unityTarget)
-		{
-			this.List = list;
-			this.Index = idx;
-			this.Target = rawTarget;
-			this.UnityTarget = unityTarget;
-		}
-
-		public override object Get()
-		{
-			return List[Index];
-		}
-
-		private void SetInternal(object value)
-		{
-			List[Index] = (T)(value);
-		}
-
-		public override void Set(object value)
-		{
-			if (!Readonly && !value.GenericEqual(Get()))
-				HandleUndoAndSet(value, SetInternal);
-		}
-
-		public override string ToString()
-		{
-			return base.ToString() + Index;
 		}
 	}
 }

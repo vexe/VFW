@@ -18,8 +18,8 @@ namespace Vexe.Editor.Drawers
 {
     public class DictionaryDrawer<TD, TK, TV> : ObjectDrawer<TD> where TD : class, IDictionary<TK, TV>, new() where TK : new()
     {
-        private List<ElementMember<TK>> keyElements;
-        private List<ElementMember<TV>> valueElements;
+        private List<EditorMember> keyElements;
+        private List<EditorMember> valueElements;
         private KVPList<TK, TV> kvpList;
         private string dictionaryName;
         private string pairFormatPattern;
@@ -29,7 +29,7 @@ namespace Vexe.Editor.Drawers
         private Color dupKeyColor, shouldWriteColor;
         private bool isKvpList;
 
-        public bool Readonly { get; set; }
+        public bool Readonly;
 
         protected override void OnSingleInitialization()
         {
@@ -62,8 +62,8 @@ namespace Vexe.Editor.Drawers
             if (invalidKeyType)
                 return;
 
-            keyElements   = new List<ElementMember<TK>>();
-            valueElements = new List<ElementMember<TV>>();
+            keyElements   = new List<EditorMember>();
+            valueElements = new List<EditorMember>();
 
             perKeyDrawing   = attributes.AnyIs<PerKeyAttribute>();
             perValueDrawing = attributes.AnyIs<PerValueAttribute>();
@@ -276,16 +276,17 @@ namespace Vexe.Editor.Drawers
             }
         }
 
-        private ElementMember<T> GetElement<T>(List<ElementMember<T>> elements, List<T> source, int index, int id)
+        private EditorMember GetElement<T>(List<EditorMember> elements, List<T> source, int index, int id)
         {
             if (index >= elements.Count)
             {
-                var element = new ElementMember<T>(
-                    @id          : id + index,
-                    @attributes  : attributes,
-                    @name        : string.Empty
+                var element = EditorMember.WrapIListElement(
+                    @elementName : string.Empty,
+                    @elementType : typeof(T),
+                    @elementId   : RTHelper.CombineHashCodes(id, index),
+                    @attributes  : attributes
                 );
-                element.Initialize(source, index, rawTarget, unityTarget);
+                element.InitializeIList(source, index, rawTarget, unityTarget);
                 elements.Add(element);
                 return element;
             }
@@ -293,7 +294,7 @@ namespace Vexe.Editor.Drawers
             try
             {
                 var e = elements[index];
-                e.Initialize(source, index, rawTarget, unityTarget);
+                e.InitializeIList(source, index, rawTarget, unityTarget);
                 return e;
             }
             catch (ArgumentOutOfRangeException)

@@ -17,7 +17,7 @@ namespace Vexe.Editor.Drawers
         protected Attribute[] attributes   { private set; get; }
 
         protected string niceName          { get { return member.NiceName;     } }
-        protected object rawTarget         { get { return member.Target;       } }
+        protected object rawTarget         { get { return member.RawTarget;    } }
         protected UnityObject unityTarget  { get { return member.UnityTarget;  } }
         protected string memberTypeName    { get { return member.TypeNiceName; } }
         protected int id                   { get { return member.Id;           } }

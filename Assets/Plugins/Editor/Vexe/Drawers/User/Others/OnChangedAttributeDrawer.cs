@@ -67,7 +67,7 @@ namespace Vexe.Editor.Drawers
 			{
 				previous = current;
 				onChanged.SafeInvoke(rawTarget, current);
-				setter.SafeInvoke(ref member.Target, current);
+				setter.SafeInvoke(ref member.RawTarget, current);
 			}
 		}
 	}

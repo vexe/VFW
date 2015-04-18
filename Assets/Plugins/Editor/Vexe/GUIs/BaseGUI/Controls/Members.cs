@@ -15,31 +15,31 @@ namespace Vexe.Editor.GUIs
 {
     public abstract partial class BaseGUI
     {
-        public bool Member(MemberInfo minfo, object rawTarget, UnityObject unityTarget, int id, bool ignoreComposition)
+        public bool Member(MemberInfo info, object rawTarget, UnityObject unityTarget, int id, bool ignoreComposition)
         {
             EditorMember member;
-            return Member(minfo, rawTarget, unityTarget, id, ignoreComposition, out member);
+            return Member(info, rawTarget, unityTarget, id, ignoreComposition, out member);
         }
 
-        public bool Member(MemberInfo minfo, object rawTarget, UnityObject unityTarget, int id, bool ignoreComposition, out EditorMember member)
+        public bool Member(MemberInfo member, object rawTarget, UnityObject unityTarget, int id, bool ignoreComposition, out EditorMember wrappedMember)
         {
-            if (minfo.MemberType == MemberTypes.Method)
+            if (member.MemberType == MemberTypes.Method)
             {
-                var method = minfo as MethodInfo;
+                var method = member as MethodInfo;
                 var methodKey = Cache.GetMethodKey(Tuple.Create(id, method));
-                var methodDrawer = MemberDrawersHandler.Instance.GetMethodDrawer(methodKey);
+                var methodDrawer = MemberDrawersHandler.GetMethodDrawer(methodKey);
                 methodDrawer.Initialize(method, rawTarget, unityTarget, methodKey, this);
-                member = null;
+                wrappedMember = null;
                 return methodDrawer.OnGUI();
             }
             else
             {
-                var m = Cache.GetMember(Tuple.Create(minfo, id));
-                m.Target = rawTarget;
-                m.UnityTarget = unityTarget;
-                member = m;
+                var cachedMember = Cache.GetMember(Tuple.Create(member, id));
+                cachedMember.RawTarget = rawTarget;
+                cachedMember.UnityTarget = unityTarget;
+                wrappedMember = cachedMember;
 
-                return Member(m, ignoreComposition);
+                return Member(cachedMember, ignoreComposition);
             }
         }
 
@@ -55,20 +55,17 @@ namespace Vexe.Editor.GUIs
 
         public bool Member(EditorMember member, Attribute[] attributes, bool ignoreComposition)
         {
-            var handler = MemberDrawersHandler.Instance;
-            var memberDrawer = handler.GetMemberDrawer(member, attributes);
+            var memberDrawer = MemberDrawersHandler.GetMemberDrawer(member, attributes);
             memberDrawer.Initialize(member, attributes, this);
             return Member(member, attributes, memberDrawer, ignoreComposition);
         }
 
         public bool Member(EditorMember member, Attribute[] attributes, BaseDrawer memberDrawer, bool ignoreComposition)
         {
-            var handler = MemberDrawersHandler.Instance;
-
             List<BaseDrawer> composites = null;
 
             if (!ignoreComposition)
-                composites = handler.GetCompositeDrawers(member, attributes, this);
+                composites = MemberDrawersHandler.GetCompositeDrawers(member, attributes, this);
 
             #if DBG
             Label(member.Id);
@@ -164,7 +161,14 @@ namespace Vexe.Editor.GUIs
             private static Func<Tuple<int, MethodInfo>, int> _getMethodKey;
             public static Func<Tuple<int, MethodInfo>, int> GetMethodKey
             {
-                get { return _getMethodKey ?? (_getMethodKey = new Func<Tuple<int, MethodInfo>, int>(x => RTHelper.CombineHashCodes(x.Item1, x.Item2)).Memoize()); }
+                get
+                {
+                    //@Note: I expected the hash code for a MethodInfo to be persistent but it turns out I was wrong
+                    //This was leading to the method foldout not being persistent between assembly reloads
+                    //So I went for the method full name as a hash instead
+                    return _getMethodKey ?? (_getMethodKey = new Func<Tuple<int, MethodInfo>, int>(x =>
+                        RTHelper.CombineHashCodes(x.Item1, x.Item2.GetFullName())).Memoize());
+                }
             }
 
             private static Func<Tuple<MemberInfo, int>, EditorMember> _getMember;
@@ -173,7 +177,7 @@ namespace Vexe.Editor.GUIs
                 get
                 {
                     return _getMember ?? (_getMember = new Func<Tuple<MemberInfo, int>, EditorMember>(x =>
-                        new EditorMember(x.Item1, null, null, x.Item2)).Memoize());
+                        EditorMember.WrapMember(x.Item1, null, null, x.Item2)).Memoize());
                 }
             }
         }

@@ -250,12 +250,12 @@ namespace Vexe.Editor.Editors
                                   .FirstOrDefault(m => m.Name == "_serializationData");
             if (field == null) throw new MemberNotFoundException("_serializationData in " + targetType.Name);
 
-            _serializationData = new EditorMember(field, target, target, id);
+            _serializationData = EditorMember.WrapMember(field, target, target, id);
 
             field = targetType.GetField("dbg", Flags.InstanceAnyVisibility);
             if (field == null) throw new MemberNotFoundException("dbg");
 
-            _debug = new EditorMember(field, target, target, id);
+            _debug = EditorMember.WrapMember(field, target, target, id);
 
             OnAfterInitialized();
         }

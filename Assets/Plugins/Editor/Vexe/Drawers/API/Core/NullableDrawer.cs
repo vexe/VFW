@@ -9,15 +9,15 @@ namespace Vexe.Editor.Drawers
 
 		protected override void OnSingleInitialization()
 		{
-			nullableMember = new ArgMember(
-				@getter        : member.Get,
-				@setter        : member.Set,
-				@target        : member.Target,
-				@unityTarget   : unityTarget,
-				@dataType      : typeof(T),
-				@attributes    : attributes,
-				@name          : niceName,
-				@id            : id
+			nullableMember = EditorMember.WrapGetSet(
+				@get          : member.Get,
+				@set          : member.Set,
+				@rawTarget    : member.RawTarget,
+				@unityTarget  : unityTarget,
+				@dataType     : typeof(T),
+				@name         : niceName,
+				@id           : id,
+                @attributes   : attributes
 			);
 		}
 

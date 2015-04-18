@@ -45,18 +45,18 @@ namespace Vexe.Editor.Drawers
 
                 argValues[i] = paramType.GetDefaultValueEmptyIfString();
 
-                var argMember = new ArgMember(
-                        @getter: () => argValues[i],
-                        @setter: x => argValues[i] = x,
-                        @target: argValues,
+                var argMember = EditorMember.WrapGetSet(
+                        @get: () => argValues[i],
+                        @set: x => argValues[i] = x,
+                        @rawTarget: argValues,
                         @unityTarget: unityTarget,
                         @name: string.Format("({0})", paramType.GetNiceName()),
-                        @id: id + i,
-                        @dataType: paramType,
-                        @attributes: null
+                        @attributes: null,
+                        @id: RTHelper.CombineHashCodes(id, i),
+                        @dataType: paramType
                     );
 
-                argMember.Target = rawTarget;
+                argMember.RawTarget = rawTarget;
                 argMembers[i] = argMember;
             }
 
@@ -544,10 +544,10 @@ namespace Vexe.Editor.Drawers
                 int i = iLoop;
                 var paramType = paramTypes[i];
 
-                var argMember = new ArgMember(
-                        @getter: () => argValues[i],
-                        @setter: x => argValues[i] = x,
-                        @target: argValues,
+                var argMember = EditorMember.WrapGetSet(
+                        get: () => argValues[i],
+                        set: x => argValues[i] = x,
+                        rawTarget: argValues,
                         @unityTarget: unityTarget,
                         @name: string.Format("({0})", paramType.GetNiceName()),
                         @id: id + i,

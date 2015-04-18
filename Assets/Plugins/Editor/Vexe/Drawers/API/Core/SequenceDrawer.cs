@@ -19,7 +19,7 @@ namespace Vexe.Editor.Drawers
 		private readonly Type elementType;
 		private string sequenceName;
 		private int advancedKey;
-		private List<ElementMember<TElement>> elements;
+		private List<EditorMember> elements;
 		private SequenceOptions options;
 		private bool perItemDrawing;
 		private bool shouldDrawAddingArea;
@@ -36,7 +36,7 @@ namespace Vexe.Editor.Drawers
 		public SequenceDrawer()
 		{
 			elementType = typeof(TElement);
-			elements    = new List<ElementMember<TElement>>();
+			elements    = new List<EditorMember>();
 		}
 
 		protected override void OnSingleInitialization()
@@ -170,7 +170,7 @@ namespace Vexe.Editor.Drawers
 								using (gui.Vertical())
 								{
 									var element = GetElement(i);
-									gui.Member(element, !perItemDrawing);
+									gui.Member(element, attributes, !perItemDrawing);
 								}
 							}
 
@@ -277,23 +277,24 @@ namespace Vexe.Editor.Drawers
 			}
 		}
 
-		private ElementMember<TElement> GetElement(int index)
+		private EditorMember GetElement(int index)
 		{
 			if (index >= elements.Count)
 			{
-				var element = new ElementMember<TElement>(
+				var element = EditorMember.WrapIListElement(
 					@attributes  : attributes,
-					@name        : string.Empty,
-					@id          : id + index
+					@elementName : string.Empty,
+                    @elementType : typeof(TElement),
+					@elementId   : RTHelper.CombineHashCodes(id, index)
 				);
 
-				element.Initialize(memberValue, index, rawTarget, unityTarget);
+				element.InitializeIList(memberValue, index, rawTarget, unityTarget);
 				elements.Add(element);
 				return element;
 			}
 
 			var e = elements[index];
-			e.Initialize(memberValue, index, rawTarget, unityTarget);
+			e.InitializeIList(memberValue, index, rawTarget, unityTarget);
 			return e;
 		}
 

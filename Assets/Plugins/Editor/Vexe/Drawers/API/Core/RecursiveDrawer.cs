@@ -117,7 +117,7 @@ namespace Vexe.Editor.Drawers
                     MemberInfo member = members[i];
                     EditorMember em;
                     changed |= gui.Member(member, target, unityTarget, id, false, out em);
-                    target = em.Target;
+                    target = em.RawTarget;
                 }
             }
 
