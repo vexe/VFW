@@ -1,33 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEditor;
-using UnityEngine;
 using Vexe.Editor.Drawers;
 using Vexe.Editor.GUIs;
 using Vexe.Editor.Types;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
-using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Editor
 {
-	public class MemberDrawersHandler
+	public static class MemberDrawersHandler
 	{
-		private readonly Type[] objectDrawerTypes;
-		private readonly Type[] attributeDrawerTypes;
-		private readonly Type[] compositeDrawerTypes;
-		private readonly Dictionary<int, List<BaseDrawer>> cachedCompositeDrawers;
-		private readonly Dictionary<int, BaseDrawer> cachedMemberDrawers;
-		private readonly Dictionary<int, MethodDrawer> cachedMethodDrawers;
-		private readonly Type fallbackDrawerType;
+		static readonly Type[] objectDrawerTypes;
+		static readonly Type[] attributeDrawerTypes;
+		static readonly Type[] compositeDrawerTypes;
+		static readonly Dictionary<int, List<BaseDrawer>> cachedCompositeDrawers;
+		static readonly Dictionary<int, BaseDrawer> cachedMemberDrawers;
+		static readonly Dictionary<int, MethodDrawer> cachedMethodDrawers;
+		static readonly Type fallbackDrawerType;
 
 		public static Func<Type, BaseDrawer> GetCachedObjectDrawer;
 
-		public static readonly MemberDrawersHandler Instance = new MemberDrawersHandler();
-
-		public MemberDrawersHandler()
+		static MemberDrawersHandler()
 		{
 			cachedMemberDrawers    = new Dictionary<int, BaseDrawer>();
 			cachedCompositeDrawers = new Dictionary<int, List<BaseDrawer>>();
@@ -56,7 +51,7 @@ namespace Vexe.Editor
                 GetDrawerForType(type, objectDrawerTypes, typeof(ObjectDrawer<>))).Memoize();
 		}
 
-		public List<BaseDrawer> GetCompositeDrawers(EditorMember member, Attribute[] attributes, BaseGUI gui)
+		public static List<BaseDrawer> GetCompositeDrawers(EditorMember member, Attribute[] attributes, BaseGUI gui)
 		{
 			List<BaseDrawer> drawers;
 			if (cachedCompositeDrawers.TryGetValue(member.Id, out drawers))
@@ -85,7 +80,7 @@ namespace Vexe.Editor
 			return drawers;
 		}
 
-		public BaseDrawer GetMemberDrawer(EditorMember member, Attribute[] attributes)
+		public static BaseDrawer GetMemberDrawer(EditorMember member, Attribute[] attributes)
 		{
 			BaseDrawer drawer;
 			if (cachedMemberDrawers.TryGetValue(member.Id, out drawer))
@@ -107,7 +102,7 @@ namespace Vexe.Editor
 			return drawer;
 		}
 
-		public BaseDrawer UpdateMemberDrawer(Type newObjType, Type newDrawerType, int id)
+		public static BaseDrawer UpdateMemberDrawer(Type newObjType, Type newDrawerType, int id)
 		{
 			BaseDrawer drawer;
 			if (cachedMemberDrawers.TryGetValue(id, out drawer))
@@ -120,7 +115,7 @@ namespace Vexe.Editor
 			return drawer;
 		}
 
-		public MethodDrawer GetMethodDrawer(int methodId)
+		public static MethodDrawer GetMethodDrawer(int methodId)
 		{
 			MethodDrawer drawer;
 			if (!cachedMethodDrawers.TryGetValue(methodId, out drawer))
@@ -128,22 +123,22 @@ namespace Vexe.Editor
 			return drawer;
 		}
 
-		public BaseDrawer GetObjectDrawer(Type objectType)
+		public static BaseDrawer GetObjectDrawer(Type objectType)
 		{
 			return GetDrawerForType(objectType, objectDrawerTypes, typeof(ObjectDrawer<>));
 		}
 
-		public BaseDrawer GetCompositeDrawer(Type objectType, Type attributeType)
+		public static BaseDrawer GetCompositeDrawer(Type objectType, Type attributeType)
 		{
 			return GetDrawerForPair(objectType, attributeType, compositeDrawerTypes, typeof(CompositeDrawer<,>));
 		}
 
-		public BaseDrawer GetAttributeDrawer(Type objectType, Type attributeType)
+		public static BaseDrawer GetAttributeDrawer(Type objectType, Type attributeType)
 		{
 			return GetDrawerForPair(objectType, attributeType, attributeDrawerTypes, typeof(AttributeDrawer<,>));
 		}
 
-		private BaseDrawer ResolveDrawerFromTypes(Type objectType, Type drawerType, Type drawerGenArgType)
+		static BaseDrawer ResolveDrawerFromTypes(Type objectType, Type drawerType, Type drawerGenArgType)
 		{
             if (objectType.IsSubTypeOfRawGeneric(typeof(IDictionary<,>)))
             {
@@ -187,7 +182,7 @@ namespace Vexe.Editor
 			return null;
 		}
 
-		private BaseDrawer GetDrawerForType(Type objectType, Type[] typeCache, Type baseDrawerType)
+		static BaseDrawer GetDrawerForType(Type objectType, Type[] typeCache, Type baseDrawerType)
 		{
 			for (int i = 0; i < typeCache.Length; i++)
 			{
@@ -210,7 +205,7 @@ namespace Vexe.Editor
 			return BaseDrawer.Create(fallbackDrawerType);
 		}
 
-		private BaseDrawer GetDrawerForPair(Type objectType, Type attributeType, Type[] typeCache, Type baseDrawerType)
+		static BaseDrawer GetDrawerForPair(Type objectType, Type attributeType, Type[] typeCache, Type baseDrawerType)
 		{
 			for (int i = 0; i < typeCache.Length; i++)
 			{
@@ -243,19 +238,19 @@ namespace Vexe.Editor
 			return null;
 		}
 
-		public void ClearCache()
+		public static void ClearCache()
 		{
 			cachedMemberDrawers.Clear();
 			cachedCompositeDrawers.Clear();
 			cachedMethodDrawers.Clear();
 		}
 
-		private static class MenuItems
+		static class MenuItems
 		{
 			[MenuItem("Tools/Vexe/BetterBehaviour/Clear drawers cache")]
 			public static void ClearCache()
 			{
-				Instance.ClearCache();;
+				MemberDrawersHandler.ClearCache();
 			}
 		}
 	}
