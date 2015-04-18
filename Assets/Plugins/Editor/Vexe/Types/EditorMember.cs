@@ -5,7 +5,6 @@ using System.Reflection;
 using UnityEditor;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
-using Vexe.Runtime.Types;
 using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Editor.Types
@@ -52,7 +51,7 @@ namespace Vexe.Editor.Types
             NiceName     = Name.Replace("_", "").SplitPascalCase();
             TypeNiceName = memberType.GetNiceName();
 			UnityTarget  = unityTarget;
-			Id           = RTHelper.CombineHashCodes(targetId, TypeNiceName, NiceName);
+			Id           = RuntimeHelper.CombineHashCodes(targetId, TypeNiceName, NiceName);
             Attributes   = attributes;
 		}
 

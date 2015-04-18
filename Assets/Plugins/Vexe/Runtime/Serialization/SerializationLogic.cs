@@ -53,7 +53,7 @@ namespace Vexe.Runtime.Serialization
 
         public List<RuntimeMember> GetSerializableMembers(Type type, object target)
         {
-            var members = ReflectionUtil.CachedGetMembers(type);
+            var members = ReflectionHelper.CachedGetMembers(type);
             var serializableMembers = members.Where(IsSerializableMember);
             var result = RuntimeMember.WrapMembers(serializableMembers, target);
             return result;

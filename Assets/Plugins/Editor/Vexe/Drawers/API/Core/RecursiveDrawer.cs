@@ -92,7 +92,7 @@ namespace Vexe.Editor.Drawers
                 for (int i = 0; i < memberNames.Length; i++)
                 {
                     var name = memberNames[i];
-                    var member = ReflectionUtil.GetCachedMember(targetType, name);
+                    var member = ReflectionHelper.GetCachedMember(targetType, name);
                     if (member == null)
                     {
                         LogFormat("RecursiveDrawer: Couldn't find member {0} in {1}", name, targetType.Name);

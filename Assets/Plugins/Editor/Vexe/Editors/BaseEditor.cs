@@ -66,7 +66,7 @@ namespace Vexe.Editor.Editors
 
         protected int id
         {
-            get { return _id != -1 ? _id : (_id = RuntimeUtils.GetTargetID(target)); }
+            get { return _id != -1 ? _id : (_id = RuntimeHelper.GetTargetID(target)); }
         }
 
         protected bool foldout
@@ -236,13 +236,13 @@ namespace Vexe.Editor.Editors
                 c.RemoveEmptyNestedCategories();
             }
 
-            var displayKey = RTHelper.CombineHashCodes(id, "display");
+            var displayKey = RuntimeHelper.CombineHashCodes(id, "display");
             var displayValue = prefs.Ints.ValueOrDefault(displayKey, -1);
             var vfwSettings = VFWSettings.GetInstance();
             _display = displayValue == -1 ? vfwSettings.DefaultDisplay : (MembersDisplay)displayValue;
             prefs.Ints[displayKey] = (int)_display;
 
-            var spacingKey = RTHelper.CombineHashCodes(id, "spacing");
+            var spacingKey = RuntimeHelper.CombineHashCodes(id, "spacing");
             _spacing = prefs.Ints.ValueOrDefault(spacingKey, vfwSettings.DefaultSpacing);
             prefs.Ints[spacingKey] = _spacing;
 
@@ -268,7 +268,7 @@ namespace Vexe.Editor.Editors
 #endif
             if (ShowScriptHeader)
             {
-                var scriptKey = RTHelper.CombineHashCodes(id, "script".GetHashCode());
+                var scriptKey = RuntimeHelper.CombineHashCodes(id, "script".GetHashCode());
                 gui.Space(3f);
                 using (gui.Horizontal(EditorStyles.toolbarButton))
                 {

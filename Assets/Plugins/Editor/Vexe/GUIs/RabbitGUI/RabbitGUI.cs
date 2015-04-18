@@ -95,7 +95,7 @@ namespace Vexe.Editor.GUIs
             //Debug.Log("Playmode changed");
             if (_validRect.HasValue)
             {
-                var key = RTHelper.CombineHashCodes(_id, "rabbit_coords");
+                var key = RuntimeHelper.CombineHashCodes(_id, "rabbit_coords");
                 _prefs.Vector3s[key] = new Vector3(_validRect.Value.x, _validRect.Value.y);
             }
 
@@ -128,7 +128,7 @@ namespace Vexe.Editor.GUIs
 
             if (!_validRect.HasValue)
             {
-                var key = RTHelper.CombineHashCodes(_id, "rabbit_coords");
+                var key = RuntimeHelper.CombineHashCodes(_id, "rabbit_coords");
                 Vector3 prevCoords;
                 if (_prefs.Vector3s.TryGetValue(key, out prevCoords))
                 {

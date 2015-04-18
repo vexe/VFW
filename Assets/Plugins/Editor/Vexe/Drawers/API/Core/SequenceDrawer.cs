@@ -61,7 +61,7 @@ namespace Vexe.Editor.Drawers
 					sequenceName += " (Readonly)";
 			}
 
-			advancedKey          = RTHelper.CombineHashCodes(id, sequenceName, "advanced");
+			advancedKey          = RuntimeHelper.CombineHashCodes(id, sequenceName, "advanced");
 			perItemDrawing       = attributes.AnyIs<PerItemAttribute>();
 			shouldDrawAddingArea = !options.Readonly && elementType.IsA<UnityObject>();
 		}
@@ -285,7 +285,7 @@ namespace Vexe.Editor.Drawers
 					@attributes  : attributes,
 					@elementName : string.Empty,
                     @elementType : typeof(TElement),
-					@elementId   : RTHelper.CombineHashCodes(id, index)
+					@elementId   : RuntimeHelper.CombineHashCodes(id, index)
 				);
 
 				element.InitializeIList(memberValue, index, rawTarget, unityTarget);

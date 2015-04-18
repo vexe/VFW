@@ -167,7 +167,7 @@ namespace Vexe.Editor.GUIs
                     //This was leading to the method foldout not being persistent between assembly reloads
                     //So I went for the method full name as a hash instead
                     return _getMethodKey ?? (_getMethodKey = new Func<Tuple<int, MethodInfo>, int>(x =>
-                        RTHelper.CombineHashCodes(x.Item1, x.Item2.GetFullName())).Memoize());
+                        RuntimeHelper.CombineHashCodes(x.Item1, x.Item2.GetFullName())).Memoize());
                 }
             }
 

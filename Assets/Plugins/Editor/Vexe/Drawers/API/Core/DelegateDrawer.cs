@@ -26,9 +26,9 @@ namespace Vexe.Editor.Drawers
         protected override void OnSingleInitialization()
         {
             adding = new AddingData();
-            kAdvanced = RTHelper.CombineHashCodes(id, "advanced");
-            kAdd = RTHelper.CombineHashCodes(id, "add");
-            kInvoke = RTHelper.CombineHashCodes(id, "invoke");
+            kAdvanced = RuntimeHelper.CombineHashCodes(id, "advanced");
+            kAdd = RuntimeHelper.CombineHashCodes(id, "add");
+            kInvoke = RuntimeHelper.CombineHashCodes(id, "invoke");
             kHeaderStr = string.Format("{0} ({1})", niceName, memberTypeName);
 
             if (memberValue == null)
@@ -52,7 +52,7 @@ namespace Vexe.Editor.Drawers
                         @unityTarget: unityTarget,
                         @name: string.Format("({0})", paramType.GetNiceName()),
                         @attributes: null,
-                        @id: RTHelper.CombineHashCodes(id, i),
+                        @id: RuntimeHelper.CombineHashCodes(id, i),
                         @dataType: paramType
                     );
 
@@ -302,8 +302,8 @@ namespace Vexe.Editor.Drawers
         {
             adding = new AddingData();
 
-            kAdvanced = RTHelper.CombineHashCodes(id, "advanced");
-            kAdd = RTHelper.CombineHashCodes(id, "add");
+            kAdvanced = RuntimeHelper.CombineHashCodes(id, "advanced");
+            kAdd = RuntimeHelper.CombineHashCodes(id, "add");
             kHeaderStr = string.Format("{0} ({1})", niceName, memberTypeName);
 
             if (memberValue == null)
@@ -361,7 +361,7 @@ namespace Vexe.Editor.Drawers
                         var handler = handlers[i];
                         var target = handler.target;
                         var removed = false;
-                        var key = RTHelper.CombineHashCodes(id, "udel", i);
+                        var key = RuntimeHelper.CombineHashCodes(id, "udel", i);
 
                         using (gui.Horizontal())
                         {

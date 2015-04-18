@@ -19,11 +19,11 @@ namespace Vexe.Editor.Drawers
 
 		protected override void OnSingleInitialization()
 		{
-			var iden = RTHelper.CombineHashCodes(id, attribute.GetType());
-			kSource  = RTHelper.CombineHashCodes(iden, "src");
-			kFoldout = RTHelper.CombineHashCodes(iden, "foldout");
-			kTarget  = RTHelper.CombineHashCodes(iden, "target");
-			kMember  = RTHelper.CombineHashCodes(iden, "member");
+			var iden = RuntimeHelper.CombineHashCodes(id, attribute.GetType());
+			kSource  = RuntimeHelper.CombineHashCodes(iden, "src");
+			kFoldout = RuntimeHelper.CombineHashCodes(iden, "foldout");
+			kTarget  = RuntimeHelper.CombineHashCodes(iden, "target");
+			kMember  = RuntimeHelper.CombineHashCodes(iden, "member");
 
 			var srcName = prefs.Strings.ValueOrDefault(kSource);
 			if (!string.IsNullOrEmpty(srcName))

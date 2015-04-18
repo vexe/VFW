@@ -25,7 +25,7 @@ namespace Vexe.Editor.Visibility
 
             GetCachedVisibleMembers = new Func<Type, List<MemberInfo>>(type =>
             {
-                return ReflectionUtil.CachedGetMembers(type)
+                return ReflectionHelper.CachedGetMembers(type)
                                      .Where(IsVisibleMember)
                                      .OrderBy<MemberInfo, float>(GetMemberDisplayOrder)
                                      .ToList();

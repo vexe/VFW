@@ -55,7 +55,7 @@ namespace Vexe.Editor.Drawers
 				int i = iLoop;
 				var argInfo = argInfos[i];
 
-				argKeys[i] = RTHelper.CombineHashCodes(id, argInfo);
+				argKeys[i] = RuntimeHelper.CombineHashCodes(id, argInfo);
 
 				argValues[i] = ValueOrDefault(argInfos[i].ParameterType, argKeys[i]);
 

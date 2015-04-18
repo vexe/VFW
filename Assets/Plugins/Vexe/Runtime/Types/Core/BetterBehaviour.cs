@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Vexe.Runtime.Extensions;
+using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Serialization;
 
 namespace Vexe.Runtime.Types
@@ -94,7 +95,7 @@ namespace Vexe.Runtime.Types
 
         public virtual void Reset()
         {
-            RuntimeUtils.ResetTarget(this);
+            RuntimeHelper.ResetTarget(this);
         }
     }
 }

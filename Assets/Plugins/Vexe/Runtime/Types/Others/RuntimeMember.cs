@@ -152,7 +152,7 @@ namespace Vexe.Runtime.Types
             if (_cachedWrapMembers == null)
                 _cachedWrapMembers = new Func<Type, List<RuntimeMember>>(x =>
                 {
-                    var members = ReflectionUtil.CachedGetMembers(x);
+                    var members = ReflectionHelper.CachedGetMembers(x);
                     return RuntimeMember.WrapMembers(members, null);
                 }).Memoize();
             return _cachedWrapMembers(type);

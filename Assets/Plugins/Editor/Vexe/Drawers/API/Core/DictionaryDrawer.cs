@@ -242,7 +242,7 @@ namespace Vexe.Editor.Drawers
                         #endif
 
                         var pairStr        = FormatPair(dKey, dValue);
-                        var entryKey       = RTHelper.CombineHashCodes(id, i, "entry");
+                        var entryKey       = RuntimeHelper.CombineHashCodes(id, i, "entry");
                         foldouts[entryKey] = gui.Foldout(pairStr, foldouts[entryKey], Layout.sExpandWidth());
 
                         #if PROFILE
@@ -283,7 +283,7 @@ namespace Vexe.Editor.Drawers
                 var element = EditorMember.WrapIListElement(
                     @elementName : string.Empty,
                     @elementType : typeof(T),
-                    @elementId   : RTHelper.CombineHashCodes(id, index),
+                    @elementId   : RuntimeHelper.CombineHashCodes(id, index),
                     @attributes  : attributes
                 );
                 element.InitializeIList(source, index, rawTarget, unityTarget);
@@ -377,7 +377,7 @@ namespace Vexe.Editor.Drawers
                 var value = default(TV); 
                 kvpList.Insert(0, key, value, false);
 
-                var pkey = RTHelper.CombineHashCodes(id, (kvpList.Count - 1), "entry");
+                var pkey = RuntimeHelper.CombineHashCodes(id, (kvpList.Count - 1), "entry");
                 foldouts[pkey] = true;
             }
             catch (ArgumentException e)

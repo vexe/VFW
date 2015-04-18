@@ -136,14 +136,14 @@ namespace Vexe.Editor.Helpers
 						padding = new RectOffset(0, 0, 4, 4),
 						normal = new GUIStyleState
 						{
-							background = RTHelper.GetTexture(61, 128, 223, 255, HideFlags.DontSave),
+							background = RuntimeHelper.GetTexture(61, 128, 223, 255, HideFlags.DontSave),
 							textColor = Color.white
 						}
 					};
 				}
 				else if (selectedStyle.normal.background == null)
 				{
-					selectedStyle.normal.background = RTHelper.GetTexture(61, 128, 223, 255, HideFlags.DontSave);
+					selectedStyle.normal.background = RuntimeHelper.GetTexture(61, 128, 223, 255, HideFlags.DontSave);
 				}
 				return selectedStyle;
 			}
@@ -250,7 +250,7 @@ namespace Vexe.Editor.Helpers
 		public static ColorDuo PinkColorDuo { get { return GetColorDuo(ref pinkColorDuo, "FFADFA", "FFC9FB"); } }
 		private static ColorDuo GetColorDuo(ref ColorDuo cd, string c1, string c2)
 		{
-			if (cd == null) cd = new ColorDuo(RTHelper.HexToColor(c1), RTHelper.HexToColor(c2));
+			if (cd == null) cd = new ColorDuo(RuntimeHelper.HexToColor(c1), RuntimeHelper.HexToColor(c2));
 			return cd;
 		}
 		#endregion
@@ -375,14 +375,14 @@ namespace Vexe.Editor
 			{
 				normal = new GUIStyleState
 				{
-					background = RTHelper.GetTexture(c1, HideFlags.HideAndDontSave)
+					background = RuntimeHelper.GetTexture(c1, HideFlags.HideAndDontSave)
 				}
 			};
 			styles[1] = new GUIStyle(GUIStyle.none)
 			{
 				normal = new GUIStyleState
 				{
-					background = RTHelper.GetTexture(c2, HideFlags.HideAndDontSave)
+					background = RuntimeHelper.GetTexture(c2, HideFlags.HideAndDontSave)
 				}
 			};
 			Reset();
