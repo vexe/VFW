@@ -1,7 +1,26 @@
-# Vexe Framework
-The Vexe Framework (VFW) is both a runtime and editor extension that offers much more advance features than what comes out of the box with Unity. A better drawing API, a faster GUI layout system for editor drawing, a custom serialization system, tons of attributes/drawers, helper types and more. Here's an overview.
+## Vexe Framework (VFW)
 
-###1- A new drawing API that has the following features:
+### What:
+  - VFW is both a runtime and editor extension that offers much more advance features than what comes out of the box with Unity. A better drawing API, a faster GUI layout system for editor drawing, a custom serialization system, tons of attributes/drawers, helper types and more. 
+ 
+### Usage:
+  - Just inherit BetterBehaviour instead of MonoBehaviour and BetterScriptableObject instead of ScriptableObject, and don't forget to add your using statement:
+
+```
+using Vexe.Runtime.Types;
+using etc;
+
+public TestBehaviour|TestObject : BetterBehaviour|BetterScriptableObject
+{
+    public Dictionary<int, GameObject> someDictionary;
+    public uAction someAction;
+    public List<int[]> someList { get; set; }
+}
+```
+
+### Here's bird's eye-view for some of the features:
+
+####1- A new drawing API that has the following features:
 1. You can write drawers for pretty much 'any' System.Type!
 1. Can be applied on any 'member' (method, property or field) You can write a single drawer and apply it on fields or properties! DRY!
 1. The API is strongly typed (uses generics). You get a strong reference to attribute you're writing your drawer for
@@ -17,27 +36,26 @@ The Vexe Framework (VFW) is both a runtime and editor extension that offers much
 1. Custom/shorter attributes to show/hide things: [Show], [Hide]
 1. Focus on writing your drawers' logic without having to write any type-checks/validation to make sure your attributes are applied on the right field/property type. Apply a Popup on a GameObject field, it just gets ignored.
 
-###2- An improved serialization system that has the following features:
-1. Polymorphic serialization (interfaces and abstract/base system objects)
-1. Generic types support. You can go crazy with nesting generics, you can nest types 'infinitely' and things will serialize
-1. Only auto-properties are serialized (properties with side-effects are not serialized - instead, you just serialize the backing field behind it instead. This is done for good reasons - because you could be accessing Unity's API from your property, and that is not allowed when using ISerializationCallback - which I what I used to register my [de]serialization calls).
-1. static fields/auto-properties serialization!
-1. readonly fields serialization!
-1. Structs and Nullables serialization.
-1. Most common collections are supported: arrays (only one dimensional), lists (you could nest lists, depending on your serializer), dictionaries, stacks, queues, etc. (I didn't write a drawer for stack/queue yet... maybe I will make a tutorial of it).
-1. Delegates are not directly serialized, but I wrote a new delegate system designed with simplicity, robustness and predictability in mind. Instead of saying Action<T>/Func<T>, just prefix that with a 'u', so uAction<T>/uFunc<T>
-1. You have custom, shorter attributes for serialization: [Serialize], [DontSerialize]
-1. ScriptableObjects support - Just like you have a BetterBehaviour, you have a BetterScriptableObject. Dealt with pretty much the same (same serialization features, same attributes, etc).
-1. Serialization can be applied to any object, not just Mono/BetterBehaviours.
+####2- An improved serialization system that has the following features:
+1. Polymorphic types (interfaces and abstract/base system objects)
+1. Generic types. (you can go crazy with nesting generics. i.e. Dictionary<int, Dictionary<List<ISomeInterface>>>)
+1. Auto-properties (properties with side-effects are *not* serialized. Instead, you just serialize the backing field behind it)
+1. static fields/auto-properties can be serialized *only* in BetterBehaviours, not in any arbitrary System.Object
+1. readonly fields!
+1. Structs, custom classes and Nullables!
+1. Most common collection types: arrays (one dimensional), List<T>, Dictionary<TK, TV>, Stack<T>, Queue<T> and HashSet<T>
+1. Delegates support with Action/Func-like equivalents: uAction and uFunc (supports up to 4 type arguments)
+1. You can have your own serialization logic with your own attributes! (more on the default serialization logic/attributes shortly)
 
-###3- Helper types:
+
+####3- Helper types:
 1. The generic event system from uFAction.
 1. BetterAnimator (an Animator wrapper that lets you easily modify the animator's floats, bools, ints, etc)
 1. SelectionMemorizer: memorizes your objects selections. Ctrl.Shift.- to go back, Ctrl.Shift.+ to go forward.
 1. BetterUndo: a simple undo system implemented via the command pattern that lets you take direct control of what is it to be done, and how it is to be undone
 1. RabbitGUI: A much faster and cleaner GUI layouting system than Unity's GUILayout/EditorGUILayout with similar API and some extra features.
 
-###4- Most the attributes from previous ShowEmAll, with some improvements/bug-fixes and a bunch of new ones:
+####4- Tons of property attributes:
 1. **Constraints**: *Min*, *Max*, *Regex*, *IP*, *NumericClamp*, *StringClamp*
 1. **Decorates**: *Comment*, *WhiteSpace*
 1. **Enums**: *EnumMask* (one that works! - credits to Bunny83), *SelectEnum* (gives you the ability to right-click an enum to show the values in a selection window - useful for enums with large values)
@@ -51,7 +69,7 @@ The Vexe Framework (VFW) is both a runtime and editor extension that offers much
 1. **Categories**: *DefineCategory*: defines a member category and lets you categorize your behavior members according to custom rules and filters. *Category*: annotate members with this, to include them in a certain category. IgnoreCategories: Ignore (hide) previously defined categories. *BasicView*: displays your behavior in an uncategorized style. *MinimalView*: even more basic than the previous.
 1. **Collections**: *Seq*: lets you customize the way your sequence (array/list) looks. *PerItem*: indicated that you want your composite attributes to be drawn on each element of a sequence (array/list). *PerKey/PerValue*: indicates that you want to apply your custom attributes on each key/value of a dictionary.
 
-###5- Screenshots:
+### Screenshots:
 - [UnityTypes](http://i.imgur.com/O5klA26.png)
 - [ShowType](http://i.imgur.com/WlLhnXn.png)
 - [Sequences](http://i.imgur.com/vtPe4SN.png)
@@ -71,7 +89,7 @@ The Vexe Framework (VFW) is both a runtime and editor extension that offers much
 - [Attributes in EditorWindow](http://i.imgur.com/2b8YOJu.png)
 - [Assignable](http://i.imgur.com/MzIPxVD.png)
 
-###6- Tutorials/Videos (read the video description to see what it covers):
+### Tutorials/Videos (read the video description to see what it covers):
 1. [Intro / API Overview](https://www.youtube.com/watch?v=9AnTNGKjAK0)
 1. [Attributes 1](https://www.youtube.com/watch?v=jsNXBY2VJ6g)
 1. [Attributes 2](https://www.youtube.com/watch?v=y3XJKnOCrcU)
@@ -83,72 +101,55 @@ The Vexe Framework (VFW) is both a runtime and editor extension that offers much
 1. [Full Serializer Integration](https://www.youtube.com/watch?v=7V4vIBBq03g)
 1. [EventSystem & BetterAnimator](https://www.youtube.com/watch?v=c3SJ0vWSIjs)
 
-###7- Known Issues:
+### Known Issues:
 1. Undo isn't 100% perfect still, (although it has been improved in 1.3)
 1. Not everything is documented yet
 1. No multi-object editing support yet
 
-###8- Acknowledgments: 
+### Acknowledgments: 
 1. Please understand that this is a one-man job, I try my best to make everything work, but I can't make everything perfect. I try to do my best isolating my code and writing unit tests for it to make everything's working OK, but a bug or two could easily slip in... If you want to write a program without bugs, then don't write it.
 1. Apologies in advance if you come across a frustrating bug or any inconvenience due to using this framework, if you do, make sure you let met know.
 1. For help, improvements/suggestions, bug reports: you could post here, pm me or email me at askvexe@gmail.com. I will try to reply ASAP and help as best as I can.
 1. I always use the latest version of Unity for development. Before you report an issue, please make sure you're using the latest version too. If the issue is still there, report it.
 
-###9- FAQ: 
-1. **Q**: License? **A**: [MIT](http://choosealicense.com/licenses/mit/).
-1. **Q**: Does this require Unity Pro? **A**: No.
-1. **Q**: Does this support AOT platforms? **A**: Yes. It has been verified to work on iOS. While not manually verified on Android, but it should work.
-1. **Q**: Why free? **A**: 1- Because I believe I can build a base "standard" framework that anyone could use in his own personal projects to benefit from and build upon. The current state in almost all asset developers is that they all come up with 'their' own solutions to the same problems over and over again. This makes it difficult for assets from different publishers to play nice with each other because their backbone is different. For ex say you purchased a property drawers asset that you'd like to use in say, Node Canvas. Well you can't because NC and the drawers asset use a different base for their codes thus making them incompatible. 2- This stuff should be available to us out-of-the-box let alone free... don't let me start uRanting. 3- Open source is beautiful. Everyone could contribute to the improvement of the software, fixing bugs, etc.
-1. **Q**: How are my class members ordered in the inspector? **A**: **(from 1.2.9c onwards)** FieldsThenPropertiesThenMethods. Fields are sorted by their order of declaration, same for properties, and methods. For ex: if you had a class where you define f1, p1, f2, m1, p2 (in that order. where f:field, p:property, m:method) you would see f1, f2, p1, p2, m1 in the inspector. You can use [DisplayOrder(#)] to explicitly define the member order. Note that having all members show up in the order they're declared in is very tricky ([see](https://www.assetstore.unity3d.com/en/#!/content/31442)) (if you know of a simpler way than what was suggested, please let me know).
+### FAQ: 
+1. **License?** 
+  - [MIT](http://choosealicense.com/licenses/mit/).
+1. **Does this require Unity Pro?** 
+  - No
+1. **Does this support AOT platforms?**
+  - Yes. It has been verified to work on iOS. While not manually verified on Android, but it should work.
+1. **Why free?** 
+  1. Because I believe I can build a base "standard" framework that anyone could use in his own personal projects to benefit from and build upon. The current state in almost all asset developers is that they all come up with 'their' own solutions to the same problems over and over again. This makes it difficult for assets from different publishers to play nice with each other because their backbone is different. For ex say you purchased a property drawers asset that you'd like to use in say, Node Canvas. Well you can't because NC and the drawers asset use a different base for their codes thus making them incompatible. 
+  2. This stuff should be available to us out-of-the-box let alone free... don't let me start uRanting. 
+  3. Open source is beautiful. Everyone could contribute to the improvement of the software, fixing bugs, etc.
+1. **How are my class members ordered in the inspector?**      
+  - The order is: fields, properties then methods. Fields are sorted by their order of declaration, same for properties, and methods. For ex: if you had a class where you define f1, p1, f2, m1, p2 (in that order. where f:field, p:property, m:method) you would see f1, f2, p1, p2, m1 in the inspector. You can use [DisplayOrder(#)] to explicitly define the member order. Note that having all members show up in the order they're declared in is very tricky ([see](https://www.assetstore.unity3d.com/en/#!/content/31442)) (if you know of a simpler way than what was suggested, please let me know).
+1. **What *doesn't* the serialization system support?**
+  - The serialization system is meant to serialize types that Unity doesn't support. Serialization of Unity objects is handled by Unity itself. When the serializer comes across a UnityEngine.Object reference, it stores it in a serialized list of Unity objects, and serializes the index of where that storage took place in the list (it's basically a hack). That means, in order to properly serialize Unity objects to Stream, converters/surrogates must be written (Look forward to my FastSave which hopefully will be out soon)
+1. **What are ehe exact serialization rules?**
+  1. Public fields are serialized by default
+  1. Auto-properties with at least a public getter or setter are serialized by default
+  1. Properties with side-effects (have bodies for their getter/setter) are never serialized
+  1. Any non-public field or auto-property marked with [SerializeField] or [Serialize] are serialized
+  1. Public fields/auto-properties are not serialized if marked with [DontSerialize] or [NonSerialized]. Note it's better to use [DontSerialize] because it can be used on Properties unlike [NonSerialized]
+  1. All the previous applies on readonly fields
+  1. For static fields/auto-properties, all the previous is applied if they're in a BetterBehaviour.
+  They might not be serialized in System.Objects depending on the serializer of use. For ex,
+  FullSerializer doesn't support serialization of static fields/auto-properties, but FastSerializer does (will be released soon)
+  1. No need to mark types with any attribute to make them [Serializable] (in fact, it's recommended that you don't mark types with [Serializable], see note below)
+1. **So should I use [Serialize], or [SerializeField]? any reason to prefer one over the other?**
+  - *Short answer:* always use [Serialize]. *Long answer:* Since BetterBehaviour is a MonoBehaviour, that means all the Unity serialization rules still apply. That is, public fields (with serializable types) are serialized by default, non-public fields (with serializable types) are serialized only when annotated with [SerializeField].
+That means, if you do have a public field or non-public marked with [SerializeField], it will be serialized twice! one by Unity, another by Vfw. So it's better to avoid friction with Unity's serialization system by making things only serializable once by Vfw (if you can help it) The way to achieve that for non-public fields is easy, you just don't use [SerializeField] but [Serialize] instead. For public fields, you could either use a public auto-property instead, or make the field readonly (works perfectly well if your field in public only because you want to
+expose it in the inspector, and not modify it from code - my personal favorite approach)
+1. **How to write converters/surrogates to customize serialization for/add support to certain types?**
+  - For FullSerializer, see FS's repo for examples https://github.com/jacobdufault/fullserializer#
+  Also see MethodInfoConverter.cs under Vexe/Runtime/Serialization/Serializers/FullSerializer
+  After you write the converter, make sure to add it in FullSerializerBackend.cs upon initializing it
+1. **How to view the serialize state of a BetterBehaviour?**
+  - Just collapse the script header foldout, from there you'll see the runtime serialization data
+1. **How do you serialize a BetterBehaviour to file?**
+  - *Short answer:* there's no direct support to do this, so don't do it. *Long answer:* Like we mentioned before, serialization of Unity objects is done by storing the object in a serializable list (by Unity) and serializing the index of the storage location. That doesn't play well with saving things to Stream (File for ex) because then the receiving end must have the same list available for deserialization to work, which isn't very practical. This is why the serialization system is mainly meant and designed for persisting data between assembly reloads. That said, you could still try to write the serialization data of a behaviour to file, it will work nicely with non-UnityObject members such as dictionary, list etc but not with UnityObject references.
 
-### 10- Latest version release notes (history file is included in the package)
 
-**-- 1.3 --**
 
-**--Source Control:**
-
-- VFW is now on [github](https://github.com/vexe/VFW)!
-
-**--Editor Fixes:**
-- **(Finally, duh!)** Fixed a RabbitGUI layout issue where the editor disappears when changing playmode. Things should now look persistent, playmode state transitions should be a lot smoother.
-
-**--Delegates:**
-- handler target could now be any System.Object! (still no support for lambdas with captures)
-- handler method is now MethodInfo instead of just a string. which means methods overloads are
-now supported in the editor
-
-**--Serialization:**
-- Updated FullSerializer and included its source code. Which in turn seemed to address most the
-serializaiton issues a lot of users started having after Unity 4.6.3
-- Renamed BetterSerializer to SerializerBackend with the FullSerializer related stuff
-implemented in FullSerializeBackend (as there will soon be a 'FastSerializerBackend' ;)
-
-**--New:**
-- Dynamic reflection system! (included within vRuntime.dll) - you can support me and buy the source code if you're interested (see)
-- Inline support for AudioSource
-- DoubleDrawer to handle drawing System.Double
-- VFWSettings asset for global settings that get applied to newly instantiated behaviours.
-found under Plugins/Editor/Vexe/ScriptableAssets or hit the menu Tools/Vexe/VFWSettings
-- More customization options on how your behaviour looks:
-a) more options in the 'Display' popup when collapsing the script header
-b) a spacing field to change members' indentation
-- MethodInfoConverter, for serializing MethodInfos
-
-**--Removed:**
-- SaveAttribute and DontSaveAttribute. Since they will be used later in FastSave
-- Basic/Full/MinimalViewAttributes. Things are always categorized now, everything is customized
-the in display options now!
-- IgnoreCategoriesAttribute
-- GUICode method in BaseEditor and replaced it with OnGUI. That way you could totally override
-OnGUI. If you want to call 'base', you can just call it...
-- Fasterflect (no need for it, since all I was using it for was its delegate API, which is what my DynamicReflection is for)
-- colorValue from DefaultAttribute
-- vEditor.dll (it was only a couple of files which are now under Plugins/Editor/Vexe/Helpers)
-- Dbg category string constant from Base behaviour classes. Want one? good, let it in your own scripts
-- The plural stuff (Lists of lists) from BetterPrefs
-
-**--Improvements/Modifications:**
-- DictionaryDrawer now works with any IDictionary
-- Seperated visibility attributes/logic from serialization attributes/logic
-- Improved overall undo support. Ctrl-z cover more cases. Also brought back BetterUndo so if
-Ctrl-z doesn't wory, try Alt-Ctrl-u
