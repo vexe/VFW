@@ -151,7 +151,5 @@ expose it in the inspector, and not modify it from code - my personal favorite a
 1. **How do you serialize a BetterBehaviour to file?**
   - *Short answer:* there's no direct support to do this, so don't do it. *Long answer:* Like we mentioned before, serialization of Unity objects is done by storing the object in a serializable list (by Unity) and serializing the index of the storage location. That doesn't play well with saving things to Stream (File for ex) because then the receiving end must have the same list available for deserialization to work, which isn't very practical. This is why the serialization system is mainly meant and designed for persisting data between assembly reloads. That said, you could still try to write the serialization data of a behaviour to file, it will work nicely with non-UnityObject members such as dictionary, list etc but not with UnityObject references.
 
-### Latest version release notes (history file is included in the package)
-
 
 
