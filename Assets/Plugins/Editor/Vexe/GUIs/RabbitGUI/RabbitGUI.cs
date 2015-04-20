@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using System.Reflection;
 using Vexe.Editor.Helpers;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
@@ -59,7 +60,19 @@ namespace Vexe.Editor.GUIs
         //private float _scrollbarOffset;
         //private Rect? _prevRect;
 
-        #if dbg_level_1
+		private static Type editorGUIType;
+		private static MethodInfo gradientFieldMethod;
+
+		static RabbitGUI() {
+			editorGUIType = typeof(EditorGUI);
+			gradientFieldMethod = editorGUIType.GetMethod ("GradientField",
+			                                               BindingFlags.NonPublic | BindingFlags.Static, 
+			                                               null,
+			                                               new Type[] { typeof(GUIContent), typeof(Rect), typeof(Gradient) }, 
+														   null);
+		}
+		
+		#if dbg_level_1
             private bool _pendingResetRequest;
             private bool pendingResetRequest
             {
@@ -494,6 +507,35 @@ namespace Vexe.Editor.GUIs
 				if(value == null)
 					value = new AnimationCurve();
 				return EditorGUI.CurveField(position, content, value);
+			}
+
+			return value;
+		}
+
+		public override Gradient GradientField (GUIContent content, Gradient value, Layout option)
+		{
+			var data = new ControlData (content, Styles.None, option, ControlType.GradientField);
+
+			Rect position;
+			if (CanDrawControl (out position, data))
+			{
+				if(value == null)
+					value = new Gradient();
+//				MethodInfo[] methods = editorGUIType.GetMethods(BindingFlags.NonPublic | BindingFlags.Static);
+//				foreach(var method in methods) {
+//					if(method.Name == "GradientField") {
+//						foreach(var param in method.GetParameters()) {
+//							Debug.Log(param.ParameterType.Name);
+//						}
+//						Debug.Log("Done");
+//					}
+//				}
+				//Debug.Log(gradientFieldMethod);
+				try {
+					return (Gradient)gradientFieldMethod.Invoke(null, new object[] { content, position, value });
+				} catch {
+					return value;
+				}
 			}
 
 			return value;

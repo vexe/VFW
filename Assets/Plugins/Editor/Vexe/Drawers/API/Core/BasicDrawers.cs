@@ -131,6 +131,14 @@ namespace Vexe.Editor.Drawers
 		}
 	}
 
+	public class GradientDrawer : BasicDrawer<Gradient>
+	{
+		protected override Gradient DoField (string text, Gradient value)
+		{
+			return gui.GradientField (text, value);
+		}
+	}
+
     public class UnityObjectDrawer : BasicDrawer<UnityObject>
     {
         public override void OnGUI()

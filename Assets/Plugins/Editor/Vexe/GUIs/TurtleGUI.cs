@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEditor;
 using UnityEngine;
+using System.Reflection;
 using Vexe.Editor.Helpers;
 using UnityObject = UnityEngine.Object;
 
@@ -10,6 +11,8 @@ namespace Vexe.Editor.GUIs
     {
         private static HorizontalBlock horizontal;
         private static VerticalBlock vertical;
+
+		private static MethodInfo gradientFieldMethod;
 
         public override Rect LastRect
         {
@@ -100,6 +103,13 @@ namespace Vexe.Editor.GUIs
 			return EditorGUILayout.CurveField (content, value, option);
 		}
 
+		public override Gradient GradientField (GUIContent content, Gradient value, Layout option)
+		{
+			if (value == null)
+				value = new Gradient ();
+			return (Gradient)gradientFieldMethod.Invoke (null, new object[] { content, value, option });
+		}
+
         protected override void BeginScrollView(ref Vector2 pos, bool alwaysShowHorizontal, bool alwaysShowVertical, GUIStyle horizontalScrollbar, GUIStyle verticalScrollbar, GUIStyle background, Layout option)
         {
             pos = GUILayout.BeginScrollView(pos, alwaysShowHorizontal, alwaysShowVertical, horizontalScrollbar, verticalScrollbar, background, option);
@@ -149,7 +159,9 @@ namespace Vexe.Editor.GUIs
         {
             horizontal = new HorizontalBlock();
             vertical = new VerticalBlock();
-        }
+			Type tyEditorGUILayout = typeof(EditorGUILayout);
+			gradientFieldMethod = tyEditorGUILayout.GetMethod("GradientField", BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { typeof(GUIContent), typeof(Gradient), typeof(GUILayoutOption[]) }, null);
+		}
 
         public TurtleGUI()
         {
