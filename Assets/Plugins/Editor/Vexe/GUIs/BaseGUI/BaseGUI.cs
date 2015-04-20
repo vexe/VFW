@@ -264,7 +264,8 @@ namespace Vexe.Editor.GUIs
 			Bounds,
 			TextArea,
 			ColorField,
-			CurveField
+			CurveField,
+			GradientField
 		}
 	}
 }
