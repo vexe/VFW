@@ -91,6 +91,14 @@ namespace Vexe.Editor.Drawers
         }
     }
 
+	public class Color32Drawer : BasicDrawer<Color32> 
+	{
+		protected override Color32 DoField (string text, Color32 value)
+		{
+			return gui.Color (text, value);
+		}
+	}
+
     public class BoundsDrawer : BasicDrawer<Bounds>
     {
         protected override Bounds DoField(string text, Bounds value)
@@ -114,6 +122,14 @@ namespace Vexe.Editor.Drawers
             return gui.Quaternion(text, value);
         }
     }
+
+	public class AnimationCurveDrawer : BasicDrawer<AnimationCurve> 
+	{
+		protected override AnimationCurve DoField (string text, AnimationCurve value)
+		{
+			return gui.Curve (text, value);
+		}
+	}
 
     public class UnityObjectDrawer : BasicDrawer<UnityObject>
     {

@@ -95,6 +95,11 @@ namespace Vexe.Editor.GUIs
             return EditorGUILayout.RectField(content, value, option);
         }
 
+		public override AnimationCurve Curve (GUIContent content, AnimationCurve value, Layout option)
+		{
+			return EditorGUILayout.CurveField (content, value, option);
+		}
+
         protected override void BeginScrollView(ref Vector2 pos, bool alwaysShowHorizontal, bool alwaysShowVertical, GUIStyle horizontalScrollbar, GUIStyle verticalScrollbar, GUIStyle background, Layout option)
         {
             pos = GUILayout.BeginScrollView(pos, alwaysShowHorizontal, alwaysShowVertical, horizontalScrollbar, verticalScrollbar, background, option);
