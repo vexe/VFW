@@ -115,6 +115,14 @@ namespace Vexe.Editor.Drawers
         }
     }
 
+	public class AnimationCurveDrawer : BasicDrawer<AnimationCurve> 
+	{
+		protected override AnimationCurve DoField (string text, AnimationCurve value)
+		{
+			return gui.Curve (text, value);
+		}
+	}
+
     public class UnityObjectDrawer : BasicDrawer<UnityObject>
     {
         public override void OnGUI()
