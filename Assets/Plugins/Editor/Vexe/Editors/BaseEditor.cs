@@ -305,7 +305,8 @@ namespace Vexe.Editor.Editors
                             if (_display != newValue)
                             {
                                 _display = newValue;
-                                prefs.Ints[id + "display".GetHashCode()] = mask;
+                                var displayKey = RuntimeHelper.CombineHashCodes(id, "display");
+                                prefs.Ints[displayKey] = mask;
                             }
                         }
 
