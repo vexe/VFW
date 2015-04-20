@@ -60,19 +60,10 @@ namespace Vexe.Editor.GUIs
         //private float _scrollbarOffset;
         //private Rect? _prevRect;
 
-		private static Type editorGUIType;
-		private static MethodInfo gradientFieldMethod;
+        static MethodCaller<object, object> _scrollableTextArea;
+        static MethodCaller<object, Gradient> _doGradientField;
 
-		static RabbitGUI() {
-			editorGUIType = typeof(EditorGUI);
-			gradientFieldMethod = editorGUIType.GetMethod ("GradientField",
-			                                               BindingFlags.NonPublic | BindingFlags.Static, 
-			                                               null,
-			                                               new Type[] { typeof(GUIContent), typeof(Rect), typeof(Gradient) }, 
-														   null);
-		}
-		
-		#if dbg_level_1
+#if dbg_level_1
             private bool _pendingResetRequest;
             private bool pendingResetRequest
             {
@@ -87,7 +78,7 @@ namespace Vexe.Editor.GUIs
                     _pendingResetRequest = value;
                 }
             }
-        #else
+#else
         private bool _pendingResetRequest;
         #endif
 
@@ -133,6 +124,28 @@ namespace Vexe.Editor.GUIs
             #if dbg_level_1
                 Debug.Log("Instantiated Rabbit");
             #endif
+        }
+
+        static RabbitGUI()
+        {
+            var editorGUIType = typeof(EditorGUI);
+
+            // ScrollabeTextArea
+            { 
+                var method = editorGUIType.GetMethod("ScrollableTextAreaInternal",
+                    new Type[] { typeof(Rect), typeof(string), typeof(Vector2).MakeByRefType(), typeof(GUIStyle) },
+                    Flags.StaticAnyVisibility);
+
+                _scrollableTextArea = method.DelegateForCall();
+            }
+            // GradientField
+            {
+                var method = editorGUIType.GetMethod("GradientField",
+                    new Type[] { typeof(GUIContent), typeof(Rect), typeof(Gradient) },
+                    Flags.StaticAnyVisibility);
+
+                _doGradientField = method.DelegateForCall<object, Gradient>();
+            }
         }
 
         public override void OnGUI(Action guiCode, Vector2 padding, int targetId)
@@ -512,34 +525,20 @@ namespace Vexe.Editor.GUIs
 			return value;
 		}
 
-		public override Gradient GradientField (GUIContent content, Gradient value, Layout option)
-		{
-			var data = new ControlData (content, Styles.None, option, ControlType.GradientField);
+        public override Gradient GradientField(GUIContent content, Gradient value, Layout option)
+        {
+            var data = new ControlData(content, Styles.None, option, ControlType.GradientField);
 
-			Rect position;
-			if (CanDrawControl (out position, data))
-			{
-				if(value == null)
-					value = new Gradient();
-//				MethodInfo[] methods = editorGUIType.GetMethods(BindingFlags.NonPublic | BindingFlags.Static);
-//				foreach(var method in methods) {
-//					if(method.Name == "GradientField") {
-//						foreach(var param in method.GetParameters()) {
-//							Debug.Log(param.ParameterType.Name);
-//						}
-//						Debug.Log("Done");
-//					}
-//				}
-				//Debug.Log(gradientFieldMethod);
-				try {
-					return (Gradient)gradientFieldMethod.Invoke(null, new object[] { content, position, value });
-				} catch {
-					return value;
-				}
-			}
+            Rect position;
+            if (CanDrawControl(out position, data))
+            {
+                if (value == null)
+                    value = new Gradient();
+                return _doGradientField(null, new object[] { content, position, value });
+            }
 
-			return value;
-		}
+            return value;
+        }
 
         public override void Box(GUIContent content, GUIStyle style, Layout option)
         {
@@ -899,25 +898,6 @@ namespace Vexe.Editor.GUIs
             }
         }
 
-        private static MethodCaller<object, object> _scrollableTextArea;
-        private static MethodCaller<object, object> scrollableTextArea
-        {
-            get
-            {
-                if (_scrollableTextArea == null)
-                {
-                    var type = typeof(EditorGUI);
-                    var method = type.GetMethod("ScrollableTextAreaInternal",
-                        new Type[] { typeof(Rect), typeof(string), typeof(Vector2).MakeByRefType(), typeof(GUIStyle) },
-                        Flags.StaticAnyVisibility);
-
-                    _scrollableTextArea = method.DelegateForCall();
-
-                }
-                return _scrollableTextArea;
-            }
-        }
-
         public override string ScrollableTextArea(string value, ref Vector2 scrollPos, GUIStyle style, Layout option)
         {
             if (option == null)
@@ -933,7 +913,7 @@ namespace Vexe.Editor.GUIs
             if (CanDrawControl(out position, data))
             {
                 var args = new object[] { position, value, scrollPos, style };
-                var newValue = scrollableTextArea.Invoke(null, args) as string;
+                var newValue = _scrollableTextArea.Invoke(null, args) as string;
                 scrollPos = (Vector2)args[2];
                 return newValue;
             }

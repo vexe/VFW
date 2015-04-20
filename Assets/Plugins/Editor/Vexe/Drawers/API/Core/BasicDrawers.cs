@@ -71,7 +71,7 @@ namespace Vexe.Editor.Drawers
     {
         protected override Vector3 DoField(string text, Vector3 value)
         {
-          return gui.Vector3(text, value);
+            return gui.Vector3(text, value);
         }
     }
 
@@ -91,13 +91,13 @@ namespace Vexe.Editor.Drawers
         }
     }
 
-	public class Color32Drawer : BasicDrawer<Color32> 
-	{
-		protected override Color32 DoField (string text, Color32 value)
-		{
-			return gui.Color (text, value);
-		}
-	}
+    public class Color32Drawer : BasicDrawer<Color32>
+    {
+        protected override Color32 DoField(string text, Color32 value)
+        {
+            return gui.Color(text, value);
+        }
+    }
 
     public class BoundsDrawer : BasicDrawer<Bounds>
     {
@@ -123,21 +123,21 @@ namespace Vexe.Editor.Drawers
         }
     }
 
-	public class AnimationCurveDrawer : BasicDrawer<AnimationCurve> 
-	{
-		protected override AnimationCurve DoField (string text, AnimationCurve value)
-		{
-			return gui.Curve (text, value);
-		}
-	}
+    public class AnimationCurveDrawer : BasicDrawer<AnimationCurve>
+    {
+        protected override AnimationCurve DoField(string text, AnimationCurve value)
+        {
+            return gui.Curve(text, value);
+        }
+    }
 
-	public class GradientDrawer : BasicDrawer<Gradient>
-	{
-		protected override Gradient DoField (string text, Gradient value)
-		{
-			return gui.GradientField (text, value);
-		}
-	}
+    public class GradientDrawer : BasicDrawer<Gradient>
+    {
+        protected override Gradient DoField(string text, Gradient value)
+        {
+            return gui.GradientField(text, value);
+        }
+    }
 
     public class UnityObjectDrawer : BasicDrawer<UnityObject>
     {
