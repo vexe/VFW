@@ -76,14 +76,13 @@ namespace Vexe.Runtime.Types.Examples
 				EventManager.Clear<OnTest>();
 		}
 
-		// Of course the events classes could be defined anywhere, not necessarily inside the same MonoBehaviour
-		public class OnPlayerDied : IGameEvent
+		public struct OnPlayerDied
 		{
 			public Transform Player { get; set; }
 			public string CauseOfDeath { get; set; }
 		}
 
-		public class OnTest : IGameEvent
+		public struct OnTest
 		{
 			public int IntValue { get; set; }
 			public float FloatValue { get; set; }
