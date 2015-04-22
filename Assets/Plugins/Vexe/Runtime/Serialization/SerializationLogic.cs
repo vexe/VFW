@@ -16,11 +16,23 @@ namespace Vexe.Runtime.Serialization
         public abstract bool IsSerializableProperty(PropertyInfo property);
         public abstract bool IsSerializableType(Type type);
 
+        public readonly Func<Type, List<RuntimeMember>> CachedGetSerializableMembers;
+
+        public ISerializationLogic()
+        {
+            CachedGetSerializableMembers = new Func<Type, List<RuntimeMember>>(type =>
+                GetSerializableMembers(type, null).ToList()).Memoize();
+        }
+
+        private List<RuntimeMember> GetSerializableMembers(Type type, object target)
+        {
+            var members = ReflectionHelper.CachedGetMembers(type);
+            var serializableMembers = members.Where(IsSerializableMember);
+            var result = RuntimeMember.WrapMembers(serializableMembers, target);
+            return result;
+        }
         public bool IsSerializableMember(MemberInfo member)
         {
-            if (member.MemberType == MemberTypes.Method)
-                return false;
-
             var field = member as FieldInfo;
             if (field != null)
                 return IsSerializableField(field);
@@ -35,39 +47,38 @@ namespace Vexe.Runtime.Serialization
 
     public class VFWSerializationLogic : ISerializationLogic
     {
-        private readonly SerializationAttributes attributes;
+        public readonly SerializationAttributes Attributes;
 
-        public readonly Func<Type, List<RuntimeMember>> GetCachedSerializableMembers;
+        public static readonly SerializationAttributes DefaultAttributes = new SerializationAttributes
+        (
+            new[]
+            {
+                // Note: it's always better to annotate with [Serialize] instead of [SerializeField] (read the FAQ)
+                typeof(SerializeField),
+                typeof(SerializeAttribute),
+            },
 
-        public static readonly VFWSerializationLogic Instance = new VFWSerializationLogic(SerializationAttributes.Default);
+            new[]
+            {
+                // Didn't include NonSerializedAttribute cause it's only applicable to fields
+                typeof(DontSerializeAttribute),
+            },
 
-        public SerializationAttributes Attributes { get { return attributes; } }
+            // We don't need to annotate types with special attributes to serialize them
+            // since we're using serializers that don't require it
+            Type.EmptyTypes
+        );
+
+        public static readonly VFWSerializationLogic Instance = new VFWSerializationLogic(DefaultAttributes);
 
         public VFWSerializationLogic(SerializationAttributes attributes)
         {
-            this.attributes = attributes;
-
-            GetCachedSerializableMembers = new Func<Type, List<RuntimeMember>>(type =>
-                GetSerializableMembers(type, null).ToList()).Memoize();
-        }
-
-        public List<RuntimeMember> GetSerializableMembers(Type type, object target)
-        {
-            var members = ReflectionHelper.CachedGetMembers(type);
-            var serializableMembers = members.Where(IsSerializableMember);
-            var result = RuntimeMember.WrapMembers(serializableMembers, target);
-            return result;
-        }
-
-        public bool IsSerializableMember(RuntimeMember member)
-        {
-            var field = member.Info as FieldInfo;
-            return field != null ? IsSerializableField(field) : IsSerializableProperty((PropertyInfo)member.Info);
+            this.Attributes = attributes;
         }
 
         public override bool IsSerializableType(Type type)
         {
-            if (IsSimpleType(type)
+            if (type.IsPrimitive || type.IsEnum || type == typeof(string)
                 || type.IsA<UnityObject>()
                 || UnityStructs.ContainsValue(type))
                 return true;
@@ -87,18 +98,18 @@ namespace Vexe.Runtime.Serialization
             if (type.IsGenericType)
                 return type.GetGenericArguments().All(IsSerializableType);
 
-            return attributes.SerializableType.IsNullOrEmpty() || attributes.SerializableType.Any(type.IsDefined);
+            return true;
         }
 
         public override bool IsSerializableField(FieldInfo field)
         {
-            if (attributes.DontSerializeMember.Any(field.IsDefined))
+            if (Attributes.DontSerializeMember.Any(field.IsDefined))
                 return false;
 
             if (field.IsLiteral)
                 return false;
 
-            if (!(field.IsPublic || attributes.SerializeMember.Any(field.IsDefined)))
+            if (!(field.IsPublic || Attributes.SerializeMember.Any(field.IsDefined)))
                 return false;
 
             bool serializable = IsSerializableType(field.FieldType);
@@ -107,7 +118,7 @@ namespace Vexe.Runtime.Serialization
 
         public override bool IsSerializableProperty(PropertyInfo property)
         {
-            if (attributes.DontSerializeMember.Any(property.IsDefined))
+            if (Attributes.DontSerializeMember.Any(property.IsDefined))
                 return false;
 
             if (!property.IsAutoProperty())
@@ -115,7 +126,7 @@ namespace Vexe.Runtime.Serialization
 
             if (!(property.GetGetMethod(true).IsPublic ||
                   property.GetSetMethod(true).IsPublic ||
-                  attributes.SerializeMember.Any(property.IsDefined)))
+                  Attributes.SerializeMember.Any(property.IsDefined)))
                 return false;
 
             bool serializable = IsSerializableType(property.PropertyType);
@@ -145,10 +156,4 @@ namespace Vexe.Runtime.Serialization
         {
             typeof(Type)
         };
-
-        private static bool IsSimpleType(Type type)
-        {
-            return type.IsPrimitive || type.IsEnum || type == typeof(string);
-        }
-    }
-}
+    }}

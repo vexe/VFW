@@ -119,7 +119,7 @@ namespace Vexe.Editor.GUIs
             _controls     = new List<GUIControl>();
             _blocks       = new List<GUIBlock>();
             _blockStack   = new Stack<GUIBlock>();
-            _prefs        = BetterPrefs.EditorInstance;
+            _prefs        = BetterPrefs.GetEditorInstance();
 
             #if dbg_level_1
                 Debug.Log("Instantiated Rabbit");

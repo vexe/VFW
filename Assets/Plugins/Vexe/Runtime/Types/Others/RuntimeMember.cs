@@ -104,22 +104,6 @@ namespace Vexe.Runtime.Types
             return true;
         }
 
-        public override string ToString()
-        {
-            return TypeNiceName + " " + Name;
-        }
-
-        public override int GetHashCode()
-        {
-            return Info.GetHashCode();
-        }
-
-        public override bool Equals(object obj)
-        {
-            var member = obj as RuntimeMember;
-            return member != null && this.Info == member.Info;
-        }
-
         public static List<RuntimeMember> WrapMembers(IEnumerable<MemberInfo> members, object target)
         {
             var result = new List<RuntimeMember>();
@@ -156,6 +140,22 @@ namespace Vexe.Runtime.Types
                     return RuntimeMember.WrapMembers(members, null);
                 }).Memoize();
             return _cachedWrapMembers(type);
+        }
+
+        public override string ToString()
+        {
+            return TypeNiceName + " " + Name;
+        }
+
+        public override int GetHashCode()
+        {
+            return Info.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            var member = obj as RuntimeMember;
+            return member != null && this.Info == member.Info;
         }
     }
 }

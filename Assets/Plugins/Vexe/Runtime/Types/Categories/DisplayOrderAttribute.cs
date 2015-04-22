@@ -8,7 +8,7 @@ namespace Vexe.Runtime.Types
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method)]
 	public class DisplayOrderAttribute : Attribute
 	{
-		public readonly float displayOrder;
+		public readonly float DisplayOrder;
 
 		public DisplayOrderAttribute() : this(-1)
 		{
@@ -16,7 +16,7 @@ namespace Vexe.Runtime.Types
 
 		public DisplayOrderAttribute(float displayOrder)
 		{
-			this.displayOrder = displayOrder;
+			this.DisplayOrder = displayOrder;
 		}
 	}
 }

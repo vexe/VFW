@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using UnityEngine;
 using Vexe.Editor.Drawers;
 using Vexe.Editor.GUIs;
 using Vexe.Editor.Types;
@@ -20,7 +21,7 @@ namespace Vexe.Editor
 		static readonly Dictionary<int, MethodDrawer> cachedMethodDrawers;
 		static readonly Type fallbackDrawerType;
 
-		public static Func<Type, BaseDrawer> GetCachedObjectDrawer;
+		public static readonly Func<Type, BaseDrawer> GetCachedObjectDrawer;
 
 		static MemberDrawersHandler()
 		{
@@ -51,7 +52,7 @@ namespace Vexe.Editor
                 GetDrawerForType(type, objectDrawerTypes, typeof(ObjectDrawer<>))).Memoize();
 		}
 
-		public static List<BaseDrawer> GetCompositeDrawers(EditorMember member, Attribute[] attributes, BaseGUI gui)
+		public static List<BaseDrawer> GetCompositeDrawers(EditorMember member, Attribute[] attributes)
 		{
 			List<BaseDrawer> drawers;
 			if (cachedCompositeDrawers.TryGetValue(member.Id, out drawers))
@@ -61,7 +62,7 @@ namespace Vexe.Editor
 
 			var memberType = member.Type;
 
-			// consider composition only if coreOnly was false, and the member type isn't a collection type,
+			// consider composition only if the member type isn't a collection type,
 			// or it is a collection type but it doesn't have any per attribute that signifies drawing per element
 			// (in other words, the composition is applied on the collection itself, and not its elements)
 			var considerComposition = !memberType.IsCollection() || !attributes.AnyDefined<DefinesElementDrawingAttribute>();
@@ -86,32 +87,17 @@ namespace Vexe.Editor
 			if (cachedMemberDrawers.TryGetValue(member.Id, out drawer))
 				return drawer;
 
-			var memberType = member.Type;
-
 			// check attribute drawer first
 			var drawingAttribute = attributes.GetAttribute<DrawnAttribute>();
 			if (drawingAttribute != null)
-				drawer = GetAttributeDrawer(memberType, drawingAttribute.GetType());
+				drawer = GetAttributeDrawer(member.Type, drawingAttribute.GetType());
 
 			// if still null get an object drawer
 			if (drawer == null)
-				drawer = GetObjectDrawer(memberType);
+				drawer = GetObjectDrawer(member.Type);
 
 			cachedMemberDrawers.Add(member.Id, drawer);
-			
-			return drawer;
-		}
 
-		public static BaseDrawer UpdateMemberDrawer(Type newObjType, Type newDrawerType, int id)
-		{
-			BaseDrawer drawer;
-			if (cachedMemberDrawers.TryGetValue(id, out drawer))
-			{
-				if (drawer.GetType() == newDrawerType)
-					return drawer;
-			}
-			drawer = GetObjectDrawer(newObjType);
-			cachedMemberDrawers[id] = drawer;
 			return drawer;
 		}
 

@@ -17,16 +17,16 @@ namespace Vexe.Runtime.Serialization
 
             Logic = VFWSerializationLogic.Instance;
 
-            fsConfig.SerializeAttributes = Logic.Attributes.SerializeMember;
-            fsConfig.IgnoreSerializeAttributes = Logic.Attributes.DontSerializeMember;
+            fsConfig.SerializeAttributes = VFWSerializationLogic.Instance.Attributes.SerializeMember;
+            fsConfig.IgnoreSerializeAttributes = VFWSerializationLogic.Instance.Attributes.DontSerializeMember;
         }
 
-        public override string Serialize(Type type, object graph, object context)
+        public override string Serialize(Type type, object value, object context)
         {
             Serializer.Context.Set(context as List<UnityObject>);
 
             fsData data;
-            var fail = Serializer.TrySerialize(type, graph, out data);
+            var fail = Serializer.TrySerialize(type, value, out data);
             if (fail.Failed) throw new Exception(fail.FormattedMessages);
 
             return fsJsonPrinter.CompressedJson(data);

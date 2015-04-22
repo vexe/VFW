@@ -8,20 +8,15 @@ using Vexe.Runtime.Helpers;
 
 namespace Vexe.Runtime.Types
 {
-	[Serializable]
 	public class KVPList<TKey, TValue> : IDictionary<TKey, TValue>
 	{
-		[SerializeField]
-		protected List<TKey> keys;
+        // Should be just public readonly, but that would not play nice with Unity serialization
+		[SerializeField] private List<TKey> keys;
+		[SerializeField] private List<TValue> values;
 
-		[SerializeField]
-		protected List<TValue> values;
-
-		public List<TKey> Keys { get { return keys; } }
-
-		public List<TValue> Values { get { return values; } }
-
-		public int Count { get { return keys.Count; } }
+        public List<TKey> Keys     { get { return keys;       } }
+        public List<TValue> Values { get { return values;     } }
+		public int Count           { get { return keys.Count; } }
 
 		public KVPList() : this(new List<TKey>(), new List<TValue>())
 		{
@@ -39,18 +34,14 @@ namespace Vexe.Runtime.Types
 			{
 				int index;
 				if (!TryGetIndex(key, out index))
-				{
 					throw new KeyNotFoundException(key.ToString());
-				}
 				return values[index];
 			}
 			set
 			{
 				int index;
 				if (!TryGetIndex(key, out index))
-				{
 					Add(key, value);
-				}
 				else values[index] = value;
 			}
 		}

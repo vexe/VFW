@@ -109,7 +109,7 @@ namespace Vexe.Editor.Drawers
 									result = (targetMember as PropertyInfo).DelegateForGet().Invoke(target);
 								else result = (targetMember as MethodInfo).DelegateForCall().Invoke(target, null);
 
-								if (!memberValue.GenericEqual(result))
+								if (!memberValue.GenericEquals(result))
 									memberValue = result;
 							}
 						}

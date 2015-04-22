@@ -65,7 +65,7 @@ namespace Vexe.Editor.GUIs
             List<BaseDrawer> composites = null;
 
             if (!ignoreComposition)
-                composites = MemberDrawersHandler.GetCompositeDrawers(member, attributes, this);
+                composites = MemberDrawersHandler.GetCompositeDrawers(member, attributes);
 
             #if DBG
             Label(member.Id);

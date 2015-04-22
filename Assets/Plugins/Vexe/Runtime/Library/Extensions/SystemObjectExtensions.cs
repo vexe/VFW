@@ -2,7 +2,7 @@
 {
 	public static class SystemObjectExtensions
 	{
-		public static bool GenericEqual<T>(this T x, T y)
+		public static bool GenericEquals<T>(this T x, T y)
 		{
 			if (typeof(T).IsValueType)
                 return x.Equals(y);

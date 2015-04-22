@@ -1,20 +1,17 @@
-﻿using UnityEngine;
-using Vexe.Runtime.Extensions;
+﻿using Vexe.Runtime.Extensions;
+using Vexe.Runtime.Helpers;
 
 namespace Vexe.Runtime.Types
 {
 	public struct Tuple<T1, T2>
 	{
-		[SerializeField] readonly private T1 _item1;
-		[SerializeField] readonly private T2 _item2;
-
-		public T1 Item1 { get { return _item1; } }
-		public T2 Item2 { get { return _item2; } }
+		[Serialize] public readonly T1 Item1;
+		[Serialize] public readonly T2 Item2;
 
 		public Tuple(T1 item1, T2 item2)
 		{
-			_item1 = item1;
-			_item2 = item2;
+			this.Item1 = item1;
+			this.Item2 = item2;
 		}
 
 		public override string ToString()
@@ -24,22 +21,20 @@ namespace Vexe.Runtime.Types
 
 		public override int GetHashCode()
 		{
-			return Item1.GetHashCode() ^ Item2.GetHashCode();
+			return RuntimeHelper.CombineHashCodes(Item1, Item2);
 		}
 
 		public override bool Equals(object obj)
 		{
 			if (obj == null || obj.GetType() != typeof(Tuple<T1, T2>))
-			{
 				return false;
-			}
-			var tuple = (Tuple<T1, T2>)obj;
-			return this == tuple;
+
+			return (Tuple<T1, T2>)obj == this;
 		}
 
 		public static bool operator ==(Tuple<T1, T2> left, Tuple<T1, T2> right)
 		{
-			return left.Item1.GenericEqual(right.Item1) && left.Item2.GenericEqual(right.Item2);
+			return left.Item1.GenericEquals(right.Item1) && left.Item2.GenericEquals(right.Item2);
 		}
 
 		public static bool operator !=(Tuple<T1, T2> left, Tuple<T1, T2> right)

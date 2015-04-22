@@ -1,12 +1,11 @@
-﻿//#define PROFILE
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using Vexe.Editor.GUIs;
 using Vexe.Runtime.Extensions;
+using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Types;
 using UnityObject = UnityEngine.Object;
 
@@ -14,10 +13,11 @@ namespace Vexe.Editor.Internal
 {
     public class MembersCategory
     {
-        private readonly int id;
-        private readonly BetterPrefs prefs;
-        private MembersDisplay display;
-        private UnityObject prevTarget;
+        private static readonly BetterPrefs _prefs = BetterPrefs.GetEditorInstance();
+
+        private readonly int _id;
+        private CategoryDisplay _display;
+        private UnityObject _prevTarget;
 
         public readonly string FullPath;
         public readonly string Name;
@@ -30,35 +30,30 @@ namespace Vexe.Editor.Internal
         public float DisplayOrder;
         public bool ForceExpand, HideHeader, IsExpanded, Indent, AlwaysHideHeader;
 
-        public MembersDisplay Display
+        public CategoryDisplay Display
         {
-            get { return display; }
+            get { return _display; }
             set
             {
-                if (display != value)
+                if (_display != value)
                 {
-                    display = value;
-                    Members.OfType<MembersCategory>().Foreach(c => c.Display = display);
+                    _display = value;
+                    for (int i = 0; i < NestedCategories.Count; i++)
+                        NestedCategories[i].Display = value;
                 }
             }
         }
 
-        public MembersCategory(string fullPath, List<MemberInfo> members, float displayOrder, int id, BetterPrefs prefs)
+        public MembersCategory(string fullPath, float displayOrder, int id)
         {
-            Members = members;
-            DisplayOrder = displayOrder;
-            this.prefs = prefs;
+            this.DisplayOrder = displayOrder;
             this.FullPath = fullPath;
             this.Name = FullPath.Substring(FullPath.LastIndexOf('/') + 1);
-            this.id = id + fullPath.GetHashCode();
+            this._id = RuntimeHelper.CombineHashCodes(id, fullPath.GetHashCode());
             Indent = true;
 
             NestedCategories = new List<MembersCategory>();
-        }
-
-        public void AddMember(MemberInfo member)
-        {
-            Members.Add(member);
+            Members = new List<MemberInfo>();
         }
 
         public void RemoveEmptyNestedCategories()
@@ -75,12 +70,12 @@ namespace Vexe.Editor.Internal
         private bool DoHeader()
         {
             bool foldout = false;
-            var boxed = (display & MembersDisplay.BoxedHeaders) == MembersDisplay.BoxedHeaders;
+            var boxed = (_display & CategoryDisplay.BoxedHeaders) == CategoryDisplay.BoxedHeaders;
             using (gui.Horizontal(boxed ? Styles.ToolbarButton : GUIStyle.none))
             {
                 gui.Space(10f);
-                foldout = gui.Foldout(Name, prefs.Bools.ValueOrDefault(id, true), Layout.sExpandWidth());
-                prefs.Bools[id] = foldout;
+                foldout = gui.Foldout(Name, _prefs.Bools.ValueOrDefault(_id, true), Layout.sExpandWidth());
+                _prefs.Bools[_id] = foldout;
             }
 
             return foldout;
@@ -98,24 +93,21 @@ namespace Vexe.Editor.Internal
             Indent = !(AlwaysHideHeader || HideHeader);
 
             bool changedTarget;
-            if (target != prevTarget)
+            if (target != _prevTarget)
             {
-                prevTarget = target;
+                _prevTarget = target;
                 changedTarget = true;
             }
             else changedTarget = false;
 
             gui.Space(1f);
 
-            bool showGuiBox   = (Display & MembersDisplay.BoxedMembersArea) > 0;
-            bool memberSplitter = (Display & MembersDisplay.MemberSplitter) > 0;
+            bool showGuiBox   = (Display & CategoryDisplay.BoxedMembersArea) > 0;
+            bool memberSplitter = (Display & CategoryDisplay.MemberSplitter) > 0;
 
             using (gui.Indent(showGuiBox ? EditorStyles.textArea : GUIStyle.none, Indent))
             {
                 gui.Space(5f);
-#if PROFILE
-				Profiler.BeginSample(name + " Members");
-#endif
                 for (int i = 0, imax = Members.Count; i < imax; i++)
                 {
                     var member = Members[i];
@@ -127,7 +119,7 @@ namespace Vexe.Editor.Internal
                     {
                         gui.Space(Spacing);
                         using (gui.Vertical())
-                            gui.Member(member, target, target, id, false);
+                            gui.Member(member, target, target, _id, false);
                     }
 
                     if (memberSplitter && i != imax - 1)
@@ -142,9 +134,9 @@ namespace Vexe.Editor.Internal
 
                     cat.gui = this.gui;
                     cat.HideHeader = this.HideHeader;
-                    cat.display = display;
+                    cat._display = _display;
 
-                    if ((display & MembersDisplay.CategorySplitter) != 0)
+                    if ((_display & CategoryDisplay.CategorySplitter) != 0)
                         gui.Splitter();
 
                     using (gui.Horizontal())
@@ -156,15 +148,12 @@ namespace Vexe.Editor.Internal
                             cat.Draw(target);
                     }
                 }
-#if PROFILE
-				Profiler.EndSample();
-#endif
             }
         }
 
         static Dictionary<MemberInfo, MethodCaller<UnityObject, bool>> _isVisibleCache = new Dictionary<MemberInfo, MethodCaller<UnityObject, bool>>();
 
-        static public bool IsVisible(MemberInfo member, UnityObject target, bool changedTarget)
+        public static bool IsVisible(MemberInfo member, UnityObject target, bool changedTarget)
         {
             MethodCaller<UnityObject, bool> isVisible;
             if (changedTarget || !_isVisibleCache.TryGetValue(member, out isVisible))

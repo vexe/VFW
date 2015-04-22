@@ -5,7 +5,7 @@ using Vexe.Runtime.Serialization;
 
 namespace Vexe.Runtime.Types
 {
-    [DefineCategory("", 0, MemberType = MemberType.All, Exclusive = false, AlwaysHideHeader = true)]
+    [DefineCategory("", 0, MemberType = CategoryMemberType.All, Exclusive = false, AlwaysHideHeader = true)]
     [DefineCategory("Dbg", 3f, Pattern = "^dbg")]
     public abstract class BetterBehaviour : MonoBehaviour, ISerializationCallbackReceiver
     {
@@ -58,7 +58,7 @@ namespace Vexe.Runtime.Types
         #region
         public bool dbg;
 
-        protected void dbgLogFormat(string msg, params object[] args)
+        protected void dLogFormat(string msg, params object[] args)
         {
             if (dbg) LogFormat(msg, args);
         }

@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using Vexe.Runtime.Extensions;
-using System;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -32,23 +30,20 @@ namespace Vexe.Runtime.Types
         const string EditorPrefsPath  = "Assets/Plugins/Editor/Vexe/ScriptableAssets/BetterEditorPrefs.asset";
         const string RuntimePrefsPath = "Assets/Plugins/Vexe/Runtime/ScriptableAssets/BetterPrefs.asset";
 
-        static BetterPrefs _editorInstance;
-        public static BetterPrefs EditorInstance
+        static BetterPrefs editorInstance;
+        public static BetterPrefs GetEditorInstance()
         {
-            get
+            if (editorInstance == null)
             {
-                if (_editorInstance == null)
+                editorInstance = AssetDatabase.LoadAssetAtPath(EditorPrefsPath, typeof(BetterPrefs)) as BetterPrefs;
+                if (editorInstance == null)
                 {
-                    _editorInstance = AssetDatabase.LoadAssetAtPath(EditorPrefsPath, typeof(BetterPrefs)) as BetterPrefs;
-                    if (_editorInstance == null)
-                    {
-                        _editorInstance = ScriptableObject.CreateInstance<BetterPrefs>();
-                        AssetDatabase.CreateAsset(_editorInstance, EditorPrefsPath);
-                        AssetDatabase.ImportAsset(EditorPrefsPath, ImportAssetOptions.ForceUpdate);
-                    }
+                    editorInstance = ScriptableObject.CreateInstance<BetterPrefs>();
+                    AssetDatabase.CreateAsset(editorInstance, EditorPrefsPath);
+                    AssetDatabase.ImportAsset(EditorPrefsPath, ImportAssetOptions.ForceUpdate);
                 }
-                return _editorInstance;
             }
+            return editorInstance;
         }
 
         public static class BetterPrefsMenus

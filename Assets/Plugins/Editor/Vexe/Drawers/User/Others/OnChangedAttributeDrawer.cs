@@ -63,7 +63,7 @@ namespace Vexe.Editor.Drawers
 		public override void OnLowerGUI()
 		{
 			var current = memberValue;
-			if (!current.GenericEqual(previous))
+			if (!current.GenericEquals(previous))
 			{
 				previous = current;
 				onChanged.SafeInvoke(rawTarget, current);

@@ -185,7 +185,7 @@ namespace Vexe.Editor.Drawers
 									int occurances = 0;
 									for (int k = 0; k < memberValue.Count; k++)
 									{
-										if (memberValue[i].GenericEqual(memberValue[k]))
+										if (memberValue[i].GenericEquals(memberValue[k]))
 										{
 											occurances++;
 											if (occurances > 1)
@@ -326,7 +326,7 @@ namespace Vexe.Editor.Drawers
 
 		private void SetAt(int index, TElement value)
 		{
-			if (!memberValue[index].GenericEqual(value))
+			if (!memberValue[index].GenericEquals(value))
 				memberValue[index] = value;
 		}
 

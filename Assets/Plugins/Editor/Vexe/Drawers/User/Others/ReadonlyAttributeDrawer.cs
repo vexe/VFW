@@ -21,7 +21,7 @@ namespace Vexe.Editor.Drawers
             if (!Application.isPlaying && attribute.AssignAtEditTime)
                 return;
 
-            if (!memberValue.GenericEqual(previous))
+            if (!memberValue.GenericEquals(previous))
                 memberValue = previous;
         }
     }

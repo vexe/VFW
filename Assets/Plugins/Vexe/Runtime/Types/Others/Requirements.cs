@@ -53,7 +53,7 @@ namespace Vexe.Runtime.Types
 			Debug.Log("resovling " + target);
 #endif
 
-			var members = VFWSerializationLogic.Instance.GetCachedSerializableMembers(target.GetType());
+			var members = VFWSerializationLogic.Instance.CachedGetSerializableMembers(target.GetType());
 			for (int i = 0; i < members.Count; i++)
 			{
 				var member = members[i];
@@ -256,7 +256,7 @@ namespace Vexe.Runtime.Types
 
 			static void ResolveTick()
 			{
-				if (!BetterPrefs.EditorInstance.Bools.ValueOrDefault(kReqAuto))
+				if (!BetterPrefs.GetEditorInstance().Bools.ValueOrDefault(kReqAuto))
 					return;
 
 				if (EditorApplication.timeSinceStartup > nextTime)
@@ -279,13 +279,13 @@ namespace Vexe.Runtime.Types
 				[MenuItem("Tools/Vexe/Requirements/Manual")]
 				public static void Manual()
 				{
-					BetterPrefs.EditorInstance.Bools[kReqAuto] = false;
+					BetterPrefs.GetEditorInstance().Bools[kReqAuto] = false;
 				}
 
 				[MenuItem("Tools/Vexe/Requirements/Automatic")]
 				public static void Automatic()
 				{
-					BetterPrefs.EditorInstance.Bools[kReqAuto] = true;
+					BetterPrefs.GetEditorInstance().Bools[kReqAuto] = true;
 				}
 			}
 		}

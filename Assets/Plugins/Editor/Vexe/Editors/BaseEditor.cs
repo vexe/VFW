@@ -28,19 +28,25 @@ namespace Vexe.Editor.Editors
         /// </summary>
         public bool ShowScriptHeader = true;
 
+        protected int id;
+
         protected BaseGUI gui;
 
-        private int _id = -1;
-        private Type _targetType;
-        private static Foldouts _foldouts;
+        protected Type targetType;
+
+        protected GameObject gameObject;
+
+        protected static BetterPrefs prefs;
+
+        protected static Foldouts foldouts;
 
         private List<MembersCategory> _categories;
         private List<MemberInfo> _visibleMembers;
         private SerializedProperty _script;
         private EditorMember _serializationData, _debug;
-        private bool _previousGUI;
+        private bool _useUnityGUI;
         private int _repaintCount, _spacing;
-        private MembersDisplay _display;
+        private CategoryDisplay _display;
         private Action _onGUIFunction;
         static int guiKey = "UnityGUI".GetHashCode();
 
@@ -50,45 +56,27 @@ namespace Vexe.Editor.Editors
             set { prefs.Bools[guiKey] = value; }
         }
 
-        protected GameObject gameObject
-        {
-            get
-            {
-                var comp = target as Component;
-                return comp == null ? null : comp.gameObject;
-            }
-        }
-
-        protected static BetterPrefs prefs
-        {
-            get { return BetterPrefs.EditorInstance; }
-        }
-
-        protected int id
-        {
-            get { return _id != -1 ? _id : (_id = RuntimeHelper.GetTargetID(target)); }
-        }
-
         protected bool foldout
         {
             get { return foldouts[id]; }
             set { foldouts[id] = value; }
         }
 
-        protected static Foldouts foldouts
-        {
-            get { return _foldouts ?? (_foldouts = new Foldouts(prefs)); }
-        }
-
-        protected Type targetType
-        {
-            get { return _targetType ?? (_targetType = target.GetType()); }
-        }
-
         private void OnEnable()
         {
-            _previousGUI = useUnityGUI;
-            gui = _previousGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI();
+            if (prefs == null)
+                prefs = BetterPrefs.GetEditorInstance();
+
+            if (foldouts == null)
+                foldouts = new Foldouts(prefs);
+
+            var component = target as Component;
+            gameObject = component == null ? null : component.gameObject;
+            targetType = target.GetType();
+            id = RuntimeHelper.GetTargetID(target);
+
+            _useUnityGUI = useUnityGUI;
+            gui = _useUnityGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI();
 
             Initialize();
 
@@ -112,19 +100,23 @@ namespace Vexe.Editor.Editors
 
         public sealed override void OnInspectorGUI()
         {
-            if (_previousGUI != useUnityGUI)
+            // update gui instance if it ever changes
+            if (_useUnityGUI != useUnityGUI)
             {
-                _previousGUI = useUnityGUI;
-                gui = _previousGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI();
+                _useUnityGUI = useUnityGUI;
+                gui = _useUnityGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI();
             }
 
-            if (_onGUIFunction == null) // creating the delegate once, reducing allocation
+            // creating the delegate once, reducing allocation
+            if (_onGUIFunction == null)
                 _onGUIFunction = OnGUI;
 
+            // I found 25 to be a good padding value such that there's not a whole lot of empty space wasted
+            // and the vertical inspector scrollbar doesn't obstruct our controls
             gui.OnGUI(_onGUIFunction, new Vector2(0f, 25f), id);
 
             // addresses somes cases of editor slugishness when selecting gameObjects
-            if (_repaintCount < 2)
+            if (_repaintCount < 3)
             {
                 _repaintCount++;
                 Repaint();
@@ -141,22 +133,28 @@ namespace Vexe.Editor.Editors
             Debug.Log(msg);
         }
 
+        /// <summary>
+        /// Called before internal initialization happens (we're just about to fetch and assign members to their corresponding categories etc)
+        /// </summary>
         protected virtual void OnBeforeInitialized() { }
+
+        /// <summary>
+        /// Called after internal initialization is finished (we're done assigning members and allocating categories)
+        /// </summary>
         protected virtual void OnAfterInitialized() { }
 
+        /// <summary>
+        /// Fetches visible members in the inspected target object and assigns them to their corresponding categories
+        /// </summary>
         private void Initialize()
         {
             OnBeforeInitialized();
 
-            // Init members
+            // fetch visibe members
             _visibleMembers = VFWVisibilityLogic.GetCachedVisibleMembers.Invoke(targetType).ToList();
 
+            // allocate categories
             _categories = new List<MembersCategory>();
-
-            Func<string, float,  MembersCategory> newCategory = (path, order) =>
-                new MembersCategory(path, new List<MemberInfo>(), order, id, prefs);
-
-            var resolver = new MembersResolution();
 
             var multiple	= targetType.GetCustomAttribute<DefineCategoriesAttribute>(true);
             var definitions = targetType.GetCustomAttributes<DefineCategoryAttribute>(true);
@@ -185,10 +183,11 @@ namespace Vexe.Editor.Editors
             Func<MemberInfo, float> getDisplayOrder = member =>
             {
                 var attr = member.GetCustomAttribute<DisplayOrderAttribute>();
-                return attr == null ? -1 : attr.displayOrder;
+                return attr == null ? -1 : attr.DisplayOrder;
             };
 
             // Parse paths and resolve definitions
+            var resolver = new CategoryDefinitionResolver();
             var lookup = new Dictionary<string, MembersCategory>();
             foreach (var x in defs)
             {
@@ -199,27 +198,27 @@ namespace Vexe.Editor.Editors
 
                 for (int i = 0; i < paths.Length; i++)
                 {
-                    var p = paths[i];
+                    var path = paths[i];
 
-                    var current = (parent == null ?
-                        _categories : parent.NestedCategories).FirstOrDefault(c => c.FullPath == p);
+                    var current = (parent == null ?  _categories :
+                        parent.NestedCategories).FirstOrDefault(c => c.FullPath == path);
 
                     if (current == null)
                     {
-                        current = newCategory(p, d.DisplayOrder);
+                        current = new MembersCategory(path, d.DisplayOrder, id);
                         if (i == 0)
                             _categories.Add(current);
                         if (parent != null)
                             parent.NestedCategories.Add(current);
                     }
-                    lookup[p] = current;
+                    lookup[path] = current;
                     parent = current;
                 }
 
                 var last = lookup[paths.Last()];
                 last.ForceExpand = d.ForceExpand;
                 last.AlwaysHideHeader = d.AlwaysHideHeader;
-                resolver.Resolve(_visibleMembers, d).Foreach(last.AddMember);
+                resolver.Resolve(_visibleMembers, d).Foreach(last.Members.Add);
 
                 lookup.Clear();
                 parent.Members = parent.Members.OrderBy(getDisplayOrder).ToList();
@@ -239,7 +238,7 @@ namespace Vexe.Editor.Editors
             var displayKey = RuntimeHelper.CombineHashCodes(id, "display");
             var displayValue = prefs.Ints.ValueOrDefault(displayKey, -1);
             var vfwSettings = VFWSettings.GetInstance();
-            _display = displayValue == -1 ? vfwSettings.DefaultDisplay : (MembersDisplay)displayValue;
+            _display = displayValue == -1 ? vfwSettings.DefaultDisplay : (CategoryDisplay)displayValue;
             prefs.Ints[displayKey] = (int)_display;
 
             var spacingKey = RuntimeHelper.CombineHashCodes(id, "spacing");
@@ -248,12 +247,14 @@ namespace Vexe.Editor.Editors
 
             var field = targetType.GetAllMembers(typeof(MonoBehaviour), Flags.InstancePrivate)
                                   .FirstOrDefault(m => m.Name == "_serializationData");
-            if (field == null) throw new MemberNotFoundException("_serializationData in " + targetType.Name);
+            if (field == null)
+                throw new MemberNotFoundException("_serializationData in " + targetType.Name);
 
             _serializationData = EditorMember.WrapMember(field, target, target, id);
 
             field = targetType.GetField("dbg", Flags.InstanceAnyVisibility);
-            if (field == null) throw new MemberNotFoundException("dbg");
+            if (field == null)
+                throw new MemberNotFoundException("dbg in " + targetType.Name);
 
             _debug = EditorMember.WrapMember(field, target, target, id);
 
@@ -262,10 +263,6 @@ namespace Vexe.Editor.Editors
 
         protected virtual void OnGUI()
         {
-#if PROFILE
-            Profiler.BeginSample(targetType.Name + " OnInspectorGUI");
-            Profiler.BeginSample(targetType.Name + " Header");
-#endif
             if (ShowScriptHeader)
             {
                 var scriptKey = RuntimeHelper.CombineHashCodes(id, "script".GetHashCode());
@@ -301,7 +298,7 @@ namespace Vexe.Editor.Editors
 
                         var mask = gui.BunnyMask("Display", _display);
                         {
-                            var newValue = (MembersDisplay)mask;
+                            var newValue = (CategoryDisplay)mask;
                             if (_display != newValue)
                             {
                                 _display = newValue;
@@ -323,15 +320,7 @@ namespace Vexe.Editor.Editors
                 }
             }
 
-#if PROFILE
-            Profiler.EndSample();
-#endif
-
             gui.BeginCheck();
-
-#if PROFILE
-            Profiler.BeginSample(targetType.Name + " Members");
-#endif
 
             for (int i = 0; i < _categories.Count; i++)
             {
@@ -339,25 +328,14 @@ namespace Vexe.Editor.Editors
                 cat.Display = _display;
                 cat.Spacing = _spacing;
                 cat.gui = gui;
-                cat.HideHeader = (_display & MembersDisplay.Headers) != MembersDisplay.Headers;
-                if ((_display & MembersDisplay.CategorySplitter) != 0)
+                cat.HideHeader = (_display & CategoryDisplay.Headers) == 0;
+                if ((_display & CategoryDisplay.CategorySplitter) != 0)
                     gui.Splitter();
                 cat.Draw(target);
             }
 
-#if PROFILE
-            Profiler.EndSample();
-#endif
-
             if (gui.HasChanged())
-            {
-                //Log("setting dirty " + target);
                 EditorUtility.SetDirty(target);
-            }
-
-#if PROFILE
-            Profiler.EndSample();
-#endif
         }
 
         private bool ScriptField()
@@ -386,13 +364,13 @@ namespace Vexe.Editor.Editors
             [MenuItem("Tools/Vexe/GUI/UseUnityGUI")]
             public static void UseUnityGUI()
             {
-                BetterPrefs.EditorInstance.Bools[guiKey] = true;
+                BetterPrefs.GetEditorInstance().Bools[guiKey] = true;
             }
 
             [MenuItem("Tools/Vexe/GUI/UseRabbitGUI")]
             public static void UseRabbitGUI()
             {
-                BetterPrefs.EditorInstance.Bools[guiKey] = false;
+                BetterPrefs.GetEditorInstance().Bools[guiKey] = false;
             }
         }
     }

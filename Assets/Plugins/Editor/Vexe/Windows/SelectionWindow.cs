@@ -175,7 +175,7 @@ namespace Vexe.Editor.Windows
 		{
 			// Default value
 			{
-				var isDefault = defaultValue.GenericEqual(getCurrent());
+				var isDefault = defaultValue.GenericEquals(getCurrent());
 				using (gui.ColorBlock(GUIHelper.RedColorDuo.FirstColor))
 				{
 					OnValueGUI(defaultValue,
@@ -199,7 +199,7 @@ namespace Vexe.Editor.Windows
 			for (int i = 0; i < filteredValues.Count; i++)
 			{
 				var value      = filteredValues[i];
-				var isSelected = value.GenericEqual(getCurrent());
+				var isSelected = value.GenericEquals(getCurrent());
 				var nextStyle  = getStyleDuo(value).NextStyle;
 
 				OnValueGUI(value, getValueName(value), width, isSelected, nextStyle,

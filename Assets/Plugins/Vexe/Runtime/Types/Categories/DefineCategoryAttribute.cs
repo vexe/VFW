@@ -12,7 +12,7 @@ namespace Vexe.Runtime.Types
 		/// Allows you to include members by their MemberType i.e. Field, Property, Method or All
 		/// You can 'or' (add) multiple member types together ex MemberType.Field | MemberType.Property
 		/// </summary>
-		public MemberType MemberType { get; set; }
+		public CategoryMemberType MemberType { get; set; }
 
 		/// <summary>
 		/// Allows you to include members whose name matches this regex pattern
@@ -75,20 +75,5 @@ namespace Vexe.Runtime.Types
 			: this(name, -1, explicitMembers)
 		{
 		}
-	}
-
-	[Flags]
-	public enum MemberType { None = 0, Field = 4, Method = 8, Property = 16, All = 28 }
-
-	[Flags]
-	public enum MembersDisplay
-	{
-	   MemberSplitter = 1 << 0, // split line between members
-	   CategorySplitter = 1 << 1, // split line between categories
-	   BoxedMembersArea = 1 << 2,	// a gui box wrapping categories
-	   Headers = 1 << 3,	 // show category header?
-	   BoxedHeaders = 1 << 4, // show headers in a gui box
-	};
-
-	public enum SetOp { Intersection, Union }
+    }
 }

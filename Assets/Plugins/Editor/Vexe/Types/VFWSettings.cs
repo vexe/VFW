@@ -6,7 +6,7 @@ namespace Vexe.Editor.Types
     public class VFWSettings : BetterScriptableObject
     {
         [EnumMask, Comment("These are the default settings that will be applied to newly instantiated BetterBehaviours and BetterScriptableObjects")]
-        public MembersDisplay DefaultDisplay = MembersDisplay.BoxedMembersArea;
+        public CategoryDisplay DefaultDisplay = CategoryDisplay.BoxedMembersArea;
         public int DefaultSpacing = 10;
 
         private const string SettingsPath = "Assets/Plugins/Editor/Vexe/ScriptableAssets/VFWSettings.asset";

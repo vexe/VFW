@@ -24,8 +24,8 @@ namespace Vexe.Editor.Drawers
         protected Type memberType          { get { return member.Type;         } }
         protected Type targetType          { get { return rawTarget.GetType(); } }
 
-        protected static BetterPrefs prefs { get { return BetterPrefs.EditorInstance; } }
-        protected static Foldouts foldouts { private set; get; }
+        protected static BetterPrefs prefs;
+        protected static Foldouts foldouts;
 
         private bool initialized;
 
@@ -44,9 +44,12 @@ namespace Vexe.Editor.Drawers
             }
         }
 
-        static BaseDrawer()
+        public BaseDrawer()
         {
-            foldouts = new Foldouts(prefs);
+            if (prefs == null)
+                prefs = BetterPrefs.GetEditorInstance();
+            if (foldouts == null)
+                foldouts = new Foldouts(prefs);
         }
 
         public BaseDrawer Initialize(EditorMember member, Attribute[] attributes, BaseGUI gui)

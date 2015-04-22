@@ -7,11 +7,10 @@ namespace Vexe.Runtime.Serialization
 {
     public abstract class SerializerBackend
     {
-        public VFWSerializationLogic Logic;
 
         public void SerializeTargetIntoData(object target, SerializationData data)
         {
-            var members = Logic.GetCachedSerializableMembers(target.GetType());
+            var members = Logic.CachedGetSerializableMembers(target.GetType());
             for (int i = 0; i < members.Count; i++)
             {
                 var member    = members[i];
@@ -29,15 +28,16 @@ namespace Vexe.Runtime.Serialization
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("Error serializing member {0} ({1}) in {2}: {3}. Stacktrace: {4}"
-                         .FormatWith(member.Name, member.Type.GetNiceName(), target, e.Message, e.StackTrace));
+                    Debug.LogError("Error serializing member " + member.Name +
+                        " (" + member.Type.Name + ") in " +
+                        target.GetType().Name + " Stacktrace: " + e.StackTrace);
                 }
             }
         }
 
         public void DeserializeDataIntoTarget(object target, SerializationData data)
         {
-            var members = Logic.GetCachedSerializableMembers(target.GetType());
+            var members = Logic.CachedGetSerializableMembers(target.GetType());
             for(int i = 0; i < members.Count; i++)
             {
                 var member    = members[i];
@@ -55,36 +55,38 @@ namespace Vexe.Runtime.Serialization
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("Error deserializing member {0} ({1}) in {2}: {3}. Stacktrace: {4}"
-                         .FormatWith(member.Name, member.Type.GetNiceName(), target, e.Message, e.StackTrace));
+                    Debug.LogError("Error deserializing member " + member.Name +
+                        " (" + member.Type.Name + ") in " +
+                        target.GetType().Name + " Stacktrace: " + e.StackTrace);
                 }
             }
         }
 
-        private Func<RuntimeMember, string> _getMemberKey;
-        private string GetMemberKey(RuntimeMember member)
+        private static Func<RuntimeMember, string> cachedGetMemberKey;
+        private static string GetMemberKey(RuntimeMember member)
         {
-            if (_getMemberKey == null)
+            if (cachedGetMemberKey == null)
             {
-                _getMemberKey = new Func<RuntimeMember, string>(x =>
-                    string.Format("{0}: {1} {2}", x.Info.MemberType.ToString(), x.TypeNiceName, x.Name)
+                cachedGetMemberKey = new Func<RuntimeMember, string>(x =>
+                    "{0}: {1} {2}".FormatWith(x.Info.MemberType.ToString(), x.TypeNiceName, x.Name)
                 ).Memoize();
             }
-            return _getMemberKey(member);
+            return cachedGetMemberKey(member);
         }
 
-        public abstract string Serialize(Type type, object graph, object context);
+        public abstract string Serialize(Type type, object value, object context);
 
-        public string Serialize(object graph, object context)
+        public string Serialize(object value, object context)
         {
-            if (graph == null)
+            if (value == null)
                 return null;
-            return Serialize(graph.GetType(), graph, context);
+
+            return Serialize(value.GetType(), value, context);
         }
         
-        public string Serialize(object graph)
+        public string Serialize(object value)
         {
-            return Serialize(graph, null);
+            return Serialize(value, null);
         }
 
         public abstract object Deserialize(Type type, string serializedState, object context);

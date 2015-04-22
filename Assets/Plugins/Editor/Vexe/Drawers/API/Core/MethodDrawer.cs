@@ -24,7 +24,7 @@ namespace Vexe.Editor.Drawers
 		private int id;
 		private BaseGUI gui;
 
-		private BetterPrefs prefs { get { return BetterPrefs.EditorInstance; } }
+		private BetterPrefs prefs { get { return BetterPrefs.GetEditorInstance(); } }
 
 		private bool foldout
 		{

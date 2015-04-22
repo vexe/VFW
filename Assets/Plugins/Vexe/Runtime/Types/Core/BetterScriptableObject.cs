@@ -5,7 +5,7 @@ using Vexe.Runtime.Serialization;
 
 namespace Vexe.Runtime.Types
 {
-    [DefineCategory("", 0, MemberType = MemberType.All, Exclusive = false, AlwaysHideHeader = true)]
+    [DefineCategory("", 0, MemberType = CategoryMemberType.All, Exclusive = false, AlwaysHideHeader = true)]
     [DefineCategory("Dbg", 3f, Pattern = "^dbg")]
     public abstract class BetterScriptableObject : ScriptableObject, ISerializationCallbackReceiver
     {

@@ -62,7 +62,7 @@ namespace Vexe.Editor.Types
 
 		public void Set(object value)
         {
-			bool sameValue = value.GenericEqual(Get());
+			bool sameValue = value.GenericEquals(Get());
 			if (sameValue)
 				return;
 
