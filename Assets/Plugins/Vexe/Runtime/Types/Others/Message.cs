@@ -107,8 +107,8 @@ namespace Vexe.Runtime.Types
 
     /// <summary>
     /// Exists for pure conveneince.
-    /// You might be like me and don't like the repetitiveness in vEvents<SomeEvent>.Raise(new SomeEvent...)
-    /// So you could just say vEvents.Raise(new SomeEvent...)
+    /// You might be like me and don't like the repetitiveness in Message<SomeMessage>.Post(new SomeMessage...)
+    /// So you could just say Message.Post(new SomeMessage...)
     /// </summary>
     public static class Message
     {
