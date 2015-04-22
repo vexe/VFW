@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Vexe.Runtime.Types;
 
-namespace Vexe.Runtime.Types.Examples
+namespace VFWExamples
 {
 #if UNITY_EDITOR
 	public static class BSOMenuItem

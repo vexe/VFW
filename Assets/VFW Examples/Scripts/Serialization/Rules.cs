@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using Vexe.Runtime.Types;
 
-namespace Vexe.Runtime.Types.Examples
+namespace VFWExamples
 {
 	[DefineCategory("Serializable")]
 	[DefineCategory("NotSerializable")]

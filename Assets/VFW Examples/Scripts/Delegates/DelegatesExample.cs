@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using Vexe.Runtime.Types.Examples;
+using VFWExamples;
 
 namespace Vexe.Runtime.Types
 {

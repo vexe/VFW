@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.IO;
+using Vexe.Runtime.Types;
 
-namespace Vexe.Runtime.Types.Examples
+namespace VFWExamples
 {
     public class BetterPrefsExample : BetterBehaviour
     {

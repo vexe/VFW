@@ -1,7 +1,8 @@
 ﻿using System;
 using UnityEngine;
+using Vexe.Runtime.Types;
 
-namespace Vexe.Runtime.Types.Examples
+namespace VFWExamples
 {
 	
 	public class EnumsExample : BetterBehaviour

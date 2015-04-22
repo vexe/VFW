@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using Vexe.Runtime.Types;
 
-namespace Vexe.Runtime.Types.Examples
+namespace VFWExamples
 {
 	// only the types in this example are currently supported for inlining.
 	// if you want to add support to more built-in types, have a look at InlineAttributeDrawer,

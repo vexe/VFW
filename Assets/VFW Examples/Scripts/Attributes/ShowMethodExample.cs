@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using Vexe.Runtime.Types;
 
-namespace Vexe.Runtime.Types.Examples
+namespace VFWExamples
 {
 	/// <summary>
 	/// A small demo for exposing methods in the inspector

@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using Vexe.Runtime.Helpers;
+using Vexe.Runtime.Types;
 
-namespace Vexe.Runtime.Types.Examples
+namespace VFWExamples
 {
 	[DefineCategory("Settings")]
 	public class PropertiesExample : BetterBehaviour

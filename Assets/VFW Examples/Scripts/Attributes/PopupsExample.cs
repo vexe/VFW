@@ -1,6 +1,7 @@
 ﻿using System.Linq;
+using Vexe.Runtime.Types;
 
-namespace Vexe.Runtime.Types.Examples
+namespace VFWExamples
 {
 	public class PopupsExample : BetterBehaviour
 	{

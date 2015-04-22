@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using Vexe.Runtime.Types;
 
-namespace Vexe.Runtime.Types.Examples
+namespace VFWExamples
 { 
 	/// <summary>
 	/// Use DisplayOrderAttribute to explictly state the order of how you wish your members to appear in

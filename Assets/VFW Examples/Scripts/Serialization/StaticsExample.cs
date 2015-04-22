@@ -1,5 +1,6 @@
-﻿
-namespace Vexe.Runtime.Types.Examples
+﻿using Vexe.Runtime.Types;
+
+namespace VFWExamples
 { 
 	
 	public class StaticsExample : BetterBehaviour

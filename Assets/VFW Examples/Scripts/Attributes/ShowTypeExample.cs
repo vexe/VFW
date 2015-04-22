@@ -1,7 +1,8 @@
 ﻿using System;
 using Vexe.Runtime.Extensions;
+using Vexe.Runtime.Types;
 
-namespace Vexe.Runtime.Types.Examples
+namespace VFWExamples
 {
 	/// <summary>
 	/// A demo for ShowTypeAttribute showing how we can overcome the fact that Unity doesn't support
