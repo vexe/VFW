@@ -7,6 +7,18 @@ using UnityEditor;
 
 namespace Vexe.Runtime.Types
 {
+    /// <summary>
+    /// Intended to be a better replacement for PlayerPrefs/EditorPrefs
+    /// Better because it gives more storage options (*), offers more flexibility (**) and faster (***)
+    /// (*) There's more data types you could store other than int/float/string.
+    /// You could also subclass and add support for arrays/lists of those types.
+    /// (**) You could serialize the prefs data to stream, say file or memory.
+    /// (***) It uses dictionaries so it's faster than writing to registry
+    /// 
+    /// NOTE: You could use the extension method (in Vexe.Runtime.Extensions) ValueOrDefault on the dictionaries
+    /// if you're not sure whether or not there's a value registered with a certain key.
+    /// There's also an overload that lets you specify the default value to use.
+    /// </summary>
     public class BetterPrefs : BetterScriptableObject
     {
         public Dictionary<int, int>     Ints     = new Dictionary<int, int>();

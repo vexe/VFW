@@ -5,6 +5,12 @@ using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Runtime.Serialization
 {
+    /// <summary>
+    /// The hack that's used to persist UnityEngine.Object references
+    /// Whenever the serializer comes across a Unity object it stores it to a list
+    /// of Unity objects (which Unity serializes) and serializes the index of where
+    /// that storage took place.
+    /// </summary>
 	public class UnityObjectConverter : fsConverter
 	{
 		private List<UnityObject> serializedObjects

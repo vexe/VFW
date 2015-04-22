@@ -7,7 +7,16 @@ namespace Vexe.Runtime.Serialization
 {
     public abstract class SerializerBackend
     {
+        /// <summary>
+        /// The serialization logic that this serializer use to fetch the serializable members of a given target
+        /// </summary>
+        public ISerializationLogic Logic;
 
+        /// <summary>
+        /// Serializes the specified target and stores the result in the specified serialization data
+        /// such that all Unity object references are stored in the data's serializedObjects list,
+        /// and the serializable members' values in the data's serializedStrings
+        /// </summary>
         public void SerializeTargetIntoData(object target, SerializationData data)
         {
             var members = Logic.CachedGetSerializableMembers(target.GetType());
@@ -35,6 +44,10 @@ namespace Vexe.Runtime.Serialization
             }
         }
 
+        /// <summary>
+        /// Fetches the serialized state of the specified target from the specified serialization data
+        /// to use it to deserialize/reload the target reassigning all the target's member values
+        /// </summary>
         public void DeserializeDataIntoTarget(object target, SerializationData data)
         {
             var members = Logic.CachedGetSerializableMembers(target.GetType());
@@ -63,6 +76,12 @@ namespace Vexe.Runtime.Serialization
         }
 
         private static Func<RuntimeMember, string> cachedGetMemberKey;
+
+        /// <summary>
+        /// Gets the serialization key used to serialize the specified member
+        /// The key in general is: "MemberType: MemberDataTypeNiceName MemberName"
+        /// Ex: "Field: int someValue", "Property: GameObject go"
+        /// </summary>
         private static string GetMemberKey(RuntimeMember member)
         {
             if (cachedGetMemberKey == null)

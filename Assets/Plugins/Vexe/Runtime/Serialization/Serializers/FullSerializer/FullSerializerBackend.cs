@@ -5,6 +5,9 @@ using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Runtime.Serialization
 { 
+    /// <summary>
+    /// An adaptor/proxy to add support for the JSON serializer FullSerializer
+    /// </summary>
     public class FullSerializerBackend : SerializerBackend
     {
         public readonly fsSerializer Serializer;

@@ -5,7 +5,7 @@ using Vexe.Runtime.Types;
 namespace Vexe.Runtime.Types
 {
     /// <summary>
-    /// A shorter alternative to SerializeField - applicable to fields and properties
+    /// Anntoate non-public fields/auto-properties with this attribute to tell that they must be serialized
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class SerializeAttribute : Attribute
@@ -13,7 +13,7 @@ namespace Vexe.Runtime.Types
     }
 
     /// <summary>
-    /// Fields/auto-properties annotated with this don't get serialized
+    /// Anntoate fields/auto-properties with this attribute to tell that they will *not* be serialized
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class DontSerializeAttribute : Attribute
@@ -23,30 +23,31 @@ namespace Vexe.Runtime.Types
 
 namespace Vexe.Runtime.Serialization
 {
+    /// <summary>
+    /// Contains Type arrays for attributes that help determine if a member or type is serializable or not
+    /// </summary>
     public class SerializationAttributes
     {
-        public Type[] SerializeMember;
-        public Type[] DontSerializeMember;
-        public Type[] SerializableType;
+        /// <summary>
+        /// Tells that a member (fields, auto-properties) must be serialized
+        /// </summary>
+        public readonly Type[] SerializeMember;
 
-        public static readonly SerializationAttributes Default = new SerializationAttributes()
+        /// <summary>
+        /// Tells that a member (fields, auto-properties) will not be serialized
+        /// </summary>
+        public readonly Type[] DontSerializeMember;
+
+        /// <summary>
+        /// Tells that a type is serializable
+        /// </summary>
+        public readonly Type[] SerializableType;
+
+        public SerializationAttributes(Type[] serializeMember, Type[] dontSerializeMember, Type[] serializableType)
         {
-            SerializeMember = new[]
-            {
-                typeof(SerializeField),
-                typeof(SerializeAttribute),
-            },
-
-            DontSerializeMember = new[]
-            {
-                typeof(NonSerializedAttribute),
-                typeof(DontSerializeAttribute),
-            },
-
-            // since we're only using FullSerializer now, we don't need to annotate types with special attributes to serialize them
-            SerializableType = new Type[0]
-            {
-            },
-        };
+            this.SerializeMember     = serializeMember;
+            this.DontSerializeMember = dontSerializeMember;
+            this.SerializableType    = serializableType;
+        }
     }
 }

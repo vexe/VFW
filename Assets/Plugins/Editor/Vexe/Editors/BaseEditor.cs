@@ -28,16 +28,41 @@ namespace Vexe.Editor.Editors
         /// </summary>
         public bool ShowScriptHeader = true;
 
+        /// <summary>
+        /// A unique identifier that we get from the target object this editor is inspecting
+        /// Mainly used for storing and persisting editor-only values in prefs objects (such as BetterPrefs)
+        /// Note that when inspecting a Better[Behaviour|ScriptableObject] we get the id from their 'Id' property
+        /// </summary>
         protected int id;
 
+        /// <summary>
+        /// The gui wrapper object of use to draw things.
+        /// Recall there's 2 types:
+        /// RabbitGUI (a fast custom gui layout system) which is meant to be the standard choice
+        /// and TurtleGUI (wraps EditorGUILayout) meant as a fallback type/ worst case scenario/ last choice type of deal
+        /// </summary>
         protected BaseGUI gui;
 
+        /// <summary>
+        /// The runtime type of the target object we're inspecting (the type always 'is a' Component)
+        /// </summary>
         protected Type targetType;
 
+        /// <summary>
+        /// The gameObject our target Component is attached to
+        /// </summary>
         protected GameObject gameObject;
 
+        /// <summary>
+        /// Storage asset for editor-only settings/values
+        /// </summary>
         protected static BetterPrefs prefs;
 
+        /// <summary>
+        /// A handly little wrapper for prefs.Bools - mainly used for setting foldout values
+        /// So instead of saying prefs.Bools[key] = value; we just say foldouts[key] = value;
+        /// And instead of: var value = prefs.Bools.ValueOrDefault(key); we just: var value = foldouts[key];
+        /// </summary>
         protected static Foldouts foldouts;
 
         private List<MembersCategory> _categories;

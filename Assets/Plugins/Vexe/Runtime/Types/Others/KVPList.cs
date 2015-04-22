@@ -8,6 +8,13 @@ using Vexe.Runtime.Helpers;
 
 namespace Vexe.Runtime.Types
 {
+    /// <summary>
+    /// A dictionary-like structure that uses lists for keys and values so it plays well with Unity's serialization system
+    /// Not out of the box of course as you still have to subclass to create your own custom class annotated with [Serializable]
+    /// ex: [Serializable] public class Lookup : KVPList<int, GameObject> { }
+    /// Since the keys/values are just likes it means you can access them independantly
+    /// There is no hashing. Instead, a linear search is performed when you lookup values
+    /// </summary>
 	public class KVPList<TKey, TValue> : IDictionary<TKey, TValue>
 	{
         // Should be just public readonly, but that would not play nice with Unity serialization

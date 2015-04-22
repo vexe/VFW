@@ -10,12 +10,19 @@ using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Runtime.Serialization
 {
+    /// <summary>
+    /// Defines a serialization logic interface that specifies whether a field, property or type is serializable or not
+    /// </summary>
     public abstract class ISerializationLogic
     {
         public abstract bool IsSerializableField(FieldInfo field);
         public abstract bool IsSerializableProperty(PropertyInfo property);
         public abstract bool IsSerializableType(Type type);
 
+        /// <summary>
+        /// Returns a list of RuntimeMember wrapping all the serializable members in the specified type.
+        /// Caches the result so that we only do the query once for a certain type.
+        /// </summary>
         public readonly Func<Type, List<RuntimeMember>> CachedGetSerializableMembers;
 
         public ISerializationLogic()
@@ -24,6 +31,9 @@ namespace Vexe.Runtime.Serialization
                 GetSerializableMembers(type, null).ToList()).Memoize();
         }
 
+        /// <summary>
+        /// Returns a list of RuntimeMember wrapping all the serializable members in the specified type.
+        /// </summary>
         private List<RuntimeMember> GetSerializableMembers(Type type, object target)
         {
             var members = ReflectionHelper.CachedGetMembers(type);
@@ -31,6 +41,12 @@ namespace Vexe.Runtime.Serialization
             var result = RuntimeMember.WrapMembers(serializableMembers, target);
             return result;
         }
+
+        /// <summary>
+        /// returns IsSerializableField if the member is a field,
+        /// returns IsSerializableProperty if the member is a property,
+        /// otherwise false
+        /// </summary>
         public bool IsSerializableMember(MemberInfo member)
         {
             var field = member as FieldInfo;
@@ -45,10 +61,22 @@ namespace Vexe.Runtime.Serialization
         }
     }
 
+    /// <summary>
+    /// The default serialization logic in VFW.
+    /// </summary>
     public class VFWSerializationLogic : ISerializationLogic
     {
+        /// <summary>
+        /// The serialization attributes that this logic uses to determine whether or not a field, property or type is serialiable
+        /// </summary>
         public readonly SerializationAttributes Attributes;
 
+        /// <summary>
+        /// The default attributes used in VFW
+        /// - [Serialize] and [SerializeField] to tell that a field/property must be serialized
+        /// - [DontSerialize] to tell that a field/property should not be serialized
+        /// - no attributes required for a type to be serializable
+        /// </summary>
         public static readonly SerializationAttributes DefaultAttributes = new SerializationAttributes
         (
             new[]
@@ -76,6 +104,18 @@ namespace Vexe.Runtime.Serialization
             this.Attributes = attributes;
         }
 
+        /// <summary>
+        /// Types don't need to be annotated with any special attributes for them to be serialized
+        /// A type is serialized if:
+        /// - it's a primitive, enum or string
+        /// - or a UnityEngine.Object
+        /// - or a Unity struct
+        /// - or a single-dimensional array and the element type is serializable
+        /// - or an interface
+        /// - or included in the 'SupportedTypes' array
+        /// - it's not included in the 'NotSupportedTypes' array
+        /// - it's generic and all its generic type arguments are serializable as well
+        /// </summary>
         public override bool IsSerializableType(Type type)
         {
             if (type.IsPrimitive || type.IsEnum || type == typeof(string)
@@ -101,6 +141,17 @@ namespace Vexe.Runtime.Serialization
             return true;
         }
 
+        /// <summary>
+        /// A field is serializable if:
+        /// - it's not marked with any of the 'DontSerializeMember' attributes
+        /// - nor literal (const)
+        /// - it's public otherwise annotated with one of the attributes in the 'SerializeMember' array
+        /// - its type is serializable
+        /// - readonly fields that meet the previous requirements are serialized in Better[Behaviour|ScriptableObject]
+        ///   and System.Objects as long as the used serializer supports it (FullSerializer does)
+        /// - static fields that meet the previous  requirements are always serialized in  Better[Behaviour|ScriptableObject],
+        /// and in System.Objects if the serializer of use supports it (FullSerialier doesn't)
+        /// </summary>
         public override bool IsSerializableField(FieldInfo field)
         {
             if (Attributes.DontSerializeMember.Any(field.IsDefined))
@@ -116,6 +167,15 @@ namespace Vexe.Runtime.Serialization
             return serializable;
         }
 
+        /// <summary>
+        /// A property is serializable if:
+        /// - it's not marked with any of the 'DontSerializeMember' attributes
+        /// - it's an auto-property
+        /// - has a public getter or setter, otherwise must be annotated with any of the 'SerializeMember' attributes
+        /// - its type is serializable
+        /// - static properties that meet the previous requirements are always serialized in Better[Behaviour|ScriptableObject],
+        ///   and in System.Objects if the serializer of use supports it (FullSerialier doesn't)
+        /// </summary>
         public override bool IsSerializableProperty(PropertyInfo property)
         {
             if (Attributes.DontSerializeMember.Any(property.IsDefined))

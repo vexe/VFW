@@ -10,6 +10,13 @@ using Vexe.Runtime.Helpers;
 
 namespace Vexe.Runtime.Types
 {
+    /// <summary>
+    /// A wrapper for metadata members (fields and properties)
+    /// that's used to conveneitly set/get the member value on a certain target.
+    /// The way setting/getting of members is done If you're in-editor or targetting standalone
+    /// is via dynamically generated delegates (which is pretty fast)
+    /// otherwise via standard reflection (slower)
+    /// </summary>
     public class RuntimeMember
     {
 #if DYNAMIC_REFLECTION
@@ -20,12 +27,36 @@ namespace Vexe.Runtime.Types
         private Func<object, object> _getter;
 #endif
         public object Target;
+
+        /// <summary>
+        /// The name of the wrapped member
+        /// </summary>
         public readonly string Name;
+
+        /// <summary>
+        /// If the member name was "_someValue" or "someValue" then the nice name would be "Some Value"
+        /// </summary>
         public readonly string NiceName;
+
+        /// <summary>
+        /// Say the member was a dictionary of float and string, the type nice name would be Dictionary<float, string>
+        /// instead of System.Collections.Generic.Dictionary<Sys.. ahhh to hell with this!>
+        /// </summary>
         public readonly string TypeNiceName;
+
+        /// <summary>
+        /// The type of the wrapped member (FieldInfo.FieldType in case of a field, or PropertyInfo.PropertyType in case of a property)
+        /// </summary>
         public readonly Type Type;
+
+        /// <summary>
+        /// A reference to the MemberInfo reference of the wrapped member
+        /// </summary>
         public readonly MemberInfo Info;
 
+        /// <summary>
+        /// The current value of the member in the current target object
+        /// </summary>
         public object Value
         {
             get
@@ -52,6 +83,11 @@ namespace Vexe.Runtime.Types
             TypeNiceName = memberType.GetNiceName();
         }
 
+        /// <summary>
+        /// Returns false if the field was constant (literal) while setting 'result' to null.
+        /// Otherwise true while setting result to a new RuntimeMember wrapping the specified field
+        /// using the appropriate method of building the [s|g]etters (delegates in case of editor/standalone, reflection otherwise)
+        /// </summary>
         public static bool TryWrapField(FieldInfo field, object target, out RuntimeMember result)
         {
             if (field.IsLiteral)
@@ -72,6 +108,12 @@ namespace Vexe.Runtime.Types
             return true;
         }
 
+        /// <summary>
+        /// Returns false if the property isn't readable or if it's an indexer, setting 'result' to null in the process.
+        /// Otherwise true while setting result to a new RuntimeMember wrapping the specified property
+        /// using the appropriate method of building the [s|g]etters (delegates in case of editor/standalone, reflection otherwise)
+        /// Note that readonly properties (getter only) are fine, as the setter will just be an empty delegate doing nothing.
+        /// </summary>
         public static bool TryWrapProperty(PropertyInfo property, object target, out RuntimeMember result)
         {
             if (!property.CanRead || property.IsIndexer())
@@ -104,6 +146,9 @@ namespace Vexe.Runtime.Types
             return true;
         }
 
+        /// <summary>
+        /// Returns a list of RuntimeMember wrapping whatever is valid from the input members IEnumerable in the specified target
+        /// </summary>
         public static List<RuntimeMember> WrapMembers(IEnumerable<MemberInfo> members, object target)
         {
             var result = new List<RuntimeMember>();
@@ -131,6 +176,11 @@ namespace Vexe.Runtime.Types
         }
 
         private static Func<Type, List<RuntimeMember>> _cachedWrapMembers;
+        /// <summary>
+        /// A cached overload of WrapMembers that returns a list of RuntimeMembers with no target specified (null)
+        /// wrapping whatever valid members there are in the specified type argument
+        /// (uses cached reflection to get the members)
+        /// </summary>
         public static List<RuntimeMember> CachedWrapMembers(Type type)
         {
             if (_cachedWrapMembers == null)
