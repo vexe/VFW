@@ -1,25 +1,52 @@
 ﻿using System;
 
-namespace Vexe.Runtime.Exceptions
+namespace System
 {
-	public class InvalidTypeException : Exception
+	public class vInvalidType : Exception
 	{
-		public InvalidTypeException(string msg) : base(msg) { }
-		public InvalidTypeException() { }
+		public vInvalidType(string msg) : base(msg) { }
+		public vInvalidType() { }
 	}
 
-	public class MemberNotFoundException : Exception
+	public class vMemberNotFound : Exception
 	{
-		public MemberNotFoundException(string msg) : base(msg) { }
+		public vMemberNotFound(string msg) : base(msg) { }
 	}
 
-	public class TypeMismatchException : Exception
+	public class vTypeMismatch : Exception
 	{
-		public TypeMismatchException(string msg) : base(msg) { }
+		public vTypeMismatch(Type expected, Type got) :
+            base("Expected type: `" + expected.Name + "` but got: `" + got.Name + "`") { }
 	}
 
-	public class WTFException : Exception
-	{
-		public WTFException(string msg) : base(msg) { }
-	}
+    public class vInvalidCast : Exception
+    {
+        public vInvalidCast(string fromTypeName, string toTypeName)
+            : base("Cannot cast from `" + fromTypeName + "` to `" + toTypeName + "`")
+        {
+        }
+
+        public vInvalidCast(Type fromType, Type toType)
+            : this(fromType.Name, toType.Name)
+        {
+        }
+
+        public vInvalidCast(object value, Type toType)
+            : this(value.GetType().Name, toType.Name)
+        {
+        }
+
+        public vInvalidCast(object value, string toTypeName)
+            : this(value.GetType().Name, toTypeName)
+        {
+        }
+    }
+
+    public class vIndexOutOfRange : Exception
+    {
+        public vIndexOutOfRange(int outOfRangeIndex, int totalCount)
+            : base("Index `" + outOfRangeIndex + "` should be greater or equal to zero and less than the total count of `" + totalCount + "`")
+        {
+        }
+    }
 }

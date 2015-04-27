@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using UnityEditor;
+using UnityEngine;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Serialization;
@@ -43,15 +44,16 @@ namespace Vexe.Runtime.Types
 
         public void OnBeforeSerialize()
         {
-            dLog("Serializing " + GetType().Name);
-            BehaviourData.Clear();
-            Serializer.SerializeTargetIntoData(this, BehaviourData);
+            if (RuntimeHelper.IsModified(this, Serializer, BehaviourData))
+            {
+                dLog("Serializing: " + GetType().Name);
+                SerializeBehaviour();
+            }
         }
 
         public void OnAfterDeserialize()
         {
-            dLog("Deserializing " + GetType().Name);
-            Serializer.DeserializeDataIntoTarget(this, BehaviourData);
+            DeserializeBehaviour();
         }
 
         // Logging
@@ -96,6 +98,19 @@ namespace Vexe.Runtime.Types
         public virtual void Reset()
         {
             RuntimeHelper.ResetTarget(this);
+        }
+
+        [ContextMenu("Load behaviour state")]
+        public void DeserializeBehaviour()
+        {
+            Serializer.DeserializeDataIntoTarget(this, BehaviourData);
+        }
+
+        [ContextMenu("Save behaviour state")]
+        public void SerializeBehaviour()
+        {
+            BehaviourData.Clear();
+            Serializer.SerializeTargetIntoData(this, BehaviourData);
         }
     }
 }

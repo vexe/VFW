@@ -37,9 +37,11 @@ namespace Vexe.Runtime.Serialization
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("Error serializing member " + member.Name +
-                        " (" + member.Type.Name + ") in " +
-                        target.GetType().Name + " Stacktrace: " + e.StackTrace);
+                    Debug.LogError(
+                        "Error serializing member `" + member.Name + "` (" + member.Type.Name + ")" +
+                        " in `" + target.GetType().Name +
+                        "` Error message: \"" + e.Message +
+                        "\" Stacktrace: " + e.StackTrace);
                 }
             }
         }
@@ -68,9 +70,11 @@ namespace Vexe.Runtime.Serialization
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("Error deserializing member " + member.Name +
-                        " (" + member.Type.Name + ") in " +
-                        target.GetType().Name + " Stacktrace: " + e.StackTrace);
+                    Debug.LogError(
+                        "Error deserializing member `" + member.Name + "` (" + member.Type.Name + ")" +
+                        " in `" + target.GetType().Name +
+                        "` Error message: \"" + e.Message +
+                        "\" Stacktrace: " + e.StackTrace);
                 }
             }
         }
@@ -82,7 +86,7 @@ namespace Vexe.Runtime.Serialization
         /// The key in general is: "MemberType: MemberDataTypeNiceName MemberName"
         /// Ex: "Field: int someValue", "Property: GameObject go"
         /// </summary>
-        private static string GetMemberKey(RuntimeMember member)
+        public static string GetMemberKey(RuntimeMember member)
         {
             if (cachedGetMemberKey == null)
             {

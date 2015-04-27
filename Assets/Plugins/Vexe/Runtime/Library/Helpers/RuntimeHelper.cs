@@ -22,6 +22,29 @@ namespace Vexe.Runtime.Helpers
             return target.GetHashCode();
         }
 
+        public static bool IsModified(UnityObject target, SerializerBackend serializer, SerializationData data)
+        {
+            var members = serializer.Logic.CachedGetSerializableMembers(target.GetType());
+            for (int i = 0; i < members.Count; i++)
+            {
+                var member    = members[i];
+                var memberKey = SerializerBackend.GetMemberKey(member);
+                member.Target = target;
+                var value = member.Value;
+
+                string prevState;
+                if (!data.serializedStrings.TryGetValue(memberKey, out prevState) && !value.IsObjectNull())
+                    return true;
+
+                string curState = serializer.Serialize(member.Type, value, data.serializedObjects);
+
+                if (prevState != null && prevState != curState)
+                    return true;
+            }
+
+            return false;
+        }
+
         public static void ResetTarget(object target)
         {
             var type = target.GetType();

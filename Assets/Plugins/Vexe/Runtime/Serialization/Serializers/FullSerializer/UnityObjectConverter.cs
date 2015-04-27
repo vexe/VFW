@@ -23,23 +23,44 @@ namespace Vexe.Runtime.Serialization
 			return typeof(UnityObject).IsAssignableFrom(type);
 		}
 
+        public override bool RequestCycleSupport(Type storageType)
+        {
+            return false;
+        }
+
+        public override bool RequestInheritanceSupport(Type storageType)
+        {
+            return false;
+        }
+
 		public override fsResult TrySerialize(object instance, out fsData serialized, Type storageType)
 		{
-			serialized = new fsData(serializedObjects.Count);
-			serializedObjects.Add(instance as UnityObject);
+            var obj = instance as UnityObject;
+            int idx = serializedObjects.IndexOf(obj);
+            if (idx == -1)
+            {
+                Serializer.TrySerialize<int>(serializedObjects.Count, out serialized);
+			    serializedObjects.Add(obj);
+            }
+            else 
+                Serializer.TrySerialize<int>(idx, out serialized);
+
 			return fsResult.Success;
 		}
 
 		public override fsResult TryDeserialize(fsData data, ref object instance, Type storageType)
 		{
-			instance = serializedObjects[(int)data.AsInt64];
+            int index = -1;
+            var result = Serializer.TryDeserialize<int>(data, ref index);
+            if (index == -1)
+                throw new InvalidOperationException("Error deserializing Unity object of type " + storageType + ". Index shouldn't be -1. Message: " + result.FormattedMessages);
+            instance = serializedObjects[index];
 			return fsResult.Success;
 		}
 
 		public override object CreateInstance(fsData data, Type storageType)
 		{
-			int index = (int)data.AsDictionary["$content"].AsInt64;
-			return serializedObjects[index];
+            return storageType;
 		}
 	}
 }

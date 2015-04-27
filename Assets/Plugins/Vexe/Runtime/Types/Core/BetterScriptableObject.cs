@@ -42,15 +42,13 @@ namespace Vexe.Runtime.Types
 
         public void OnBeforeSerialize()
         {
-            dLog("Serializing " + GetType().Name);
-            ObjectData.Clear();
-            Serializer.SerializeTargetIntoData(this, ObjectData);
+            if (RuntimeHelper.IsModified(this, Serializer, ObjectData))
+                SerializeObject();
         }
 
         public void OnAfterDeserialize()
         {
-            dLog("Deserializing " + GetType().Name);
-            Serializer.DeserializeDataIntoTarget(this, ObjectData);
+            DeserializeObject();
         }
 
         // Logging
@@ -94,6 +92,17 @@ namespace Vexe.Runtime.Types
         public virtual void Reset()
         {
             RuntimeHelper.ResetTarget(this);
+        }
+
+        public void DeserializeObject()
+        {
+            Serializer.DeserializeDataIntoTarget(this, ObjectData);
+        }
+
+        public void SerializeObject()
+        {
+            ObjectData.Clear();
+            Serializer.SerializeTargetIntoData(this, ObjectData);
         }
     }
 }
