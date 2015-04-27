@@ -9,7 +9,7 @@ using Vexe.Runtime.Types;
 
 namespace Vexe.Editor.Drawers
 {
-	public class AssignableAttributeDrawer : CompositeDrawer<object, AssignableAttribute>
+	public class AssignableDrawer : CompositeDrawer<object, AssignableAttribute>
 	{
 		private int kFoldout, kTarget, kMember, kSource;
 		private int targetIdx, memberIdx;
@@ -17,7 +17,7 @@ namespace Vexe.Editor.Drawers
 		private Component target;
 		private MemberInfo targetMember;
 
-		protected override void OnSingleInitialization()
+		protected override void Initialize()
 		{
 			var iden = RuntimeHelper.CombineHashCodes(id, attribute.GetType());
 			kSource  = RuntimeHelper.CombineHashCodes(iden, "src");

@@ -14,7 +14,6 @@ using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Editor.Drawers
 {
-    [IgnoreOnTypes(typeof(uDelegate))] // Todo: do it in a better way
     public class DelegateDrawer : ObjectDrawer<IBaseDelegate>
     {
         private AddingData adding;
@@ -23,13 +22,13 @@ namespace Vexe.Editor.Drawers
         private int kAdvanced, kAdd, kInvoke;
         private string kHeaderStr;
 
-        protected override void OnSingleInitialization()
+        protected override void Initialize()
         {
             adding = new AddingData();
             kAdvanced = RuntimeHelper.CombineHashCodes(id, "advanced");
             kAdd = RuntimeHelper.CombineHashCodes(id, "add");
             kInvoke = RuntimeHelper.CombineHashCodes(id, "invoke");
-            kHeaderStr = string.Format("{0} ({1})", niceName, memberTypeName);
+            kHeaderStr = string.Format("{0} ({1})", displayText, memberTypeName);
 
             if (memberValue == null)
                 memberValue = memberType.Instance<IBaseDelegate>();
@@ -298,13 +297,13 @@ namespace Vexe.Editor.Drawers
         private int  kAdvanced, kAdd;
         private string kHeaderStr;
 
-        protected override void OnSingleInitialization()
+        protected override void Initialize()
         {
             adding = new AddingData();
 
             kAdvanced = RuntimeHelper.CombineHashCodes(id, "advanced");
             kAdd = RuntimeHelper.CombineHashCodes(id, "add");
-            kHeaderStr = string.Format("{0} ({1})", niceName, memberTypeName);
+            kHeaderStr = string.Format("{0} ({1})", displayText, memberTypeName);
 
             if (memberValue == null)
                 memberValue = new uDelegate();

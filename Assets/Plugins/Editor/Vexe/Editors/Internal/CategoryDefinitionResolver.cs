@@ -89,10 +89,10 @@ namespace Vexe.Editor.Internal
 			{
 				switch (definition.Grouping)
 				{
-					case SetOp.Intersection:
+					case CategorySetOp.Intersection:
 						result.AddRange(defMembers.Aggregate((g1, g2) => g1.Intersect(g2)));
 						break;
-					case SetOp.Union:
+					case CategorySetOp.Union:
 						result.AddRange(defMembers.UnionAll());
 						break;
 				}

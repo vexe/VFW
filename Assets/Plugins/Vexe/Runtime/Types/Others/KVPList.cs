@@ -246,7 +246,7 @@ namespace Vexe.Runtime.Types
 
 		public override string ToString()
 		{
-			return string.Format("[{0}, {1}]", typeof(TKey).GetNiceName(), typeof(TValue).GetNiceName());
+			return string.Format("<{0}, {1}> (Count = {2})", typeof(TKey).GetNiceName(), typeof(TValue).GetNiceName(), Count);
 		}
 	}
 

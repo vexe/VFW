@@ -19,7 +19,7 @@
 
 		/// <summary>
 		/// returns `obj == null || obj.Equals(null)` which is safer to use in generic methods
-		/// if the object has an overriden == operator (es useful when working with Unity)
+		/// if the object has an overriden == operator (useful when working with Unity types)
 		/// </summary>
 		public static bool IsObjectNull(this object obj)
 		{

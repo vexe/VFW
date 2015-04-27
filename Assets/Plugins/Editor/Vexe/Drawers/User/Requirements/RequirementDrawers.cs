@@ -5,7 +5,7 @@ using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Editor.Drawers
 {
-	public abstract class BaseRequirementAttributeDrawer<T> : CompositeDrawer<UnityObject, T> where T : RequiredAttribute
+	public abstract class BaseRequirementDrawer<T> : CompositeDrawer<UnityObject, T> where T : RequiredAttribute
 	{
 		protected abstract string GetHelpMsg();
 		
@@ -18,7 +18,7 @@ namespace Vexe.Editor.Drawers
 		}
 	}
 
-	public class RequiredFromThisAttributeDrawer : BaseRequirementAttributeDrawer<RequiredFromThisAttribute>
+	public class RequiredFromThisDrawer : BaseRequirementDrawer<RequiredFromThisAttribute>
 	{
 		protected override string GetHelpMsg()
 		{
@@ -26,7 +26,7 @@ namespace Vexe.Editor.Drawers
 		}
 	}
 
-	public class RequiredSingleAttributeDrawer : BaseRequirementAttributeDrawer<RequiredSingleAttribute>
+	public class RequiredSingleDrawer : BaseRequirementDrawer<RequiredSingleAttribute>
 	{
 		protected override string GetHelpMsg()
 		{
@@ -34,7 +34,7 @@ namespace Vexe.Editor.Drawers
 		}
 	}
 
-	public class RequiredAttributeDrawer : BaseRequirementAttributeDrawer<RequiredAttribute>
+	public class RequiredDrawer : BaseRequirementDrawer<RequiredAttribute>
 	{
 		protected override string GetHelpMsg()
 		{
@@ -42,7 +42,7 @@ namespace Vexe.Editor.Drawers
 		}
 	}
 
-	public class RequiredFromChildrenAttributeDrawer : BaseRequirementAttributeDrawer<RequiredFromChildrenAttribute>
+	public class RequiredFromChildrenDrawer : BaseRequirementDrawer<RequiredFromChildrenAttribute>
 	{
 		protected override string GetHelpMsg()
 		{
@@ -50,7 +50,7 @@ namespace Vexe.Editor.Drawers
 		}
 	}
 
-	public class RequiredFromParentsAttributeDrawer : BaseRequirementAttributeDrawer<RequiredFromParentsAttribute>
+	public class RequiredFromParentsDrawer : BaseRequirementDrawer<RequiredFromParentsAttribute>
 	{
 		protected override string GetHelpMsg()
 		{

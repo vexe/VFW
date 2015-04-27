@@ -2,7 +2,7 @@
 
 namespace Vexe.Editor.Drawers
 {
-	public class WhiteSpaceAttributeDrawer : CompositeDrawer<object, WhitespaceAttribute>
+	public class WhiteSpaceDrawer : CompositeDrawer<object, WhitespaceAttribute>
 	{
 		public override void OnUpperGUI()
 		{

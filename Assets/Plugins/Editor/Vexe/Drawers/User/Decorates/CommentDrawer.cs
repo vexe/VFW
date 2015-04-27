@@ -3,7 +3,7 @@ using Vexe.Runtime.Types;
 
 namespace Vexe.Editor.Drawers
 {
-	public class CommentAttributeDrawer : CompositeDrawer<object, CommentAttribute>
+	public class CommentDrawer : CompositeDrawer<object, CommentAttribute>
 	{
 		public override void OnUpperGUI()
 		{

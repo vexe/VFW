@@ -4,9 +4,9 @@ using Random = UnityEngine.Random;
 
 namespace Vexe.Editor.Drawers
 {
-	public abstract class RandomAttributeDrawer<T> : CompositeDrawer<T, RandAttribute>
+	public abstract class RandomDrawer<T, A> : CompositeDrawer<T, A> where A : CompositeAttribute
 	{
-		protected override void OnSingleInitialization()
+		protected override void Initialize()
 		{
 			// Randomize once when we're initialized
 			if (!foldout)
@@ -25,19 +25,19 @@ namespace Vexe.Editor.Drawers
 		protected abstract void Randomize();
 	}
 
-	public class RandomfloatAttributeDrawer : RandomAttributeDrawer<float>
+	public class fRandDrawer : RandomDrawer<float, fRandAttribute>
 	{
 		protected override void Randomize()
 		{
-			memberValue = Random.Range(attribute.floatMin, attribute.floatMax);
+			memberValue = Random.Range(attribute.min, attribute.max);
 		}
 	}
 
-	public class RandomIntAttributeDrawer : RandomAttributeDrawer<int>
+	public class iRandDrawer : RandomDrawer<int, iRandAttribute>
 	{
 		protected override void Randomize()
 		{
-			memberValue = Random.Range(attribute.intMin, attribute.intMax);
+			memberValue = Random.Range(attribute.min, attribute.max);
 		}
 	}
 }

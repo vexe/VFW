@@ -9,20 +9,17 @@ namespace Vexe.Editor.Drawers
 {
 	public class FieldFilter
 	{
-		public BaseGUI gui { get; set; }
-
 		private readonly string[] values;
 		private readonly Action<string> setValue;
 		private string search;
 
-		public FieldFilter(string[] values, BaseGUI gui, Action<string> setValue)
+		public FieldFilter(string[] values, Action<string> setValue)
 		{
 			this.values   = values;
-			this.gui      = gui;
 			this.setValue = setValue;
 		}
 
-		public void OnGUI()
+		public void OnGUI(BaseGUI gui)
 		{
 			var newSearch = gui.Text(GUIContent.none, search, Layout.sWidth(50f));
 			if (search != newSearch)
@@ -52,26 +49,21 @@ namespace Vexe.Editor.Drawers
 	{
 		private FieldFilter filter;
 
-		protected override void OnMultipleInitialization()
+		protected override void Initialize()
 		{
-			filter.gui = gui;
-		}
-
-		protected override void OnSingleInitialization()
-		{
-			filter = new FieldFilter(GetValues(), gui, SetValue);
+			filter = new FieldFilter(GetValues(), SetValue);
 		}
 
 		public override void OnRightGUI()
 		{
-			filter.OnGUI();
+			filter.OnGUI(gui);
 		}
 
 		protected abstract string[] GetValues();
 		protected abstract void SetValue(string value);
 	}
 
-	public class FilterEnumAttributeDrawer : FilterDrawer<Enum, FilterEnumAttribute>
+	public class FilterEnumDrawer : FilterDrawer<Enum, FilterEnumAttribute>
 	{
 		protected override void SetValue(string value)
 		{
@@ -84,7 +76,7 @@ namespace Vexe.Editor.Drawers
 		}
 	}
 
-	public class FilterTagsAttributeDrawer : FilterDrawer<string, FilterTagsAttribute>
+	public class FilterTagsDrawer : FilterDrawer<string, FilterTagsAttribute>
 	{
 		protected override string[] GetValues()
 		{

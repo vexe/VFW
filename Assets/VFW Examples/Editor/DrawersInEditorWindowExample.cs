@@ -40,7 +40,7 @@ namespace VFWExamples
         private void OnEnable()
         {
             id = Guid.NewGuid().GetHashCode();
-            members = VFWVisibilityLogic.GetCachedVisibleMembers.Invoke(GetType());
+            members = VFWVisibilityLogic.CachedGetVisibleMembers.Invoke(GetType());
         }
 
         private void OnGUI()

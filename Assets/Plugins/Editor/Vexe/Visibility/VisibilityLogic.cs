@@ -15,7 +15,7 @@ namespace Vexe.Editor.Visibility
     {
         public static readonly VisibilityAttributes Attributes;
         public static readonly Func<MemberInfo, bool> CachedIsVisibleMember;
-        public static readonly Func<Type, List<MemberInfo>> GetCachedVisibleMembers;
+        public static readonly Func<Type, List<MemberInfo>> CachedGetVisibleMembers;
 
         static VFWVisibilityLogic()
         {
@@ -23,20 +23,20 @@ namespace Vexe.Editor.Visibility
 
             CachedIsVisibleMember = new Func<MemberInfo, bool>(IsVisibleMember).Memoize();
 
-            GetCachedVisibleMembers = new Func<Type, List<MemberInfo>>(type =>
+            CachedGetVisibleMembers = new Func<Type, List<MemberInfo>>(type =>
             {
                 return ReflectionHelper.CachedGetMembers(type)
-                                     .Where(IsVisibleMember)
-                                     .OrderBy<MemberInfo, float>(GetMemberDisplayOrder)
-                                     .ToList();
+                                       .Where(IsVisibleMember)
+                                       .OrderBy<MemberInfo, float>(GetMemberDisplayOrder)
+                                       .ToList();
             }).Memoize();
         }
 
         public static float GetMemberDisplayOrder(MemberInfo member)
         {
-            var attribute = member.GetCustomAttribute<DisplayOrderAttribute>();
+            var attribute = member.GetCustomAttribute<DisplayAttribute>();
             if (attribute != null)
-                return attribute.DisplayOrder;
+                return attribute.Order;
 
             switch (member.MemberType)
             {

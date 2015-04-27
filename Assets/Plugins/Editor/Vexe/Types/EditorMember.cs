@@ -2,25 +2,35 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
+using Vexe.Runtime.Types;
 using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Editor.Types
 {
-	public class EditorMember
-	{
+    public class EditorMember
+    {
         public object RawTarget;
-		public UnityObject UnityTarget;
+        public UnityObject UnityTarget;
+        public string DisplayText;
 
 		public readonly int Id;
         public readonly string Name;
-        public readonly string NiceName;
         public readonly string TypeNiceName;
         public readonly Type Type;
         public readonly MemberInfo Info;
         public readonly Attribute[] Attributes;
+
+        public static readonly Dictionary<string, Func<EditorMember, string>> Formatters = new Dictionary<string, Func<EditorMember, string>>()
+        {
+            { @"\$type"    , x => x.Type.Name },
+            { @"\$nicetype", x => x.TypeNiceName },
+            { @"\$name"    , x => x.Name },
+            { @"\$nicename", x => x.Name.Replace("_", "").SplitPascalCase() },
+        };
 
         public object Value
         {
@@ -42,17 +52,46 @@ namespace Vexe.Editor.Types
         private const double kUndoTick = .5;
 		private SetVarOp<object> _setVar;
 
-        private EditorMember(MemberInfo memberInfo, Type memberType, string memberName, object rawTarget, UnityObject unityTarget, int targetId, Attribute[] attributes)
+        private EditorMember(MemberInfo memberInfo, Type memberType, string memberName,
+            object rawTarget, UnityObject unityTarget, int targetId, Attribute[] attributes)
 		{
             Info         = memberInfo;
             Type         = memberType;
             RawTarget    = rawTarget;
             Name         = memberName;
-            NiceName     = Name.Replace("_", "").SplitPascalCase();
             TypeNiceName = memberType.GetNiceName();
-			UnityTarget  = unityTarget;
-			Id           = RuntimeHelper.CombineHashCodes(targetId, TypeNiceName, NiceName);
+            UnityTarget  = unityTarget;
             Attributes   = attributes;
+
+            string displayFormat = null;
+
+            var formatAttr = attributes.GetAttribute<DisplayAttribute>();
+            if (formatAttr != null && !string.IsNullOrEmpty(formatAttr.FormatLabel))
+                displayFormat = formatAttr.FormatLabel;
+
+            var settings = VFWSettings.GetInstance();
+
+            if (displayFormat == null)
+            {
+                if (Type.IsImplementerOfRawGeneric(typeof(IDictionary<,>)))
+                    displayFormat = settings.DefaultDictionaryFormat;
+                else if (Type.IsImplementerOfRawGeneric(typeof(IList<>)))
+                    displayFormat = settings.DefaultSequenceFormat;
+                else displayFormat = settings.DefaultMemberFormat;
+            }
+
+            var iter = Formatters.GetEnumerator();
+            while(iter.MoveNext())
+            {
+                var pair = iter.Current;
+                var pattern = pair.Key;
+                var result = pair.Value(this);
+                displayFormat = Regex.Replace(displayFormat, pattern, result, RegexOptions.IgnoreCase);
+            }
+
+            DisplayText = displayFormat;
+
+            Id = RuntimeHelper.CombineHashCodes(targetId, TypeNiceName, DisplayText);
 		}
 
         public object Get()
@@ -66,7 +105,7 @@ namespace Vexe.Editor.Types
 			if (sameValue)
 				return;
 
-			HandleUndoAndSet(value, _set);
+			HandleUndoAndSet(value);
 
 			if (UnityTarget != null)
 				EditorUtility.SetDirty(UnityTarget);
@@ -77,8 +116,11 @@ namespace Vexe.Editor.Types
             return Get() as T;
         }
 
-		private void HandleUndoAndSet(object value, Action<object> set)
+		private void HandleUndoAndSet(object value)
 		{
+			if (UnityTarget != null)
+				Undo.RecordObject(UnityTarget, "Editor Member Modification");
+
 			_undoTimer = EditorApplication.timeSinceStartup - _undoLastTime;
 			if (_undoTimer > kUndoTick)
 			{
@@ -88,10 +130,7 @@ namespace Vexe.Editor.Types
 				_setVar.ToValue = value;
 				_undo.RegisterThenPerform(_setVar);
 			}
-			else set(value);
-
-			if (UnityTarget != null)
-				Undo.RecordObject(UnityTarget, "member set");
+			else _set(value);
 		}
 
         public override string ToString()
@@ -114,7 +153,7 @@ namespace Vexe.Editor.Types
         {
             var field = memberInfo as FieldInfo;
             if (field != null)
-            { 
+            {
                 if (field.IsLiteral)
                     throw new InvalidOperationException("Field is const, this is not supported: " + field);
 
@@ -157,7 +196,7 @@ namespace Vexe.Editor.Types
             result.InitGetSet(get, set);
             return result;
         }
-	
+
         public static EditorMember WrapIListElement(string elementName, Type elementType, int elementId, Attribute[] attributes)
         {
             var result = new EditorMember(null, elementType, elementName, null, null, elementId, attributes);
@@ -199,9 +238,16 @@ namespace Vexe.Editor.Types
 
         private void SetWrappedMemberValue(object value)
         {
-            _memberSetter(ref RawTarget, value);
+            try
+            {
+                _memberSetter(ref RawTarget, value);
+            }
+            catch(InvalidCastException)
+            {
+                throw new vInvalidCast(value, TypeNiceName);
+            }
         }
-	}
+    }
 
 	public static class EditorMemberExtensions
 	{

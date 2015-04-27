@@ -50,7 +50,7 @@ namespace Vexe.Runtime.Types
 		/// Whether to perform a union or intersection on the definition rules
 		/// Default: SetOp.Intersect
 		/// </summary>
-		public SetOp Grouping { get; set; }
+		public CategorySetOp Grouping { get; set; }
 
 		/// <summary>
 		/// If true, the category will always be expanded
@@ -67,7 +67,7 @@ namespace Vexe.Runtime.Types
 			FullPath = fullPath;
 			DisplayOrder = displayOrder;
 			ExplicitMembers = explicitMembers;
-			Grouping = SetOp.Intersection;
+			Grouping = CategorySetOp.Intersection;
 			Exclusive = true;
 		}
 

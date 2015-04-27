@@ -10,7 +10,7 @@ using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Editor.Drawers
 {
-	public class PathAttributeDrawer : CompositeDrawer<string, PathAttribute>
+	public class PathDrawer : CompositeDrawer<string, PathAttribute>
 	{
 		public override void OnMemberDrawn(Rect rect)
 		{

@@ -16,7 +16,7 @@ namespace Vexe.Editor.Drawers
         protected EditorMember member      { private set; get; }
         protected Attribute[] attributes   { private set; get; }
 
-        protected string niceName          { get { return member.NiceName;     } }
+        protected string displayText       { get { return member.DisplayText;  } set { member.DisplayText = value; } }
         protected object rawTarget         { get { return member.RawTarget;    } }
         protected UnityObject unityTarget  { get { return member.UnityTarget;  } }
         protected string memberTypeName    { get { return member.TypeNiceName; } }
@@ -63,16 +63,14 @@ namespace Vexe.Editor.Drawers
 #if DBG
                 Log(this + " is Already initialized");
 #endif
-                OnMultipleInitialization();
                 return this;
             }
 #if DBG
             Log("Initializing: " + this);
 #endif
             initialized = true;
-            OnInternalInitialization();
-            OnSingleInitialization();
-            OnMultipleInitialization();
+            InternalInitialize();
+            Initialize();
             return this;
         }
 
@@ -81,14 +79,8 @@ namespace Vexe.Editor.Drawers
             return foldout = gui.Foldout(foldout);
         }
 
-        public static BaseDrawer Create(Type drawerType)
-        {
-            return drawerType.Instance<BaseDrawer>();
-        }
-
-        protected virtual void OnInternalInitialization() { }
-        protected virtual void OnSingleInitialization() { }
-        protected virtual void OnMultipleInitialization() { }
+        protected virtual void InternalInitialize() { }
+        protected virtual void Initialize() { }
 
         public abstract void OnGUI();
         public virtual void OnUpperGUI() { }

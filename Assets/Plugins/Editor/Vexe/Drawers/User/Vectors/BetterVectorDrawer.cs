@@ -7,11 +7,13 @@ using Random = UnityEngine.Random;
 
 namespace Vexe.Editor.Drawers
 {
-	public abstract class BetterVectorDrawer<TVector> : AttributeDrawer<TVector, BetterVectorAttribute>
+	public abstract class BetterVectorDrawer<T, A> : AttributeDrawer<T, A> where A : DrawnAttribute
 	{
 		private const string kBtnReset     = "0";
 		private const string kBtnNormalize = "1";
 		private const string kBtnRandomize = "r";
+
+        Func<string, T, T> _getField;
 
         protected static float rand()
         {
@@ -22,13 +24,14 @@ namespace Vexe.Editor.Drawers
 		{
 			using (gui.Horizontal())
 			{
+                if (_getField == null)
+                    _getField = GetField();
+
 				var current = memberValue;
-				var newValue = GetField()(niceName, current);
+				var newValue = _getField(displayText, current);
 				{
 					if (!VectorEquals(current, newValue))
-					{
 						memberValue = newValue;
-					}
 				}
 
 				gui.Space(12f);
@@ -46,9 +49,6 @@ namespace Vexe.Editor.Drawers
 			}
 		}
 
-		protected abstract Func<string, TVector, TVector> GetField();
-		protected abstract bool VectorEquals(TVector left, TVector right);
-
 		private void DoButtons()
 		{
 			gui.FlexibleSpace();
@@ -65,14 +65,16 @@ namespace Vexe.Editor.Drawers
 				memberValue = Reset();
 		}
 
-		protected abstract TVector Reset();
-		protected abstract TVector Normalize();
-		protected abstract TVector Randomize();
-		protected abstract TVector Paste();
+		protected abstract Func<string, T, T> GetField();
+		protected abstract bool VectorEquals(T left, T right);
+		protected abstract T Reset();
+		protected abstract T Normalize();
+		protected abstract T Randomize();
+		protected abstract T Paste();
 		protected abstract void Copy();
 	}
 
-	public class BetterVector2Drawer : BetterVectorDrawer<Vector2>
+	public class BetterV2Drawer : BetterVectorDrawer<Vector2, BetterV2Attribute>
 	{
 		protected override void Copy()         { Clipboard.GetInstance().V2Value = memberValue; }
 		protected override Vector2 Paste()     { return Clipboard.GetInstance().V2Value; }
@@ -91,7 +93,7 @@ namespace Vexe.Editor.Drawers
 		}
 	}
 
-	public class BetterVector3Drawer : BetterVectorDrawer<Vector3>
+	public class BetterV3Drawer : BetterVectorDrawer<Vector3, BetterV3Attribute>
 	{
 		protected override void Copy()         { Clipboard.GetInstance().V3Value = memberValue; }
 		protected override Vector3 Paste()     { return Clipboard.GetInstance().V3Value; }

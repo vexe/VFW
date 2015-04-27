@@ -5,7 +5,7 @@ using Vexe.Runtime.Types;
 
 namespace Vexe.Editor.Drawers
 {
-	public class SelectEnumAttributeDrawer : CompositeDrawer<Enum, SelectEnumAttribute>
+	public class SelectEnumDrawer : CompositeDrawer<Enum, SelectEnumAttribute>
 	{
 		public override void OnRightGUI()
 		{

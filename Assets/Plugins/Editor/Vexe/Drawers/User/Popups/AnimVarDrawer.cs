@@ -6,7 +6,7 @@ using Vexe.Runtime.Types;
 
 namespace Vexe.Editor.Drawers
 {
-	public class AnimatorVariableAttributeDrawer : AttributeDrawer<string, AnimVarAttribute>
+	public class AnimVarDrawer : AttributeDrawer<string, AnimVarAttribute>
 	{
 		private string[] _variables;
 		private int _current;
@@ -29,7 +29,7 @@ namespace Vexe.Editor.Drawers
 			}
 		}
 
-		protected override void OnSingleInitialization()
+		protected override void Initialize()
 		{
 			if (memberValue == null)
 				memberValue = "";
@@ -47,7 +47,7 @@ namespace Vexe.Editor.Drawers
 			{
 				if (!attribute.AutoMatch.IsNullOrEmpty())
 				{
-					string match = niceName.Remove(niceName.IndexOf(attribute.AutoMatch));
+					string match = displayText.Remove(displayText.IndexOf(attribute.AutoMatch));
 					match = Regex.Replace(match, @"\s+", "");
 					if (_variables.ContainsValue(match))
 						memberValue = match;
@@ -60,14 +60,14 @@ namespace Vexe.Editor.Drawers
 		{
 			if (animator == null || animator.runtimeAnimatorController == null)
 			{
-				memberValue = gui.Text(niceName, memberValue);
+				memberValue = gui.Text(displayText, memberValue);
 			}
 			else
 			{
 				if (_variables.IsNullOrEmpty())
 					FetchVariables();
 
-				var selection = gui.Popup(niceName, _current, _variables);
+				var selection = gui.Popup(displayText, _current, _variables);
 				{
 					if (_current != selection || memberValue != _variables[selection])
 						memberValue = _variables[_current = selection];

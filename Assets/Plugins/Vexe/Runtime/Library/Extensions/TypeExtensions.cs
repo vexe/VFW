@@ -46,14 +46,9 @@ namespace Vexe.Runtime.Extensions
             return DelegateForCall(type, name, Flags.InstanceAnyVisibility, paramTypes);
         }
 
-        public static bool IsMethodImplemented(this Type src, string methodName)
+        public static bool IsMethodImplemented(this Type src, string methodName, Type[] paramTypes)
         {
-            return IsMethodImplemented(src, methodName, Flags.AllMembers | BindingFlags.Static);
-        }
-
-        public static bool IsMethodImplemented(this Type src, string methodName, BindingFlags flags)
-        {
-            var method = src.GetMethod(methodName, flags);
+            var method = src.GetMethod(methodName, paramTypes);
             if (method == null)
                 return false;
 
@@ -101,7 +96,7 @@ namespace Vexe.Runtime.Extensions
 
         public static T GetAttribute<T>(this IEnumerable<Attribute> attributes) where T : Attribute
         {
-            return attributes.FirstOrDefault(a => a is T) as T;
+            return attributes.OfType<T>().FirstOrDefault() as T;
         }
 
         public static Attribute[] GetAttributes(this Type type)
@@ -383,9 +378,7 @@ namespace Vexe.Runtime.Extensions
             {
                 Type current = toCheck.IsGenericType ? toCheck.GetGenericTypeDefinition() : toCheck;
                 if (current == baseType)
-                {
                     return true;
-                }
                 toCheck = toCheck.BaseType;
             }
             return false;
@@ -407,9 +400,9 @@ namespace Vexe.Runtime.Extensions
         /// <summary>
         /// Returns true if 'type' is an implementer or subclass of raw generic of 'baseType'
         /// </summary>
-        public static bool IsSubTypeOfRawGeneric(this Type type, Type baseType)
+        public static bool IsSubclassOrImplementerOfRawGeneric(this Type type, Type baseType)
         {
-            return IsImplementerOfRawGeneric(type, baseType) || IsSubclassOfRawGeneric(type, baseType);
+            return IsSubclassOfRawGeneric(type, baseType) || IsImplementerOfRawGeneric(type, baseType);
         }
 
         // http://stackoverflow.com/questions/2490244/default-value-of-a-type-at-runtime

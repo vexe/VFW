@@ -18,4 +18,19 @@ namespace Vexe.Runtime.Types
 	public class HideAttribute : Attribute
 	{
 	}
+
+	/// <summary>
+	/// Annotate members with this attribute to make then visible only when a certain condition is met
+	/// The name of the condition method must be passed as an argument to the attribute constructor
+	/// The method should return a boolean, and take no parameters
+	/// </summary>
+	public class VisibleWhenAttribute : Attribute
+	{
+		public readonly string ConditionMethod;
+
+		public VisibleWhenAttribute(string conditionMethod)
+		{
+			this.ConditionMethod = conditionMethod;
+		}
+	}
 }

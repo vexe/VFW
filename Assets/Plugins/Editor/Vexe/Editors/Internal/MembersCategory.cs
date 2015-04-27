@@ -163,10 +163,10 @@ namespace Vexe.Editor.Internal
                     return true;
 
                 var flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public;
-                var method = target.GetType().GetMethod(vis.conditionMethod, flags);
+                var method = target.GetType().GetMethod(vis.ConditionMethod, flags);
                 if (method == null)
                 {
-                    Debug.LogError("Method not found: " + vis.conditionMethod);
+                    Debug.LogError("Method not found: " + vis.ConditionMethod);
                     _isVisibleCache[member] = null;
                     return true;
                 }

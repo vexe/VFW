@@ -5,14 +5,14 @@ using Vexe.Runtime.Types;
 
 namespace Vexe.Editor.Drawers
 {
-	public class ParagraphAttributeDrawer : AttributeDrawer<string, ParagraphAttribute>
+	public class ParagraphDrawer : AttributeDrawer<string, ParagraphAttribute>
 	{
 		private Vector2 _scrollPos;
 		private float _prevHeight;
 
 		static GUIContent content = new GUIContent();
 
-		protected override void OnSingleInitialization()
+		protected override void Initialize()
 		{
 			if (memberValue == null)
 				memberValue = string.Empty;
@@ -20,7 +20,7 @@ namespace Vexe.Editor.Drawers
 
 		public override void OnGUI()
 		{
-			gui.Label(niceName);
+			gui.Label(displayText);
 
 			content.text = memberValue;
 			float height = EditorStyles.textArea.CalcHeight(content, (gui as RabbitGUI).Width);

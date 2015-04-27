@@ -19,7 +19,7 @@ namespace Vexe.Editor.Drawers
     using Vexe.Runtime.Serialization;
     using Editor = UnityEditor.Editor;
 
-    public class InlineAttributeDrawer : CompositeDrawer<UnityObject, InlineAttribute>
+    public class InlineDrawer : CompositeDrawer<UnityObject, InlineAttribute>
     {
         private bool hideTarget;
         private List<bool> expandValues;
@@ -27,7 +27,7 @@ namespace Vexe.Editor.Drawers
         // Add the types you want to support here...
         private Dictionary<Type, Action<UnityObject, BaseGUI>> customEditors;
         
-        public InlineAttributeDrawer ()
+        public InlineDrawer ()
         {
             customEditors = new Dictionary<Type, Action<UnityObject, BaseGUI>>
             {
@@ -147,7 +147,7 @@ namespace Vexe.Editor.Drawers
             }
         }
 
-        protected override void OnSingleInitialization()
+        protected override void Initialize()
         {
             expandValues = new List<bool>();
             GuiBox       = attribute.GuiBox;

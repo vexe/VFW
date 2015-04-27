@@ -55,7 +55,7 @@ namespace Vexe.Editor.GUIs
 
         public bool Member(EditorMember member, Attribute[] attributes, bool ignoreComposition)
         {
-            var memberDrawer = MemberDrawersHandler.GetMemberDrawer(member, attributes);
+            var memberDrawer = MemberDrawersHandler.GetMemberDrawer(member, attributes, ignoreComposition);
             memberDrawer.Initialize(member, attributes, this);
             return Member(member, attributes, memberDrawer, ignoreComposition);
         }

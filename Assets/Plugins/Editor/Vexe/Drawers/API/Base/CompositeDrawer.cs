@@ -14,7 +14,7 @@ namespace Vexe.Editor.Drawers
 			set { member.Value = value; }
 		}
 
-		protected sealed override void OnInternalInitialization()
+		protected sealed override void InternalInitialize()
 		{
 			attribute = attributes.GetAttribute<A>();
 		}

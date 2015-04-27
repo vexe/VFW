@@ -10,7 +10,7 @@ using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Editor.Drawers
 {
-	public class SelectObjAttributeDrawer : AttributeDrawer<UnityObject, SelectObjAttribute>
+	public class SelectObjDrawer : AttributeDrawer<UnityObject, SelectObjAttribute>
 	{
 		public override void OnGUI()
 		{
@@ -19,7 +19,7 @@ namespace Vexe.Editor.Drawers
 				bool isNull = member.IsNull();
 				bool isObjectField = prefs.Bools.ValueOrDefault(id);
 
-				gui.Text(niceName, isNull ? "null" : memberValue.name + " (" + memberTypeName + ")");
+				gui.Text(displayText, isNull ? "null" : memberValue.name + " (" + memberTypeName + ")");
 
 				var fieldRect = gui.LastRect;
 				{

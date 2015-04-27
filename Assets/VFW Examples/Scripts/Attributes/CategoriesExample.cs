@@ -9,7 +9,7 @@ namespace VFWExamples
 	/// </summary>
 	[DefineCategory("NonExclusiveStrings", 2.5f, DataType = typeof(string), Pattern = "^nonEx", Exclusive = false)]
 	[DefineCategory("ExclusiveInts", 2.6f, DataType = typeof(int), Pattern = "^ex")]
-	[DefineCategory("Unite", 2.7f, DataType = typeof(void), MemberType = CategoryMemberType.Property, Pattern = "^nonEx", Grouping = SetOp.Union, Exclusive = false)]
+	[DefineCategory("Unite", 2.7f, DataType = typeof(void), MemberType = CategoryMemberType.Property, Pattern = "^nonEx", Grouping = CategorySetOp.Union, Exclusive = false)]
 	[DefineCategory("Explicit", 2.8f, "otherString1", "exInt1", "floatProp1", "CustomMethod")]
 	[DefineCategory("Fields/Custom")]
 	public class CategoriesExample : BetterBehaviour

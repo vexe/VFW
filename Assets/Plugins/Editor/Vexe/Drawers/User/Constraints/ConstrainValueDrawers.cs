@@ -3,7 +3,7 @@ using Vexe.Runtime.Types;
 
 namespace Vexe.Editor.Drawers
 {
-	public abstract class ConstrainValueAttributeDrawer<TValue, TAttribute> : CompositeDrawer<TValue, TAttribute>
+	public abstract class ConstrainValueDrawer<TValue, TAttribute> : CompositeDrawer<TValue, TAttribute>
 		where TAttribute : ConstrainValueAttribute
 	{
 		public override void OnLowerGUI()
@@ -14,51 +14,51 @@ namespace Vexe.Editor.Drawers
 		protected abstract TValue Constrain();
 	}
 
-	public class IntMinAttributeDrawer : ConstrainValueAttributeDrawer<int, MinAttribute>
+	public class iMinDrawer : ConstrainValueDrawer<int, iMinAttribute>
 	{
 		protected override int Constrain()
 		{
-			return Mathf.Max(memberValue, attribute.intMin);
+			return Mathf.Max(memberValue, attribute.min);
 		}
 	}
 
-	public class FloatMinAttributeDrawer : ConstrainValueAttributeDrawer<float, MinAttribute>
+	public class fMinDrawer : ConstrainValueDrawer<float, fMinAttribute>
 	{
 		protected override float Constrain()
 		{
-			return Mathf.Max(memberValue, attribute.floatMin);
+			return Mathf.Max(memberValue, attribute.min);
 		}
 	}
 
-	public class IntMaxAttributeDrawer : ConstrainValueAttributeDrawer<int, MaxAttribute>
+	public class iMaxDrawer : ConstrainValueDrawer<int, iMaxAttribute>
 	{
 		protected override int Constrain()
 		{
-			return Mathf.Min(memberValue, attribute.intMax);
+			return Mathf.Min(memberValue, attribute.max);
 		}
 	}
 
-	public class FloatMaxAttributeDrawer : ConstrainValueAttributeDrawer<float, MaxAttribute>
+	public class fMaxDrawer : ConstrainValueDrawer<float, fMaxAttribute>
 	{
 		protected override float Constrain()
 		{
-			return Mathf.Min(memberValue, attribute.floatMax);
+			return Mathf.Min(memberValue, attribute.max);
 		}
 	}
 
-	public class IntNumericClampAttributeDrawer : ConstrainValueAttributeDrawer<int, NumericClampAttribute>
+	public class iClampDrawer : ConstrainValueDrawer<int, iClampAttribute>
 	{
 		protected override int Constrain()
 		{
-			return Mathf.Clamp(memberValue, attribute.intMin, attribute.intMax);
+			return Mathf.Clamp(memberValue, attribute.min, attribute.max);
 		}
 	}
 
-	public class FloatNumericClampAttributeDrawer : ConstrainValueAttributeDrawer<float, NumericClampAttribute>
+	public class fClampDrawer : ConstrainValueDrawer<float, fClampAttribute>
 	{
 		protected override float Constrain()
 		{
-			return Mathf.Clamp(memberValue, attribute.floatMin, attribute.floatMax);
+			return Mathf.Clamp(memberValue, attribute.min, attribute.max);
 		}
 	}
 }

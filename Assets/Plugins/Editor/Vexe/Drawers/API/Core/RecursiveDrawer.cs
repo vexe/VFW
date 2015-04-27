@@ -11,27 +11,28 @@ using Vexe.Editor.Visibility;
 using Vexe.Editor.Windows;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
+using Vexe.Runtime.Types;
 using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Editor.Drawers
 {
     public class RecursiveDrawer : ObjectDrawer<object>
     {
-        private bool isToStringImpl;
-        private string nullString;
-        private Type polymorphicType;
+        private bool _isToStringImpl;
+        private Type _polymorphicType;
+        private string _nullString;
 
-        protected override void OnSingleInitialization()
+        protected override void Initialize()
         {
-            nullString = string.Format("null ({0})", memberTypeName);
+            _nullString = string.Format("null ({0})", memberTypeName);
 
             if (memberValue != null)
-            { 
-                polymorphicType = memberValue.GetType();
-                isToStringImpl = polymorphicType.IsMethodImplemented("ToString");
+            {
+                _polymorphicType = memberValue.GetType();
+                _isToStringImpl = _polymorphicType.IsMethodImplemented("ToString", Type.EmptyTypes);
             }
-            else 
-                isToStringImpl = memberType.IsMethodImplemented("ToString");
+            else
+                _isToStringImpl = memberType.IsMethodImplemented("ToString", Type.EmptyTypes);
         }
 
         public override void OnGUI()
@@ -45,7 +46,7 @@ namespace Vexe.Editor.Drawers
                 return;
             }
 
-            if (polymorphicType == null || polymorphicType == memberType)
+            if (_polymorphicType == null || _polymorphicType == memberType)
             {
                 object value = member.Value;
                 DrawRecursive(ref value, gui, id, unityTarget);
@@ -53,7 +54,7 @@ namespace Vexe.Editor.Drawers
             }
             else
             {
-                var drawer = MemberDrawersHandler.GetCachedObjectDrawer.Invoke(polymorphicType);
+                var drawer = MemberDrawersHandler.GetCachedObjectDrawer.Invoke(_polymorphicType);
                 var drawerType = drawer.GetType();
                 if (drawerType == typeof(RecursiveDrawer))
                 {
@@ -83,8 +84,8 @@ namespace Vexe.Editor.Drawers
             List<MemberInfo> members;
             var targetType = target.GetType();
             if (memberNames.IsNullOrEmpty())
-            { 
-                members = VFWVisibilityLogic.GetCachedVisibleMembers.Invoke(targetType);
+            {
+                members = VFWVisibilityLogic.CachedGetVisibleMembers(targetType);
             }
             else
             {
@@ -128,22 +129,15 @@ namespace Vexe.Editor.Drawers
         {
             using (gui.Horizontal())
             {
-                var isEmpty = string.IsNullOrEmpty(niceName);
-                var display = isEmpty ? string.Empty : niceName + " " + (foldout ? "^" : ">");
+                var isEmpty = string.IsNullOrEmpty(displayText);
+                var display = isEmpty ? string.Empty : displayText + " " + (foldout ? "^" : ">");
                 var value   = member.Value;
                 string field;
-                
+
                 if (value == null)
-                {
-                    field = nullString;
-                }
+                    field = _nullString;
                 else
-                {
-                    if (isToStringImpl)
-                        field = value.ToString();
-                    else
-                        field = string.Format("{0} ({1})", value.ToString(), value.GetType().GetNiceName());
-                }
+                    field = _isToStringImpl ? value.ToString() : value.GetType().GetNiceName();
 
                 if (isEmpty)
                     Foldout();
@@ -152,11 +146,8 @@ namespace Vexe.Editor.Drawers
 
                 var fieldRect = gui.LastRect;
                 gui.Cursor(fieldRect, MouseCursor.Link);
-                if (!isEmpty && fieldRect.Contains(Event.current.mousePosition))
-                {
-                    if (EventsHelper.IsLMBMouseDown())
-                        foldout = !foldout;
-                }
+                if (!isEmpty && fieldRect.Contains(Event.current.mousePosition) && EventsHelper.IsLMBMouseDown())
+                    foldout = !foldout;
 
                 var drop = gui.RegisterFieldForDrop<UnityObject>(fieldRect, objs => objs.Select(x =>
                 {
@@ -172,7 +163,10 @@ namespace Vexe.Editor.Drawers
                 }).FirstOrDefault());
 
                 if (drop != null)
+                {
                     value = memberValue = drop;
+                    GUI.changed = true;
+                }
 
                 SelectionButton();
             }
@@ -266,7 +260,7 @@ namespace Vexe.Editor.Drawers
                 member.Set(inst);
 
                 if (memberValue != null)
-                    polymorphicType = memberValue.GetType();
+                    _polymorphicType = memberValue.GetType();
 
                 EditorHelper.RepaintAllInspectors();
             }

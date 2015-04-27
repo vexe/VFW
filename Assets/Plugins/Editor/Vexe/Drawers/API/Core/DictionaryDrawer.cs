@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
-using UnityEngine;
-using Vexe.Editor.Helpers;
 using Vexe.Editor.Types;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
@@ -16,81 +14,36 @@ using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Editor.Drawers
 {
-    public class DictionaryDrawer<TD, TK, TV> : ObjectDrawer<TD> where TD : class, IDictionary<TK, TV>, new() where TK : new()
+    public class IDictionaryDrawer<TD, TK, TV> : ObjectDrawer<TD> where TD : class, IDictionary<TK, TV>, new() where TK : new()
     {
-        private List<EditorMember> keyElements;
-        private List<EditorMember> valueElements;
-        private KVPList<TK, TV> kvpList;
-        private string dictionaryName;
-        private string pairFormatPattern;
-        private MethodCaller<object, object> pairFormatMethod;
-        private bool perKeyDrawing, perValueDrawing;
-        private bool shouldRead = true, shouldWrite, invalidKeyType;
-        private Color dupKeyColor, shouldWriteColor;
-        private bool isKvpList;
+        private List<EditorMember> _keyElements;
+        private List<EditorMember> _valueElements;
+        private KVPList<TK, TV> _kvpList;
+        private string _formatPairPattern;
+        private bool _perKeyDrawing, _perValueDrawing;
+        private bool _invalidKeyType, _isReadonly;
 
-        public bool Readonly;
-
-        protected override void OnSingleInitialization()
+        protected override void Initialize()
         {
-            isKvpList = memberType.IsA<KVPList<TK, TV>>();
-
-            shouldWriteColor = GUIHelper.OrangeColorDuo.FirstColor;
-            dupKeyColor = GUIHelper.RedColorDuo.FirstColor;
-
-            var kt = typeof(TK);
-
-            if (kt.IsAbstract || kt.IsA<UnityObject>())
-            { 
-                //Log("key type is abstract or a unityobject");
-                invalidKeyType = true;
-            }
-
-            if (!invalidKeyType && !kt.IsValueType && kt != typeof(string))
-            {
-                try
-                {
-                    kt.ActivatorInstance();
-                }
-                catch (MissingMemberException)
-                {
-                    //Log("key type is not newable");
-                    invalidKeyType = true;
-                }
-            }
-
-            if (invalidKeyType)
+            _invalidKeyType = !typeof(TK).IsValueType && typeof(TK) != typeof(string);
+            if (_invalidKeyType)
                 return;
 
-            keyElements   = new List<EditorMember>();
-            valueElements = new List<EditorMember>();
+            _keyElements   = new List<EditorMember>();
+            _valueElements = new List<EditorMember>();
 
-            perKeyDrawing   = attributes.AnyIs<PerKeyAttribute>();
-            perValueDrawing = attributes.AnyIs<PerValueAttribute>();
-            Readonly		= attributes.AnyIs<ReadonlyAttribute>();
+            _perKeyDrawing   = attributes.AnyIs<PerKeyAttribute>();
+            _perValueDrawing = attributes.AnyIs<PerValueAttribute>();
 
-            var formatMember = attributes.OfType<FormatMemberAttribute>().FirstOrDefault();
-            if (formatMember == null || string.IsNullOrEmpty(formatMember.pattern))
+            var displayAttr = attributes.GetAttribute<DisplayAttribute>();
+            if (displayAttr != null)
             { 
-                dictionaryName  = niceName;
-                dictionaryName += " (" + memberType.GetNiceName() + ")";
-            }
-            else
-            {
-                dictionaryName = formatMember.Format(niceName, memberType.GetNiceName());
+                _formatPairPattern = displayAttr.FormatKVPair;
+                _isReadonly = (displayAttr.DictOpt & Dict.Readonly) != 0;
             }
 
-            var pairFormat = attributes.GetAttribute<FormatPairAttribute>();
-            if (pairFormat != null)
-            {
-                if (!string.IsNullOrEmpty(pairFormat.Method))
-                    pairFormatMethod = rawTarget.GetType().DelegateForCall(pairFormat.Method, Flags.InstanceAnyVisibility, typeof(TK), typeof(TV));
-                else if (!string.IsNullOrEmpty(pairFormat.Pattern))
-                    pairFormatPattern = pairFormat.Pattern;
-            }
-
-            if (Readonly)
-                dictionaryName += " (Readonly)";
+            if (_isReadonly)
+                displayText += " (Readonly)";
 
             #if DBG
             Log("Dictionary drawer Initialized (" + dictionaryName + ")");
@@ -105,37 +58,28 @@ namespace Vexe.Editor.Drawers
 
         public override void OnGUI()
         {
-            if (invalidKeyType)
+            if (_invalidKeyType)
             {
-                gui.HelpBox("Key type {0} must either be a ValueType or a 'new'able ReferenceType (not an abstract type/a UnityEngine.Object and has an empty or implicit/compiler-generated constructor)".FormatWith(typeof(TK).Name),
-                    MessageType.Error);
+                gui.HelpBox("Unsuported key type: {0}. Only Value-types and strings are, sorry!"
+                   .FormatWith(typeof(TK)), MessageType.Error);
                 return;
             }
 
             if (memberValue == null)
-            { 
-                #if DBG
-                Log("Dictionary null " + dictionaryName);
-                #endif
                 memberValue = new TD();
-            }
 
-            // if the member is a kvpList, we can read immediately because we don't have to worry about allocation or anything it's just an assignment
-            if (isKvpList)
-            {
-                kvpList = memberValue as KVPList<TK, TV>;
-            }
-            else
-            {
-                shouldRead |= (kvpList == null || (!shouldWrite && memberValue.Count != kvpList.Count));
+            if (_kvpList == null)
+                _kvpList = new KVPList<TK, TV>();
+            else _kvpList.Clear();
 
-                if (shouldRead)
+            // Read
+            {
+                var iter = memberValue.GetEnumerator();
+                while(iter.MoveNext())
                 {
-                    #if DBG
-                    Log("Reading " + dictionaryName);
-                    #endif
-                    kvpList = memberValue.ToKVPList();
-                    shouldRead = false;
+                    var key = iter.Current.Key;
+                    var value = iter.Current.Value;
+                    _kvpList[key] = value;
                 }
             }
 
@@ -146,71 +90,23 @@ namespace Vexe.Editor.Drawers
 
             using (gui.Horizontal())
             {
-                foldout = gui.Foldout(dictionaryName, foldout, Layout.sExpandWidth());
+                foldout = gui.Foldout(displayText, foldout, Layout.sExpandWidth());
 
-                if (!Readonly)
+                if (!_isReadonly)
                 {
                     gui.FlexibleSpace();
 
-                    using (gui.State(kvpList.Count > 0))
+                    using (gui.State(_kvpList.Count > 0))
                     {
                         if (gui.ClearButton("dictionary"))
-                        {
-                            kvpList.Clear();
-                            shouldWrite = true;
-                        }
+                            _kvpList.Clear();
 
                         if (gui.RemoveButton("last dictionary pair"))
-                        {
-                            kvpList.RemoveFirst();
-                            shouldWrite = true;
-                        }
+                            _kvpList.RemoveFirst();
                     }
 
-                    if (gui.AddButton("pair"))
-                    {
+                    if (gui.AddButton("pair", MiniButtonStyle.ModRight))
                         AddNewPair();
-                        shouldWrite = true;
-                    }
-
-                    Color col;
-                    if (!kvpList.Keys.IsUnique())
-                        col = dupKeyColor;
-                    else if (shouldWrite)
-                        col = shouldWriteColor;
-                    else col = Color.white;
-
-                    using (gui.ColorBlock(col))
-                    if (gui.MiniButton("w", "Write dictionary (Orange means you modified the dictionary and should write, Red means you have a duplicate key and must address it before writing)", MiniButtonStyle.ModRight))
-                    {
-                        #if DBG
-                        Log("Writing " + dictionaryName);
-                        #endif
-                        if (isKvpList)
-                        {
-                            memberValue = kvpList as TD;
-                        }
-                        else
-                        { 
-                            try
-                            {
-                                var newDict = new TD();
-                                for (int i = 0; i < kvpList.Count; i++)
-                                {
-                                    var k = kvpList.Keys[i];
-                                    var v = kvpList.Values[i];
-                                    newDict.Add(k, v);
-                                }
-                                memberValue = newDict;
-                            }
-                            catch (ArgumentException e)
-                            {
-                                Log(e.Message);
-                            }
-                        }
-
-                        shouldWrite = false;
-                    }
                 }
             }
 
@@ -221,9 +117,10 @@ namespace Vexe.Editor.Drawers
             if (!foldout)
                 return;
 
-            if (kvpList.Count == 0)
+            if (memberValue.Count == 0)
             {
-                gui.HelpBox("Dictionary is empty");
+                using (gui.Indent())
+                    gui.HelpBox("Dictionary is empty");
             }
             else
             { 
@@ -232,10 +129,10 @@ namespace Vexe.Editor.Drawers
                 #endif
                 using (gui.Indent())
                 {
-                    for (int i = 0; i < kvpList.Count; i++)
+                    for (int i = 0; i < _kvpList.Count; i++)
                     {
-                        var dKey   = kvpList.Keys[i];
-                        var dValue = kvpList.Values[i];
+                        var dKey   = _kvpList.Keys[i];
+                        var dValue = _kvpList.Values[i];
 
                         #if PROFILE
                         Profiler.BeginSample("DictionaryDrawer KVP assignments");
@@ -257,11 +154,11 @@ namespace Vexe.Editor.Drawers
                         #endif
                         using (gui.Indent())
                         {
-                            var keyMember = GetElement(keyElements, kvpList.Keys, i, entryKey + 1);
-                            shouldWrite |= gui.Member(keyMember, !perKeyDrawing);
+                            var keyMember = GetElement(_keyElements, _kvpList.Keys, i, entryKey + 1);
+                            gui.Member(keyMember, !_perKeyDrawing);
 
-                            var valueMember = GetElement(valueElements, kvpList.Values, i, entryKey + 2);
-                            shouldWrite |= gui.Member(valueMember, !perValueDrawing);
+                            var valueMember = GetElement(_valueElements, _kvpList.Values, i, entryKey + 2);
+                            gui.Member(valueMember, !_perValueDrawing);
                         }
                         #if PROFILE
                         Profiler.EndSample();
@@ -272,7 +169,23 @@ namespace Vexe.Editor.Drawers
                 Profiler.EndSample();
                 #endif
 
-                shouldWrite |= memberValue.Count > kvpList.Count;
+                // Write
+                {
+                    memberValue.Clear();
+                    for (int i = 0; i < _kvpList.Count; i++)
+                    {
+                        var key = _kvpList.Keys[i];
+                        var value = _kvpList.Values[i];
+                        try
+                        {
+                            memberValue.Add(key, value);
+                        }
+                        catch (ArgumentException)
+                        {
+                            Log("Key already exists: " + key);
+                        }
+                    }
+                }
             }
         }
 
@@ -319,23 +232,15 @@ namespace Vexe.Editor.Drawers
                     var key = pair.Key;
                     var value = pair.Value;
 
-                    if (pairFormatPattern == null)
-                    { 
-                        if (pairFormatMethod == null)
-                            return string.Format("[{0}, {1}]", GetObjectString(key), GetObjectString(value));
-                        return pairFormatMethod(rawTarget, new object[] { pair.Key, pair.Value }) as string;
-                    }
-
-                    var result = pairFormatPattern;
-                    result = Regex.Replace(result, @"\$keyType", key == null ? "null" : key.GetType().GetNiceName());
-                    result = Regex.Replace(result, @"\$valueType", value == null ? "null" : value.GetType().GetNiceName());
+                    var result = _formatPairPattern;
+                    result = Regex.Replace(result, @"\$keytype", key == null ? "null" : key.GetType().GetNiceName());
+                    result = Regex.Replace(result, @"\$valuetype", value == null ? "null" : value.GetType().GetNiceName());
                     result = Regex.Replace(result, @"\$key", GetObjectString(key));
                     result = Regex.Replace(result, @"\$value", GetObjectString(value));
                     return result;
                 }).Memoize());
             }
         }
-
 
         private string GetObjectString(object from)
         {
@@ -345,44 +250,45 @@ namespace Vexe.Editor.Drawers
             return (obj != null) ? (obj.name + " (" + obj.GetType().Name + ")") : from.ToString();
         }
 
-        Func<TK> _getNewKey;
-        Func<TK> getNewKey
-        {
-            get
-            {
-                if (_getNewKey == null)
-                {
-                    if (typeof(TK).IsValueType)
-                    {
-                        _getNewKey = () => (TK)typeof(TK).GetDefaultValue();
-                    }
-                    else if (typeof(TK) == typeof(string))
-                    {
-                        _getNewKey = () => (TK)(object)string.Empty;
-                    }
-                    else
-                    {
-                        _getNewKey = () => new TK();
-                    }
-                }
-                return _getNewKey;
-            }
-        }
-
         private void AddNewPair()
         {
+            TK defKey;
+
+            if (typeof(TK) == typeof(string))
+            {
+                var x = "New Key ";
+                var n = 0;
+                while(_kvpList.Keys.Contains((TK)(object)(x + n))) n++;
+                defKey = (TK)(object)(x + n);
+            }
+            else if (typeof(TK) == typeof(int))
+            {
+                var n = 0;
+                while (_kvpList.Keys.Contains((TK)(object)(n))) n++;
+                defKey = (TK)(object)n;
+            }
+            else if (typeof(TK).IsEnum)
+            {
+                var values = Enum.GetValues(typeof(TK)) as TK[];
+                var result = values.Except(_kvpList.Keys).ToList();
+                if (result.Count == 0)
+                    return;
+                defKey = (TK)result[0];
+            }
+            else defKey = default(TK);
+
             try
             {
-                var key = getNewKey();
-                var value = default(TV); 
-                kvpList.Insert(0, key, value, false);
+                var defValue = default(TV); 
+                _kvpList.Insert(0, defKey, defValue);
+                memberValue.Add(defKey, defValue);
 
-                var pkey = RuntimeHelper.CombineHashCodes(id, (kvpList.Count - 1), "entry");
-                foldouts[pkey] = true;
+                var eKey = RuntimeHelper.CombineHashCodes(id, (_kvpList.Count - 1), "entry");
+                foldouts[eKey] = true;
             }
-            catch (ArgumentException e)
+            catch (ArgumentException)
             {
-                Log(e.Message);
+                Log("Key already exists: " + defKey);
             }
         }
     }

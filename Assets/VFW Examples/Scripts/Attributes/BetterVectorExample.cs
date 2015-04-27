@@ -5,16 +5,16 @@ namespace VFWExamples
 {
 	public class BetterVectorExample : BetterBehaviour
 	{
-		[BetterVector]
+		[BetterV2]
 		public Vector2 vector2Field;
 
-		[BetterVector]
+		[BetterV2]
 		public Vector2 Vector2Property { get; set; }
 
-		[BetterVector]
+		[BetterV3]
 		public Vector3 vector3Field;
 
-		[BetterVector]
+		[BetterV3]
 		public Vector3 Vector3Property { get; set; }
 	}
 }

@@ -9,7 +9,17 @@ namespace Vexe.Editor.Drawers
 	{
 		protected T memberValue
 		{
-			get { return (T)member.Value; }
+			get
+            {
+                try
+                {
+                    return (T)member.Value;
+                }
+                catch(InvalidCastException)
+                {
+                    throw new vInvalidCast(member.TypeNiceName, typeof(T).GetNiceName());
+                }
+            }
 			set { member.Value = value; }
 		}
 

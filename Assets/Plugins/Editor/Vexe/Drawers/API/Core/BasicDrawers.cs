@@ -16,7 +16,7 @@ namespace Vexe.Editor.Drawers
 
         public override void OnGUI()
         {
-            memberValue = DoField(niceName, memberValue);
+            memberValue = DoField(displayText, memberValue);
 #if DBG
             var curValue = memberValue;
             var newValue = DoField(niceName, curValue);
@@ -32,6 +32,14 @@ namespace Vexe.Editor.Drawers
         protected override int DoField(string text, int value)
         {
             return gui.Int(text, value);
+        }
+    }
+
+    public class UIntDrawer : BasicDrawer<uint>
+    {
+        protected override uint DoField(string text, uint value)
+        {
+            return (uint)Math.Max(0, gui.Int(text, (int)value));
         }
     }
 
@@ -143,7 +151,7 @@ namespace Vexe.Editor.Drawers
     {
         public override void OnGUI()
         {
-            memberValue = gui.Object(niceName, memberValue, memberType, !AssetDatabase.Contains(unityTarget));
+            memberValue = gui.Object(displayText, memberValue, memberType, !AssetDatabase.Contains(unityTarget));
         }
     }
 

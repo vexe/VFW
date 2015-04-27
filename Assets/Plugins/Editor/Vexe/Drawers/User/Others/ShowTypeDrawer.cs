@@ -7,13 +7,13 @@ using Vexe.Editor.Types;
 
 namespace Vexe.Editor.Drawers
 {
-	public class TypeDrawer : AttributeDrawer<Type, ShowTypeAttribute>
+	public class ShowTypeDrawer : AttributeDrawer<Type, ShowTypeAttribute>
 	{
 		private Type[] availableTypes;
 		private string[] typesNames;
 		private int index;
 
-		protected override void OnSingleInitialization()
+		protected override void Initialize()
 		{
 			if (attribute.FromThisGo)
 			{
@@ -36,7 +36,7 @@ namespace Vexe.Editor.Drawers
 		public override void OnGUI()
 		{
 			index = member.IsNull() ? -1 : availableTypes.IndexOf(memberValue);
-			var selection = gui.Popup(niceName, index, typesNames);
+			var selection = gui.Popup(displayText, index, typesNames);
 			{
 				if (index != selection)
 				{

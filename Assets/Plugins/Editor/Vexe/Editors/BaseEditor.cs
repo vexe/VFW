@@ -11,7 +11,6 @@ using Vexe.Editor.GUIs;
 using Vexe.Editor.Internal;
 using Vexe.Editor.Types;
 using Vexe.Editor.Visibility;
-using Vexe.Runtime.Exceptions;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Types;
@@ -176,7 +175,7 @@ namespace Vexe.Editor.Editors
             OnBeforeInitialized();
 
             // fetch visibe members
-            _visibleMembers = VFWVisibilityLogic.GetCachedVisibleMembers.Invoke(targetType).ToList();
+            _visibleMembers = VFWVisibilityLogic.CachedGetVisibleMembers(targetType).ToList();
 
             // allocate categories
             _categories = new List<MembersCategory>();
@@ -204,12 +203,6 @@ namespace Vexe.Editor.Editors
                        let paths = ParseCategoryPath(d.FullPath)
                        orderby !d.Exclusive
                        select new { def = d, paths };
-
-            Func<MemberInfo, float> getDisplayOrder = member =>
-            {
-                var attr = member.GetCustomAttribute<DisplayOrderAttribute>();
-                return attr == null ? -1 : attr.DisplayOrder;
-            };
 
             // Parse paths and resolve definitions
             var resolver = new CategoryDefinitionResolver();
@@ -246,7 +239,7 @@ namespace Vexe.Editor.Editors
                 resolver.Resolve(_visibleMembers, d).Foreach(last.Members.Add);
 
                 lookup.Clear();
-                parent.Members = parent.Members.OrderBy(getDisplayOrder).ToList();
+                parent.Members = parent.Members.OrderBy<MemberInfo, float>(VFWVisibilityLogic.GetMemberDisplayOrder).ToList();
             }
 
             // filter out empty categories
@@ -273,13 +266,13 @@ namespace Vexe.Editor.Editors
             var field = targetType.GetAllMembers(typeof(MonoBehaviour), Flags.InstancePrivate)
                                   .FirstOrDefault(m => m.Name == "_serializationData");
             if (field == null)
-                throw new MemberNotFoundException("_serializationData in " + targetType.Name);
+                throw new vMemberNotFound("_serializationData in " + targetType.Name);
 
             _serializationData = EditorMember.WrapMember(field, target, target, id);
 
             field = targetType.GetField("dbg", Flags.InstanceAnyVisibility);
             if (field == null)
-                throw new MemberNotFoundException("dbg in " + targetType.Name);
+                throw new vMemberNotFound("dbg in " + targetType.Name);
 
             _debug = EditorMember.WrapMember(field, target, target, id);
 
@@ -360,7 +353,13 @@ namespace Vexe.Editor.Editors
             }
 
             if (gui.HasChanged())
+            {
+#if DBG
+                Log("Target changed: " + target);
+#endif
                 EditorUtility.SetDirty(target);
+                //SerializationManager.MarkModified(target);
+            }
         }
 
         private bool ScriptField()

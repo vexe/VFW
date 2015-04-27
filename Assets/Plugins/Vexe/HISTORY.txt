@@ -211,9 +211,9 @@ Editor: RecursiveDrawer's selection button will only show "MonoBehavoiurs" as op
 
 _______________
 -- VFW 1.2.7 --
-- Drawers: added MeshRenderer and Camera support to InlineAttributeDrawer
+- Drawers: added MeshRenderer and Camera support to InlineDrawer
 - Drawers: RecurisveDrawer can now take an optional array of member names to specificy exactly what
-  members to be drawn in a given target (used by InlineAttributeDrawer)
+  members to be drawn in a given target (used by InlineDrawer)
 - Drawers: fixed Popup not setting member to value at index 0 initially
 - Drawers: OnChanged wasn't able to pick static methods to call when the member value changes
 - Runtime Serialization: Added support for iOS!

@@ -1,5 +1,5 @@
 ﻿#if UNITY_EDITOR || UNITY_STANDALONE
-#define DYNAMIC_REFLECTION
+//#define DYNAMIC_REFLECTION
 #endif
 
 using System;
@@ -65,11 +65,18 @@ namespace Vexe.Runtime.Types
             }
             set
             {
+                try
+                {
 #if DYNAMIC_REFLECTION
-                _setter(ref Target, value);
+                    _setter(ref Target, value);
 #else
-                _setter(Target, value);
+                    _setter(Target, value);
 #endif
+                }
+                catch(InvalidCastException)
+                {
+                    throw new vInvalidCast(value, TypeNiceName);
+                }
             }
         }
 

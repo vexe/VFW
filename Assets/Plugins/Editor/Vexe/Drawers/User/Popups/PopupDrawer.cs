@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Vexe.Editor.GUIs;
-using Vexe.Runtime.Exceptions;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
 
 namespace Vexe.Editor.Drawers
 {
-	public class PopupAttributeDrawer : AttributeDrawer<string, PopupAttribute>
+	public class PopupDrawer : AttributeDrawer<string, PopupAttribute>
 	{
 		private string[] values;
 		private int? currentIndex;
@@ -19,7 +18,7 @@ namespace Vexe.Editor.Drawers
 		private static string[] NA = new string[1] { "NA" };
 		private const string OwnerTypePrefix = "target";
 
-		protected override void OnSingleInitialization()
+		protected override void Initialize()
 		{
 			string fromMember = attribute.PopulateFrom;
 			if (fromMember.IsNullOrEmpty())
@@ -60,7 +59,7 @@ namespace Vexe.Editor.Drawers
 				var all = populateFrom.GetAllMembers(typeof(object));
 				var member = all.FirstOrDefault(x => attribute.CaseSensitive ? x.Name == fromMember : x.Name.ToLower() == fromMember.ToLower());
 				if (member == null)
-					throw new MemberNotFoundException(fromMember);
+					throw new vMemberNotFound(fromMember);
 
 				var field = member as FieldInfo;
 				if (field != null)
@@ -74,7 +73,7 @@ namespace Vexe.Editor.Drawers
 					{
 						var method = member as MethodInfo;
 						if (method == null)
-							throw new WTFException("{0} is not a field, nor a property nor a method!".FormatWith(fromMember));
+							throw new Exception("{0} is not a field, nor a property nor a method!".FormatWith(fromMember));
 
 						populateMethod = (member as MethodInfo).DelegateForCall();
 					}
@@ -103,7 +102,7 @@ namespace Vexe.Editor.Drawers
 
 			using (gui.Horizontal())
 			{
-				int x = gui.Popup(niceName, currentIndex.Value, values);
+				int x = gui.Popup(displayText, currentIndex.Value, values);
 				{
 					if (currentIndex != x || (values.InBounds(x) && memberValue != values[x]))
 					{

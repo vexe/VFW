@@ -16,54 +16,39 @@ namespace Vexe.Editor.Drawers
 {
 	public abstract class SequenceDrawer<TSequence, TElement> : ObjectDrawer<TSequence> where TSequence : IList<TElement>
 	{
-		private readonly Type elementType;
-		private string sequenceName;
-		private int advancedKey;
-		private List<EditorMember> elements;
-		private SequenceOptions options;
-		private bool perItemDrawing;
-		private bool shouldDrawAddingArea;
-		private int newSize;
+		private readonly Type _elementType;
+		private int _advancedKey;
+		private List<EditorMember> _elements;
+		private SequenceOptions _options;
+		private bool _perItemDrawing;
+		private bool _shouldDrawAddingArea;
+		private int _newSize;
 
 		private bool isAdvancedChecked
 		{
-			get { return prefs.Bools.ValueOrDefault(advancedKey); }
-			set { prefs.Bools[advancedKey] = value; }
+			get { return prefs.Bools.ValueOrDefault(_advancedKey); }
+			set { prefs.Bools[_advancedKey] = value; }
 		}
 
 		protected abstract TSequence GetNew();
 
 		public SequenceDrawer()
 		{
-			elementType = typeof(TElement);
-			elements    = new List<EditorMember>();
+			_elementType = typeof(TElement);
+			_elements    = new List<EditorMember>();
 		}
 
-		protected override void OnSingleInitialization()
+		protected override void Initialize()
 		{
-			var seqOptions   = attributes.GetAttribute<SeqAttribute>();
-			options          = new SequenceOptions(seqOptions != null ? seqOptions.options : SeqOpt.None);
-			options.Readonly = options.Readonly || attributes.AnyIs<ReadonlyAttribute>();
+			var displayAttr = attributes.GetAttribute<DisplayAttribute>();
+			_options        = new SequenceOptions(displayAttr != null ? displayAttr.SeqOpt : Seq.None);
 
-			// Sequence name
-			{
-				var formatMember = attributes.GetAttribute<FormatMemberAttribute>();
-				if (formatMember != null)
-				{
-					sequenceName = formatMember.Format(niceName, memberType.GetNiceName());
-				}
-				else
-				{
-					sequenceName = niceName + " (" + memberType.GetNiceName() + ")";
-				}
+            if (_options.Readonly)
+                displayText += " (Readonly)";
 
-				if (options.Readonly)
-					sequenceName += " (Readonly)";
-			}
-
-			advancedKey          = RuntimeHelper.CombineHashCodes(id, sequenceName, "advanced");
-			perItemDrawing       = attributes.AnyIs<PerItemAttribute>();
-			shouldDrawAddingArea = !options.Readonly && elementType.IsA<UnityObject>();
+			_advancedKey          = RuntimeHelper.CombineHashCodes(id, "advanced");
+			_perItemDrawing       = attributes.AnyIs<PerItemAttribute>();
+			_shouldDrawAddingArea = !_options.Readonly && _elementType.IsA<UnityObject>();
 		}
 
 		public override void OnGUI()
@@ -71,19 +56,19 @@ namespace Vexe.Editor.Drawers
 			if (memberValue == null)
 				memberValue = GetNew();
 
-			bool showAdvanced = options.Advanced && !options.Readonly;
+			bool showAdvanced = _options.Advanced && !_options.Readonly;
 
 			// header
 			using (gui.Horizontal())
 			{
-				foldout = gui.Foldout(sequenceName, foldout, Layout.sExpandWidth());
+				foldout = gui.Foldout(displayText, foldout, Layout.sExpandWidth());
 
 				gui.FlexibleSpace();
 
 				if (showAdvanced)
 					isAdvancedChecked = gui.CheckButton(isAdvancedChecked, "advanced mode");
 
-				if (!options.Readonly)
+				if (!_options.Readonly)
 				{
 					using (gui.State(memberValue.Count > 0))
 					{
@@ -101,12 +86,13 @@ namespace Vexe.Editor.Drawers
 
 			if (memberValue.IsEmpty())
 			{
-				gui.HelpBox("Sequence is empty");
+                using(gui.Indent())
+				    gui.HelpBox("Sequence is empty");
 				return;
 			}
 
 			// body
-			using (gui.Vertical(options.GuiBox ? GUI.skin.box : GUIStyle.none))
+			using (gui.Vertical(_options.GuiBox ? GUI.skin.box : GUIStyle.none))
 			{
 				// advanced area
 				if (isAdvancedChecked)
@@ -115,11 +101,11 @@ namespace Vexe.Editor.Drawers
 					{
 						using (gui.Horizontal())
 						{
-							newSize = gui.Int("New size", newSize);
+							_newSize = gui.Int("New size", _newSize);
 							if (gui.MiniButton("c", "Commit", MiniButtonStyle.ModRight))
 							{
-								if (newSize != memberValue.Count)
-									memberValue.AdjustSize(newSize, RemoveAt, AddValue);
+								if (_newSize != memberValue.Count)
+									memberValue.AdjustSize(_newSize, RemoveAt, AddValue);
 							}
 						}
 
@@ -136,7 +122,7 @@ namespace Vexe.Editor.Drawers
 							if (gui.MoveUpButton())
 								memberValue.Shift(false);
 
-							if (!elementType.IsValueType && gui.MiniButton("N", "Filter nulls"))
+							if (!_elementType.IsValueType && gui.MiniButton("N", "Filter nulls"))
 							{
 								for (int i = memberValue.Count - 1; i > -1; i--)
 									if (memberValue[i] == null)
@@ -146,7 +132,7 @@ namespace Vexe.Editor.Drawers
 					}
 				}
 
-				using (gui.Indent(options.GuiBox ? GUI.skin.box : GUIStyle.none))
+				using (gui.Indent(_options.GuiBox ? GUI.skin.box : GUIStyle.none))
 				{
 #if PROFILE
 					Profiler.BeginSample("Sequence Elements");
@@ -158,7 +144,7 @@ namespace Vexe.Editor.Drawers
 
 						using (gui.Horizontal())
 						{
-							if (options.LineNumbers)
+							if (_options.LineNumbers)
 							{
 								gui.NumericLabel(i);
 							}
@@ -170,17 +156,17 @@ namespace Vexe.Editor.Drawers
 								using (gui.Vertical())
 								{
 									var element = GetElement(i);
-									gui.Member(element, attributes, !perItemDrawing);
+									gui.Member(element, attributes, !_perItemDrawing);
 								}
 							}
 
 							if (gui.HasChanged())
 							{
-								if (options.Readonly)
+								if (_options.Readonly)
 								{
 									memberValue[i] = previous;
 								}
-								else if (options.UniqueItems)
+								else if (_options.UniqueItems)
 								{
 									int occurances = 0;
 									for (int k = 0; k < memberValue.Count; k++)
@@ -214,7 +200,7 @@ namespace Vexe.Editor.Drawers
 								}
 							}
 
-							if (!options.Readonly && options.PerItemRemove && gui.RemoveButton("element", MiniButtonStyle.ModRight))
+							if (!_options.Readonly && _options.PerItemRemove && gui.RemoveButton("element", MiniButtonStyle.ModRight))
 							{
 								RemoveAt(i);
 							}
@@ -227,7 +213,7 @@ namespace Vexe.Editor.Drawers
 			}
 
 			// footer
-			if (shouldDrawAddingArea)
+			if (_shouldDrawAddingArea)
 			{
 				Action<UnityObject> addOnDrop = obj =>
 				{
@@ -235,7 +221,7 @@ namespace Vexe.Editor.Drawers
 					object value;
 					if (go != null)
 					{
-						value = elementType == typeof(GameObject) ? (UnityObject)go : go.GetComponent(elementType);
+						value = _elementType == typeof(GameObject) ? (UnityObject)go : go.GetComponent(_elementType);
 					}
 					else value = obj;
 					AddValue((TElement)value);
@@ -251,23 +237,23 @@ namespace Vexe.Editor.Drawers
 						{
 							var go = obj as GameObject;
 							var isGo = go != null;
-							if (elementType == typeof(GameObject))
+							if (_elementType == typeof(GameObject))
 							{
 								return isGo;
 							}
-							return isGo ? go.GetComponent(elementType) != null : obj.GetType().IsA(elementType);
+							return isGo ? go.GetComponent(_elementType) != null : obj.GetType().IsA(_elementType);
 						}),
 						@cursor: MouseCursor.Link,
 						@onDrop: addOnDrop,
 						@onMouseUp: () => SelectionWindow.Show(new Tab<UnityObject>(
-							@getValues: () => UnityObject.FindObjectsOfType(elementType),
+							@getValues: () => UnityObject.FindObjectsOfType(_elementType),
 							@getCurrent: () => null,
 							@setTarget: item =>
 							{
 								AddValue((TElement)(object)item);
 							},
 							@getValueName: value => value.name,
-							@title: elementType.Name + "s")),
+							@title: _elementType.Name + "s")),
 						@preSpace: 2f,
 						@postSpace: 35f,
 						@height: 15f
@@ -279,7 +265,7 @@ namespace Vexe.Editor.Drawers
 
 		private EditorMember GetElement(int index)
 		{
-			if (index >= elements.Count)
+			if (index >= _elements.Count)
 			{
 				var element = EditorMember.WrapIListElement(
 					@attributes  : attributes,
@@ -289,11 +275,11 @@ namespace Vexe.Editor.Drawers
 				);
 
 				element.InitializeIList(memberValue, index, rawTarget, unityTarget);
-				elements.Add(element);
+				_elements.Add(element);
 				return element;
 			}
 
-			var e = elements[index];
+			var e = _elements[index];
 			e.InitializeIList(memberValue, index, rawTarget, unityTarget);
 			return e;
 		}
@@ -337,7 +323,7 @@ namespace Vexe.Editor.Drawers
 
 		private void AddValue()
 		{
-			AddValue((TElement)elementType.GetDefaultValueEmptyIfString());
+			AddValue((TElement)_elementType.GetDefaultValueEmptyIfString());
 		}
 		#endregion
 
@@ -350,17 +336,17 @@ namespace Vexe.Editor.Drawers
 			public bool GuiBox;
 			public bool UniqueItems;
 
-			public SequenceOptions(SeqOpt options)
+			public SequenceOptions(Seq options)
 			{
-				Func<SeqOpt, bool> contains = value =>
+				Func<Seq, bool> contains = value =>
 					(options & value) != 0;
 
-				Readonly      = contains(SeqOpt.Readonly);
-				Advanced      = contains(SeqOpt.Advanced);
-				LineNumbers   = contains(SeqOpt.LineNumbers);
-				PerItemRemove = contains(SeqOpt.PerItemRemove);
-				GuiBox        = contains(SeqOpt.GuiBox);
-				UniqueItems   = contains(SeqOpt.UniqueItems);
+				Readonly      = contains(Seq.Readonly);
+				Advanced      = contains(Seq.Advanced);
+				LineNumbers   = contains(Seq.LineNumbers);
+				PerItemRemove = contains(Seq.PerItemRemove);
+				GuiBox        = contains(Seq.GuiBox);
+				UniqueItems   = contains(Seq.UniqueItems);
 			}
 		}
 	}

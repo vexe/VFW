@@ -6,7 +6,7 @@ namespace VFWExamples
 	
 	public class VisibleWhenExample : BetterBehaviour
 	{
-		[DisplayOrder(0), Comment(
+		[Display(0f), Comment(
 			"The visibility of the other members are determined by this value. " +
 			"< 5 SetBig and smallColor will be visible. " + 
 			"> 10 SetSmall and bigColor will be visible. " +

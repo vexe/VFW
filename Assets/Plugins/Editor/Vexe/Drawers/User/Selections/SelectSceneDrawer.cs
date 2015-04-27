@@ -9,9 +9,9 @@ using Vexe.Runtime.Types;
 
 namespace Vexe.Editor.Drawers
 {
-	public class SelectSceneAttributeDrawer : CompositeDrawer<string, SelectSceneAttribute>
+	public class SelectSceneDrawer : CompositeDrawer<string, SelectSceneAttribute>
 	{
-		protected override void OnSingleInitialization()
+		protected override void Initialize()
 		{
 			if (memberValue == null)
 				memberValue = string.Empty;

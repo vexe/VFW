@@ -1,18 +1,18 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Reflection;
-using Vexe.Runtime.Exceptions;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
 
 namespace Vexe.Editor.Drawers
 {
-	public class OnChangedAttributeDrawer : CompositeDrawer<object, OnChangedAttribute>
+	public class OnChangedDrawer : CompositeDrawer<object, OnChangedAttribute>
 	{
 		private MethodCaller<object, object> onChanged;
 		private MemberSetter<object, object> setter;
 		private object previous;
 
-		protected override void OnSingleInitialization()
+		protected override void Initialize()
 		{
 			string call = attribute.Call;
 			string set  = attribute.Set;
@@ -33,7 +33,7 @@ namespace Vexe.Editor.Drawers
 					}
 					catch
 					{
-						throw new MemberNotFoundException("Failed to get a field or property to set with the name: " + set);
+						throw new vMemberNotFound("Failed to get a field or property to set with the name: " + set);
 					}
 				}
 			}
@@ -53,7 +53,7 @@ namespace Vexe.Editor.Drawers
 				}
 				catch
 				{
-					throw new MemberNotFoundException(string.Format("Couldn't find an appropriate method to call with the name: {0} on target {1} when apply OnChanged on member {2}", call, rawTarget, member.Name));
+					throw new vMemberNotFound(string.Format("Couldn't find an appropriate method to call with the name: {0} on target {1} when apply OnChanged on member {2}", call, rawTarget, member.Name));
 				}
 			}
 

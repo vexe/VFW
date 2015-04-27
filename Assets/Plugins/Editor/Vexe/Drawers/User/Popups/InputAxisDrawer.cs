@@ -4,12 +4,12 @@ using Vexe.Runtime.Types;
 
 namespace Vexe.Editor.Drawers
 {
-	public class InputAxisAttributeDrawer : AttributeDrawer<string, InputAxisAttribute>
+	public class InputAxisDrawer : AttributeDrawer<string, InputAxisAttribute>
 	{
 		private string[] axes;
 		private int current;
 
-		protected override void OnSingleInitialization()
+		protected override void Initialize()
 		{
 			if (memberValue == null)
 				memberValue = "";
@@ -20,7 +20,7 @@ namespace Vexe.Editor.Drawers
 
 		public override void OnGUI()
 		{
-			var x = gui.Popup(niceName, current, axes);
+			var x = gui.Popup(displayText, current, axes);
 			{
 				var newValue = axes[x];
 				if (current != x || memberValue != newValue)

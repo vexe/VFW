@@ -3,7 +3,7 @@ using Vexe.Runtime.Types;
 
 namespace Vexe.Editor.Drawers
 {
-	public class RegexAttributeDrawer<T> : CompositeDrawer<string, T> where T : RegexAttribute
+	public class RegexDrawer<T> : CompositeDrawer<string, T> where T : RegexAttribute
 	{
 		private string recentValid;
 

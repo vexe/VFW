@@ -106,8 +106,8 @@ namespace Vexe.Editor
                         .Add<fMinAttribute, fMinDrawer>()
                         .Add<iMaxAttribute, iMaxDrawer>()
                         .Add<fMaxAttribute, fMaxDrawer>()
-                        .Add<iNumericClampAttribute, iNumericClampDrawer>()
-                        .Add<fNumericClampAttribute, fNumericClampDrawer>();
+                        .Add<iClampAttribute, iClampDrawer>()
+                        .Add<fClampAttribute, fClampDrawer>();
                 }
                 // Regex
                 {

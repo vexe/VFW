@@ -4,10 +4,10 @@ namespace VFWExamples
 	
 	public class SlidersExample : BetterBehaviour
 	{
-		[FloatSlider(0, 10)]
+		[fSlider(-1.5f, 10.5f)]
 		public float floatSlider;
 
-		[IntSlider(3, 15)]
+		[iSlider(3, 15)]
 		public int IntSlider { get; set; }
 	}
 }

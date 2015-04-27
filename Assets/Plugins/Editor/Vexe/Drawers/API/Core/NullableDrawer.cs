@@ -7,7 +7,7 @@ namespace Vexe.Editor.Drawers
 	{
 		private EditorMember nullableMember;
 
-		protected override void OnSingleInitialization()
+		protected override void Initialize()
 		{
 			nullableMember = EditorMember.WrapGetSet(
 				@get          : member.Get,
@@ -15,7 +15,7 @@ namespace Vexe.Editor.Drawers
 				@rawTarget    : member.RawTarget,
 				@unityTarget  : unityTarget,
 				@dataType     : typeof(T),
-				@name         : niceName,
+				@name         : displayText,
 				@id           : id,
                 @attributes   : attributes
 			);

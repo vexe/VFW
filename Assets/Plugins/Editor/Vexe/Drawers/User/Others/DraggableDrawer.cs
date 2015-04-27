@@ -5,7 +5,7 @@ using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Editor.Drawers
 {
-	public class DraggableAttributeDrawer : CompositeDrawer<UnityObject, DraggableAttribute>
+	public class DraggableDrawer : CompositeDrawer<UnityObject, DraggableAttribute>
 	{
 		public override void OnMemberDrawn(Rect rect)
 		{
