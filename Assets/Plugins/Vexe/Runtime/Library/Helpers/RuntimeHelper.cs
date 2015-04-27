@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using UnityEngine;
-using Vexe.Runtime.Types;
 using Vexe.Runtime.Extensions;
+using Vexe.Runtime.Serialization;
+using Vexe.Runtime.Types;
+using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Runtime.Helpers
 {
@@ -47,15 +51,54 @@ namespace Vexe.Runtime.Helpers
 
         public static void ResetTarget(object target)
         {
-            var type = target.GetType();
-            var members = RuntimeMember.CachedWrapMembers(type);
+            Func<Type, bool> IsTypeSerializedByUnity = type =>
+            {
+                // Might be forgetting something here...
+                return (type.IsPrimitive || type.IsEnum || type == typeof(string)
+                    || type.IsA<UnityObject>()
+                    || VFWSerializationLogic.UnityStructs.ContainsValue(type)
+                    || type == typeof(AnimationCurve)
+                    || type == typeof(Gradient));
+            };
+
+            Func<FieldInfo, bool> IsFieldSerializedByUnity = field =>
+            {
+                var type = field.FieldType;
+                if (!IsTypeSerializedByUnity(type))
+                    return false;
+
+                if (!field.IsPublic && !field.IsDefined<SerializeField>())
+                    return false;
+
+                if (type.IsArray)
+                    return type.GetArrayRank() == 1 && IsTypeSerializedByUnity(type.GetElementType());
+
+                if (type.IsGenericType)
+                    return type.GetGenericTypeDefinition() == typeof(List<>) && IsTypeSerializedByUnity(type.GetGenericArguments()[0]);
+
+                if (type.IsAbstract)
+                    return false;
+
+                return type.IsDefined<SerializableAttribute>();
+            };
+
+            var members = RuntimeMember.CachedWrapMembers(target.GetType());
             for (int i = 0; i < members.Count; i++)
 			{
 				var member = members[i];
+				member.Target = target;
 				var defAttr = member.Info.GetCustomAttribute<DefaultAttribute>();
-				if (defAttr != null)
+                if (defAttr == null)
+                { 
+                    // if a field is not serializable by Unity, then Unity won't be able to set it to whatever we initialized it with,
+                    // so we will reset it to its default value and unfortunately ignore the field initialization because it's very
+                    // hard to obtain that value
+                    var field = member.Info as FieldInfo;
+                    if (field != null && !IsFieldSerializedByUnity(field) || member.Info is PropertyInfo)
+                        member.Value = member.Type.GetDefaultValue();
+                }
+				else
 				{ 
-					member.Target = target;
 					var value = defAttr.Value;
 					if (value == null && !member.Type.IsAbstract) // null means to instantiate a new instance
 						value = member.Type.ActivatorInstance();
