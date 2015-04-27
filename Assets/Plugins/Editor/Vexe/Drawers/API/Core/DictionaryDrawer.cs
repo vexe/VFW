@@ -42,6 +42,9 @@ namespace Vexe.Editor.Drawers
                 _isReadonly = (displayAttr.DictOpt & Dict.Readonly) != 0;
             }
 
+            if (_formatPairPattern.IsNullOrEmpty())
+                _formatPairPattern = "[$key, $value]";
+
             if (_isReadonly)
                 displayText += " (Readonly)";
 
@@ -82,7 +85,6 @@ namespace Vexe.Editor.Drawers
                     _kvpList[key] = value;
                 }
             }
-
 
             #if PROFILE
             Profiler.BeginSample("DictionaryDrawer Header");
