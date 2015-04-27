@@ -23,6 +23,11 @@ namespace Vexe.Editor.Drawers
 			gui.Member(member, false);
 		}
 
+        public override bool CanHandle(Type memberType)
+        {
+            return memberType.IsA<T>() || memberType.IsSubclassOrImplementerOfRawGeneric(typeof(T));
+        }
+
 		public sealed override void OnLeftGUI() { }
 		public sealed override void OnRightGUI() { }
 		public sealed override void OnUpperGUI() { }

@@ -1,15 +1,21 @@
-﻿using Vexe.Runtime.Extensions;
+﻿using System;
+using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
 
 namespace Vexe.Editor.Drawers
 {
-	public abstract class AttributeDrawer<TObject, TAttribute> : ObjectDrawer<TObject> where TAttribute : DrawnAttribute
+	public abstract class AttributeDrawer<T, A> : ObjectDrawer<T> where A : DrawnAttribute
 	{
-		protected TAttribute attribute { private set; get; }
+		protected A attribute { private set; get; }
 
-		protected sealed override void OnInternalInitialization()
+		protected sealed override void InternalInitialize()
 		{
-			attribute = attributes.GetAttribute<TAttribute>();
+			attribute = attributes.GetAttribute<A>();
 		}
+
+        public override bool CanHandle(Type memberType)
+        {
+            return memberType.IsA<T>() || memberType.IsSubclassOrImplementerOfRawGeneric(typeof(T));
+        }
 	}
 }

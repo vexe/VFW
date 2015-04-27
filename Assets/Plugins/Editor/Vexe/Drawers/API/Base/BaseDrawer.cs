@@ -97,6 +97,8 @@ namespace Vexe.Editor.Drawers
         public virtual void OnLowerGUI() { }
         public virtual void OnMemberDrawn(Rect rect) { }
 
+        public abstract bool CanHandle(Type memberType);
+
         protected static void LogFormat(string msg, params object[] args)
         {
             Debug.Log(string.Format(msg, args));

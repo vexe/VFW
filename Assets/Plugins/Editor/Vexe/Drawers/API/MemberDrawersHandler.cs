@@ -4,69 +4,55 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using Vexe.Editor.Drawers;
-using Vexe.Editor.GUIs;
 using Vexe.Editor.Types;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
 
 namespace Vexe.Editor
 {
+    [InitializeOnLoad]
 	public static class MemberDrawersHandler
 	{
-		static readonly Type[] objectDrawerTypes;
-		static readonly Type[] attributeDrawerTypes;
-		static readonly Type[] compositeDrawerTypes;
-		static readonly Dictionary<int, List<BaseDrawer>> cachedCompositeDrawers;
-		static readonly Dictionary<int, BaseDrawer> cachedMemberDrawers;
-		static readonly Dictionary<int, MethodDrawer> cachedMethodDrawers;
-		static readonly Type fallbackDrawerType;
+		static readonly Dictionary<int, List<BaseDrawer>> _cachedCompositeDrawers;
+		static readonly Dictionary<int, BaseDrawer> _cachedMemberDrawers;
+		static readonly Dictionary<int, MethodDrawer> _cachedMethodDrawers;
+
+        static readonly HashSet<Type> _definesElementDrawingAttributes;
+
+        public static readonly TypeDrawerMapper Mapper;
 
 		public static readonly Func<Type, BaseDrawer> GetCachedObjectDrawer;
 
 		static MemberDrawersHandler()
 		{
-			cachedMemberDrawers    = new Dictionary<int, BaseDrawer>();
-			cachedCompositeDrawers = new Dictionary<int, List<BaseDrawer>>();
-			cachedMethodDrawers    = new Dictionary<int, MethodDrawer>();
+            Mapper = new TypeDrawerMapper();
+            Mapper.AddBuiltinTypes();
 
-			fallbackDrawerType = typeof(RecursiveDrawer);
+			_cachedMemberDrawers    = new Dictionary<int, BaseDrawer>();
+			_cachedCompositeDrawers = new Dictionary<int, List<BaseDrawer>>();
+			_cachedMethodDrawers    = new Dictionary<int, MethodDrawer>();
 
-			Type[] drawerTypes = AppDomain.CurrentDomain.GetAssemblies()
-														.SelectMany(x => x.GetTypes())
-														.Where(t => t.IsA<BaseDrawer>())
-												   		.Where(t => !t.IsAbstract)
-												   		.ToArray();
+            _definesElementDrawingAttributes = new HashSet<Type>()
+            {
+                typeof(PerItemAttribute), typeof(PerKeyAttribute), typeof(PerValueAttribute)
+            };
 
-			compositeDrawerTypes = drawerTypes.Where(t => t.IsSubclassOfRawGeneric(typeof(CompositeDrawer<,>)))
-											  .ToArray();
-
-			attributeDrawerTypes = drawerTypes.Where(t => t.IsSubclassOfRawGeneric(typeof(AttributeDrawer<,>)))
-											  .ToArray();
-
-			objectDrawerTypes = drawerTypes.Except(attributeDrawerTypes)
-										   .Disinclude(fallbackDrawerType)
-										   .Where(t => t.IsSubclassOfRawGeneric(typeof(ObjectDrawer<>)))
-										   .ToArray();
-
-            GetCachedObjectDrawer = new Func<Type, BaseDrawer>(type =>
-                GetDrawerForType(type, objectDrawerTypes, typeof(ObjectDrawer<>))).Memoize();
+            //TODO: check if this is still needed
+            GetCachedObjectDrawer = new Func<Type, BaseDrawer>(Mapper.GetDrawer).Memoize();
 		}
 
 		public static List<BaseDrawer> GetCompositeDrawers(EditorMember member, Attribute[] attributes)
 		{
 			List<BaseDrawer> drawers;
-			if (cachedCompositeDrawers.TryGetValue(member.Id, out drawers))
+			if (_cachedCompositeDrawers.TryGetValue(member.Id, out drawers))
 				return drawers;
 
 			drawers = new List<BaseDrawer>();
 
-			var memberType = member.Type;
-
 			// consider composition only if the member type isn't a collection type,
 			// or it is a collection type but it doesn't have any per attribute that signifies drawing per element
 			// (in other words, the composition is applied on the collection itself, and not its elements)
-			var considerComposition = !memberType.IsCollection() || !attributes.AnyDefined<DefinesElementDrawingAttribute>();
-
+			var considerComposition = !member.Type.IsCollection() || !attributes.Any(x => _definesElementDrawingAttributes.Contains(x.GetType()));
 			if (considerComposition)
 			{
 				var compositeAttributes = attributes.OfType<CompositeAttribute>()
@@ -74,29 +60,48 @@ namespace Vexe.Editor
 													.ToList();
 
 				for (int i = 0; i < compositeAttributes.Count; i++)
-					drawers.AddIfNotNull(GetCompositeDrawer(memberType, compositeAttributes[i].GetType()));
+                {
+                    var drawer = NewCompositeDrawer(compositeAttributes[i].GetType());
+                    if (!drawer.CanHandle(member.Type))
+                    {
+                        Debug.LogError("Drawer {0} can't seem to handle type {1}. Make sure you're not applying attributes on the wrong members"
+                             .FormatWith(drawer.GetType().GetNiceName(), member.TypeNiceName));
+                        continue;
+                    }
+					drawers.Add(drawer);
+                }
 			}
 
-			cachedCompositeDrawers.Add(member.Id, drawers);
+			_cachedCompositeDrawers.Add(member.Id, drawers);
 			return drawers;
 		}
 
-		public static BaseDrawer GetMemberDrawer(EditorMember member, Attribute[] attributes)
+		public static BaseDrawer GetMemberDrawer(EditorMember member, Attribute[] attributes, bool ignoreAttributes)
 		{
 			BaseDrawer drawer;
-			if (cachedMemberDrawers.TryGetValue(member.Id, out drawer))
+			if (_cachedMemberDrawers.TryGetValue(member.Id, out drawer))
 				return drawer;
 
-			// check attribute drawer first
-			var drawingAttribute = attributes.GetAttribute<DrawnAttribute>();
-			if (drawingAttribute != null)
-				drawer = GetAttributeDrawer(member.Type, drawingAttribute.GetType());
+			var canApplyDrawer = !member.Type.IsCollection() || !attributes.Any(x => _definesElementDrawingAttributes.Contains(x.GetType()));
+            if (canApplyDrawer && !ignoreAttributes)
+            {
+                var drawingAttribute = attributes.GetAttribute<DrawnAttribute>();
+                if (drawingAttribute != null)
+                    drawer = NewDrawer(drawingAttribute.GetType());
+            }
 
-			// if still null get an object drawer
-			if (drawer == null)
-				drawer = GetObjectDrawer(member.Type);
+            if (drawer == null)
+				drawer = NewObjectDrawer(member.Type);
 
-			cachedMemberDrawers.Add(member.Id, drawer);
+            if (!drawer.CanHandle(member.Type))
+            {
+                Debug.LogError("Drawer `{0}` can't seem to handle type `{1}`. Make sure you're not applying attributes on the wrong members"
+                    .FormatWith(drawer.GetType().GetNiceName(), member.TypeNiceName));
+
+                drawer = Mapper.GetDrawer(member.Type);
+            }
+
+			_cachedMemberDrawers.Add(member.Id, drawer);
 
 			return drawer;
 		}
@@ -104,131 +109,31 @@ namespace Vexe.Editor
 		public static MethodDrawer GetMethodDrawer(int methodId)
 		{
 			MethodDrawer drawer;
-			if (!cachedMethodDrawers.TryGetValue(methodId, out drawer))
-				cachedMethodDrawers.Add(methodId, drawer = new MethodDrawer());
+			if (!_cachedMethodDrawers.TryGetValue(methodId, out drawer))
+				_cachedMethodDrawers.Add(methodId, drawer = new MethodDrawer());
 			return drawer;
 		}
 
-		public static BaseDrawer GetObjectDrawer(Type objectType)
+		public static BaseDrawer NewObjectDrawer(Type objectType)
 		{
-			return GetDrawerForType(objectType, objectDrawerTypes, typeof(ObjectDrawer<>));
+            return Mapper.GetDrawer(objectType);
 		}
 
-		public static BaseDrawer GetCompositeDrawer(Type objectType, Type attributeType)
+		public static BaseDrawer NewCompositeDrawer(Type attributeType)
 		{
-			return GetDrawerForPair(objectType, attributeType, compositeDrawerTypes, typeof(CompositeDrawer<,>));
+            return Mapper.GetDrawer(attributeType);
 		}
 
-		public static BaseDrawer GetAttributeDrawer(Type objectType, Type attributeType)
+		public static BaseDrawer NewDrawer(Type attributeType)
 		{
-			return GetDrawerForPair(objectType, attributeType, attributeDrawerTypes, typeof(AttributeDrawer<,>));
-		}
-
-		static BaseDrawer ResolveDrawerFromTypes(Type objectType, Type drawerType, Type drawerGenArgType)
-		{
-            if (objectType.IsSubTypeOfRawGeneric(typeof(IDictionary<,>)))
-            {
-                var args = new List<Type>(objectType.GetGenericArgsInThisOrAbove());
-                args.Insert(0, objectType);
-                return BaseDrawer.Create(typeof(DictionaryDrawer<,,>).MakeGenericType(args.ToArray()));
-            }
-
-            if (objectType.IsSubTypeOfRawGeneric(typeof(List<>)))
-            {
-                var elementType = objectType.GetGenericArgsInThisOrAbove()[0];
-                return BaseDrawer.Create(typeof(ListDrawer<>).MakeGenericType(elementType));
-            }
-
-			if (objectType.IsArray)
-			{
-                var elementType = objectType.GetElementType();
-				return BaseDrawer.Create(typeof(ArrayDrawer<>).MakeGenericType(elementType));
-			}
-
-			if (objectType.IsA(drawerGenArgType))
-			{
-				return BaseDrawer.Create(drawerType);
-			}
-
-			if (drawerGenArgType.IsGenericType)
-			{
-				if (objectType.IsSubTypeOfRawGeneric(drawerGenArgType.GetGenericTypeDefinition()))
-				{
-                    var args = objectType.GetGenericArgsInThisOrAbove();
-                    return BaseDrawer.Create(drawerType.MakeGenericType(args));
-				}
-			}
-			else if (!drawerGenArgType.IsConstructedGenType())
-			{
-				var args = drawerType.GetGenericArguments();
-				if (args.Length == 1 && args[0].IsGenericTypeDefinition)
-					return BaseDrawer.Create(drawerType.MakeGenericType(objectType));
-			}
-
-			return null;
-		}
-
-		static BaseDrawer GetDrawerForType(Type objectType, Type[] typeCache, Type baseDrawerType)
-		{
-			for (int i = 0; i < typeCache.Length; i++)
-			{
-				var drawerType = typeCache[i];
-
-				var ignoreFor = drawerType.GetCustomAttribute<IgnoreOnTypes>();
-				if (ignoreFor != null)
-				{
-					var forTypes = ignoreFor.types;
-					if (forTypes.Any(x => objectType.IsSubclassOfRawGeneric(x)))
-						continue;
-				}
-
-				var firstGen = drawerType.GetParentGenericArguments(baseDrawerType)[0];
-				var drawer = ResolveDrawerFromTypes(objectType, drawerType, firstGen);
-				if (drawer != null)
-					return drawer;
-			}
-
-			return BaseDrawer.Create(fallbackDrawerType);
-		}
-
-		static BaseDrawer GetDrawerForPair(Type objectType, Type attributeType, Type[] typeCache, Type baseDrawerType)
-		{
-			for (int i = 0; i < typeCache.Length; i++)
-			{
-				var drawerType = typeCache[i];
-
-				var ignoreFor = drawerType.GetCustomAttribute<IgnoreOnTypes>();
-				if (ignoreFor != null)
-				{
-					var forTypes = ignoreFor.types;
-					if (forTypes.Any(x => objectType.IsSubclassOfRawGeneric(x)))
-						continue;
-				}
-
-				var args = drawerType.GetParentGenericArguments(baseDrawerType);
-
-				if (attributeType == args[1])
-				{
-					var drawer = ResolveDrawerFromTypes(objectType, drawerType, args[0]);
-					if (drawer != null)
-						return drawer;
-				}
-				else if (args[1].IsGenericParameter)
-				{
-					var constraints = args[1].GetGenericParameterConstraints();
-					if (constraints.Length == 1 && attributeType.IsA(constraints[0]))
-						return BaseDrawer.Create(drawerType.MakeGenericType(attributeType));
-				}
-			}
-
-			return null;
+            return Mapper.GetDrawer(attributeType);
 		}
 
 		public static void ClearCache()
 		{
-			cachedMemberDrawers.Clear();
-			cachedCompositeDrawers.Clear();
-			cachedMethodDrawers.Clear();
+			_cachedMemberDrawers.Clear();
+			_cachedCompositeDrawers.Clear();
+			_cachedMethodDrawers.Clear();
 		}
 
 		static class MenuItems
