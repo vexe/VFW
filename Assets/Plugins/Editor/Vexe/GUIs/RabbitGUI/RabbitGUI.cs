@@ -55,10 +55,9 @@ namespace Vexe.Editor.GUIs
         private float _prevInspectorWidth;
         private bool _pendingLayoutRequest;
         private bool _allocatedMemory;
+        private bool _storedValidRect;
         private int _id;
-        private BetterPrefs _prefs;
-        //private float _scrollbarOffset;
-        //private Rect? _prevRect;
+        private static BetterPrefs _prefs;
 
         static MethodCaller<object, object> _scrollableTextArea;
         static MethodCaller<object, Gradient> _doGradientField;
@@ -94,25 +93,6 @@ namespace Vexe.Editor.GUIs
         }
         #endif
 
-        void OnPlaymodeChanged()
-        {
-            //Debug.Log("Playmode changed");
-            if (_validRect.HasValue)
-            {
-                var key = RuntimeHelper.CombineHashCodes(_id, "rabbit_coords");
-                _prefs.Vector3s[key] = new Vector3(_validRect.Value.x, _validRect.Value.y);
-            }
-
-            //if (_prevRect.HasValue)
-            //{
-                //var prevKey = RTHelper.CombineHashCodes(_id, "prevRect");
-                //var x = _prevRect.Value.x;
-                //var y = _prevRect.Value.y;
-                //_prefs.Vector3s[prevKey] = new Vector3(x, y);
-                //Debug.Log("Saved: " + x + " " + y);
-            //}
-        }
-
         public RabbitGUI()
         {
             _currentPhase = GUIPhase.Layout;
@@ -131,7 +111,7 @@ namespace Vexe.Editor.GUIs
             var editorGUIType = typeof(EditorGUI);
 
             // ScrollabeTextArea
-            { 
+            {
                 var method = editorGUIType.GetMethod("ScrollableTextAreaInternal",
                     new Type[] { typeof(Rect), typeof(string), typeof(Vector2).MakeByRefType(), typeof(GUIStyle) },
                     Flags.StaticAnyVisibility);
@@ -145,6 +125,29 @@ namespace Vexe.Editor.GUIs
                     Flags.StaticAnyVisibility);
 
                 _doGradientField = method.DelegateForCall<object, Gradient>();
+            }
+        }
+
+        void OnEditorUpdate()
+        {
+            if (!EditorApplication.isCompiling)
+                return;
+
+            StoreValidRect();
+        }
+
+        void OnPlaymodeChanged()
+        {
+            StoreValidRect();
+        }
+
+        void StoreValidRect()
+        {
+            if (!_storedValidRect && _validRect.HasValue)
+            {
+                var key = RuntimeHelper.CombineHashCodes(_id, "rabbit_coords");
+                _prefs.Vector3s[key] = new Vector3(_validRect.Value.x, _validRect.Value.y);
+                _storedValidRect = true;
             }
         }
 
@@ -175,49 +178,6 @@ namespace Vexe.Editor.GUIs
                     _validRect = unityRect;
                     _pendingLayoutRequest = true;
                 }
-
-                //var bar = GUI.skin.verticalScrollbar;
-                //var offset = bar.fixedWidth + bar.margin.left;
-                //var bools = prefs.Bools;
-                //var prevKey = RTHelper.CombineHashCodes(_id, "prevRect");
-                //if (!_prevRect.HasValue)
-                //{
-                //    Debug.Log("pr has no value. reading from prefs");
-                //    float result;
-                //    _prefs.Floats.TryGetValue(prevKey, out result);
-                //    var tmp = new Rect();
-                //    tmp.width = result;
-                //    _prevRect = tmp;
-                //    Debug.Log("read: " + result);
-                //}
-                //if (unityRect.width == _prevRect.Value.width - offset)
-                //{
-                //    //Debug.Log("Scrollbar on");
-                //    _prefs.Floats[prevKey] = _prevRect.Value.width;
-                //    var tmp = _prevRect.Value;
-                //    tmp.width += offset;
-                //    _prevRect = tmp;
-                //    _validRect = _prevRect;
-                //    _pendingLayoutRequest = true;
-                //    _scrollbarOffset = offset - 2;
-                //}
-                //else if (unityRect.width == _prevRect.Value.width + offset)
-                //{
-                //    //Debug.Log("Scrollbar off");
-                //    _prefs.Floats[prevKey] = _prevRect.Value.width;
-                //    var tmp = _prevRect.Value;
-                //    tmp.width -= offset;
-                //    _prevRect = tmp;
-                //    _validRect = _prevRect;
-                //    _scrollbarOffset = 0;
-                //    _pendingLayoutRequest = true;
-                //}
-                //else if (!_validRect.HasValue || _validRect.Value.y != unityRect.y)
-                //{
-                //    _validRect = unityRect;
-                //    _pendingLayoutRequest = true;
-                //}
-                //_prevRect = unityRect;
             }
 
             if (_validRect.HasValue)
@@ -256,11 +216,13 @@ namespace Vexe.Editor.GUIs
         public override void OnEnable()
         {
             EditorApplication.playmodeStateChanged += OnPlaymodeChanged;
+            EditorApplication.update += OnEditorUpdate;
         }
 
         public override void OnDisable()
         {
             EditorApplication.playmodeStateChanged -= OnPlaymodeChanged;
+            EditorApplication.update -= OnEditorUpdate;
         }
 
         private void End()
