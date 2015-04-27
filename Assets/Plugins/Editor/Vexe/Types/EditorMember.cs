@@ -29,7 +29,7 @@ namespace Vexe.Editor.Types
             { @"\$type"    , x => x.Type.Name },
             { @"\$nicetype", x => x.TypeNiceName },
             { @"\$name"    , x => x.Name },
-            { @"\$nicename", x => x.Name.Replace("_", "").SplitPascalCase() },
+            { @"\$nicename", x => x.Name.Replace("m_", "").Replace("_", "").SplitPascalCase() },
         };
 
         public object Value
