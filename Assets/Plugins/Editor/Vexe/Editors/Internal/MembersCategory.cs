@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -134,7 +133,7 @@ namespace Vexe.Editor.Internal
 
                     cat.gui = this.gui;
                     cat.HideHeader = this.HideHeader;
-                    cat._display = _display;
+                    cat.Display = _display;
 
                     if ((_display & CategoryDisplay.CategorySplitter) != 0)
                         gui.Splitter();
@@ -158,12 +157,11 @@ namespace Vexe.Editor.Internal
             MethodCaller<UnityObject, bool> isVisible;
             if (changedTarget || !_isVisibleCache.TryGetValue(member, out isVisible))
             {
-                var vis = member.GetAttributes().GetAttribute<VisibleWhenAttribute>();
+                var vis = member.GetCustomAttribute<VisibleWhenAttribute>();
                 if (vis == null)
                     return true;
 
-                var flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public;
-                var method = target.GetType().GetMethod(vis.ConditionMethod, flags);
+                var method = target.GetType().GetMethod(vis.ConditionMethod, Flags.StaticInstanceAnyVisibility);
                 if (method == null)
                 {
                     Debug.LogError("Method not found: " + vis.ConditionMethod);

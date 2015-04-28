@@ -11,7 +11,6 @@ using Vexe.Editor.Visibility;
 using Vexe.Editor.Windows;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
-using Vexe.Runtime.Types;
 using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Editor.Drawers

@@ -96,7 +96,9 @@ namespace Vexe.Editor.Editors
 
             var component = target as Component;
             gameObject = component == null ? null : component.gameObject;
+
             targetType = target.GetType();
+
             id = RuntimeHelper.GetTargetID(target);
 
             _useUnityGUI = useUnityGUI;
@@ -107,7 +109,7 @@ namespace Vexe.Editor.Editors
             gui.OnEnable();
         }
 
-        void OnDisable()
+        private void OnDisable()
         {
             gui.OnDisable();
         }
@@ -174,7 +176,7 @@ namespace Vexe.Editor.Editors
         {
             OnBeforeInitialized();
 
-            // fetch visibe members
+            // fetch visible members
             _visibleMembers = VFWVisibilityLogic.CachedGetVisibleMembers(targetType).ToList();
 
             // allocate categories
@@ -283,7 +285,7 @@ namespace Vexe.Editor.Editors
         {
             if (ShowScriptHeader)
             {
-                var scriptKey = RuntimeHelper.CombineHashCodes(id, "script".GetHashCode());
+                var scriptKey = RuntimeHelper.CombineHashCodes(id, "script");
                 gui.Space(3f);
                 using (gui.Horizontal(EditorStyles.toolbarButton))
                 {
