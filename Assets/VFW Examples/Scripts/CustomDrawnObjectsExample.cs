@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using Vexe.Runtime.Types;
-using System;
+﻿using Vexe.Runtime.Types;
 
 namespace VFWExamples
 {
@@ -15,6 +12,8 @@ namespace VFWExamples
 
         [Override]
         public CustomObject drawn2;
+
+        public Index2D drawn3;
     }
 
     public class CustomObject
@@ -24,5 +23,13 @@ namespace VFWExamples
 
     public class OverrideAttribute : DrawnAttribute
     {
+    }
+
+    public struct Index2D
+    {
+        [iMin(0), iMax(10), Comment("[0 -> 10]")]
+        public readonly int i;
+        [iClamp(0, 10)]
+        public readonly int j;
     }
 }

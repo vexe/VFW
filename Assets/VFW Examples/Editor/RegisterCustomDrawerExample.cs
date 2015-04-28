@@ -2,6 +2,7 @@
 using UnityEditor;
 using Vexe.Editor;
 using Vexe.Editor.Drawers;
+using Vexe.Editor.Types;
 
 namespace VFWExamples
 {
@@ -16,7 +17,8 @@ namespace VFWExamples
         static CustomMapper()
         {
             MemberDrawersHandler.Mapper.Insert<CustomObject, CustomDrawer1>()
-                                       .Insert<OverrideAttribute, CustomDrawer2>();
+                                       .Insert<OverrideAttribute, CustomDrawer2>()
+                                       .Insert<Index2D, CustomDrawer3>();
         }
     }
 
@@ -41,6 +43,37 @@ namespace VFWExamples
 
             gui.HelpBox("I'm overridden :(");
             memberValue.str = gui.Text("Override", memberValue.str);
+        }
+    }
+
+    public class CustomDrawer3 : ObjectDrawer<Index2D>
+    {
+        private EditorMember i, j;
+
+        protected override void Initialize()
+        {
+            // this is only necessary if Index2D was a class
+            //if (memberValue == null)
+            //    memberValue = new Index2D();
+
+            // 'i' and 'j' could be fields or properties
+            i = FindRelativeMember("i");
+            j = FindRelativeMember("j");
+        }
+
+        public override void OnGUI()
+        {
+            using (gui.Horizontal())
+            {
+                gui.Prefix(displayText);
+                using (gui.LabelWidth(13f))
+                {
+                    // gui.Member will take into consideration attributes applied on 'i' and 'j'
+                    // as well as handling undo
+                    gui.Member(i);
+                    gui.Member(j);
+                }
+            }
         }
     }
 }
