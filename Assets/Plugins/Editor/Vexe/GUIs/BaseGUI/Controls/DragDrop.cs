@@ -125,24 +125,34 @@ namespace Vexe.Editor.GUIs
 			RegisterFieldForDrag(LastRect, dragObject);
 		}
 
+        static Predicate<UnityObject[]> _alwaysAcceptDrop = objs => true;
+
+		public T RegisterFieldForDrop<T>(Rect fieldRect, Func<UnityObject[], UnityObject> getDroppedObject) where T : UnityObject
+        {
+            return RegisterFieldForDrop<T>(fieldRect, getDroppedObject, _alwaysAcceptDrop);
+        }
+
 		/// <summary>
 		/// Registers fieldRect for drop operations.
 		/// Returns the dropped value
 		/// </summary>
-		public T RegisterFieldForDrop<T>(Rect fieldRect, Func<UnityObject[], UnityObject> getDroppedObject) where T : UnityObject
+		public T RegisterFieldForDrop<T>(Rect fieldRect, Func<UnityObject[], UnityObject> getDroppedObject, Predicate<UnityObject[]> isDropAccepted) where T : UnityObject
 		{
 			Event currentEvent = Event.current;
 			EventType eventType = currentEvent.type;
 			T result = null;
 			if (fieldRect.Contains(currentEvent.mousePosition) && (eventType == EventType.DragUpdated || eventType == EventType.DragPerform))
 			{
-				DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
-				if (eventType == EventType.DragPerform)
-				{
-					DragAndDrop.AcceptDrag();
-					result = getDroppedObject(DragAndDrop.objectReferences) as T;
-					currentEvent.Use();
-				}
+                if (isDropAccepted(DragAndDrop.objectReferences))
+                {
+                    DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                    if (eventType == EventType.DragPerform)
+                    {
+                        DragAndDrop.AcceptDrag();
+                        result = getDroppedObject(DragAndDrop.objectReferences) as T;
+                        currentEvent.Use();
+                    }
+                }
 			}
 			return result;
 		}

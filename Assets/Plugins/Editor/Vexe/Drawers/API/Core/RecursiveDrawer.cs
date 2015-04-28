@@ -20,6 +20,8 @@ namespace Vexe.Editor.Drawers
         private bool _isToStringImpl;
         private Type _polymorphicType;
         private string _nullString;
+        private Func<UnityObject[], UnityObject> _getDraggedObject;
+        private Predicate<UnityObject[]> _isDropAccepted;
 
         protected override void Initialize()
         {
@@ -32,6 +34,30 @@ namespace Vexe.Editor.Drawers
             }
             else
                 _isToStringImpl = memberType.IsMethodImplemented("ToString", Type.EmptyTypes);
+
+            _getDraggedObject = objs =>
+            {
+                for (int i = 0; i < objs.Length; i++)
+                {
+                    var drag = objs[i];
+                    if (drag == null)
+                        continue;
+
+                    var go = drag as GameObject;
+                    if (go != null)
+                    {
+                        var c = go.GetComponent(memberType);
+                        if (c != null)
+                            return c;
+                    }
+
+                    if (drag.GetType().IsA(memberType))
+                        return drag;
+                }
+                return null;
+            };
+
+            _isDropAccepted = objs => _getDraggedObject(objs) != null;
         }
 
         public override void OnGUI()
@@ -148,19 +174,7 @@ namespace Vexe.Editor.Drawers
                 if (!isEmpty && fieldRect.Contains(Event.current.mousePosition) && EventsHelper.IsLMBMouseDown())
                     foldout = !foldout;
 
-                var drop = gui.RegisterFieldForDrop<UnityObject>(fieldRect, objs => objs.Select(x =>
-                {
-                    if (x == null)
-                        return null;
-
-                    var go = x as GameObject;
-                    if (go != null)
-                        return go.GetComponent(memberType);
-
-                    return x.GetType().IsA(memberType) ? x : null;
-
-                }).FirstOrDefault());
-
+                var drop = gui.RegisterFieldForDrop<UnityObject>(fieldRect, _getDraggedObject, _isDropAccepted);
                 if (drop != null)
                 {
                     value = memberValue = drop;
