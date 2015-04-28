@@ -10,7 +10,7 @@ namespace System
 
 	public class vMemberNotFound : Exception
 	{
-		public vMemberNotFound(string msg) : base(msg) { }
+		public vMemberNotFound(Type type, string name) : base(string.Format("Member {0} not found in type {1}", name, type)) { }
 	}
 
 	public class vTypeMismatch : Exception

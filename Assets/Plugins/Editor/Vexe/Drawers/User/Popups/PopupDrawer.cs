@@ -59,7 +59,7 @@ namespace Vexe.Editor.Drawers
 				var all = populateFrom.GetAllMembers(typeof(object));
 				var member = all.FirstOrDefault(x => attribute.CaseSensitive ? x.Name == fromMember : x.Name.ToLower() == fromMember.ToLower());
 				if (member == null)
-					throw new vMemberNotFound(fromMember);
+					throw new vMemberNotFound(populateFrom, fromMember);
 
 				var field = member as FieldInfo;
 				if (field != null)

@@ -266,13 +266,13 @@ namespace Vexe.Editor.Editors
             var field = targetType.GetAllMembers(typeof(MonoBehaviour), Flags.InstancePrivate)
                                   .FirstOrDefault(m => m.Name == "_serializationData");
             if (field == null)
-                throw new vMemberNotFound("_serializationData in " + targetType.Name);
+                throw new vMemberNotFound(targetType, "_serializationData");
 
             _serializationData = EditorMember.WrapMember(field, target, target, id);
 
             field = targetType.GetField("dbg", Flags.InstanceAnyVisibility);
             if (field == null)
-                throw new vMemberNotFound("dbg in " + targetType.Name);
+                throw new vMemberNotFound(targetType, "dbg");
 
             _debug = EditorMember.WrapMember(field, target, target, id);
 

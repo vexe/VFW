@@ -33,7 +33,7 @@ namespace Vexe.Editor.Drawers
 					}
 					catch
 					{
-						throw new vMemberNotFound("Failed to get a field or property to set with the name: " + set);
+						throw new vMemberNotFound(targetType, set);
 					}
 				}
 			}
@@ -53,7 +53,7 @@ namespace Vexe.Editor.Drawers
 				}
 				catch
 				{
-					throw new vMemberNotFound(string.Format("Couldn't find an appropriate method to call with the name: {0} on target {1} when apply OnChanged on member {2}", call, rawTarget, member.Name));
+					throw new vMemberNotFound(targetType, call);
 				}
 			}
 
