@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using System.Reflection;
 using Vexe.Editor.Helpers;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
@@ -53,20 +52,21 @@ namespace Vexe.Editor.GUIs
         private int _nextControlIdx;
         private int _nextBlockIdx;
         private float _prevInspectorWidth;
-        private bool _pendingLayoutRequest;
+        private bool _pendingLayout;
+        private bool _pendingRepaint;
         private bool _allocatedMemory;
         private bool _storedValidRect;
         private int _id;
         private static BetterPrefs _prefs;
 
         static MethodCaller<object, object> _scrollableTextArea;
-        static MethodCaller<object, Gradient> _doGradientField;
+        static MethodCaller<object, Gradient> _gradientField;
 
 #if dbg_level_1
-            private bool _pendingResetRequest;
+            private bool _pendingReset;
             private bool pendingResetRequest
             {
-                get { return _pendingResetRequest; }
+                get { return _pendingReset; }
                 set
                 {
                     if (value)
@@ -74,11 +74,11 @@ namespace Vexe.Editor.GUIs
                         Debug.Log("Setting pending reset to true");
                         LogCallStack();
                     }
-                    _pendingResetRequest = value;
+                    _pendingReset = value;
                 }
             }
 #else
-        private bool _pendingResetRequest;
+        private bool _pendingReset;
         #endif
 
         #if dbg_level_1
@@ -124,7 +124,7 @@ namespace Vexe.Editor.GUIs
                     new Type[] { typeof(GUIContent), typeof(Rect), typeof(Gradient) },
                     Flags.StaticAnyVisibility);
 
-                _doGradientField = method.DelegateForCall<object, Gradient>();
+                _gradientField = method.DelegateForCall<object, Gradient>();
             }
         }
 
@@ -176,7 +176,7 @@ namespace Vexe.Editor.GUIs
                 if (!_validRect.HasValue || _validRect.Value.y != unityRect.y)
                 {
                     _validRect = unityRect;
-                    _pendingLayoutRequest = true;
+                    _pendingLayout = true;
                 }
             }
 
@@ -197,13 +197,13 @@ namespace Vexe.Editor.GUIs
             if (_currentPhase == GUIPhase.Layout)
             {
                 #if dbg_level_1
-                    Debug.Log("Layout phase. Was pending layout: {0}. Was pending reset: {1}".FormatWith(_pendingLayoutRequest, _pendingResetRequest));
+                    Debug.Log("Layout phase. Was pending layout: {0}. Was pending reset: {1}".FormatWith(_pendingLayout, _pendingReset));
                 #endif
                 Width = start.width;
                 Height = 0f;
                 _startRect = start;
-                _pendingLayoutRequest = false;
-                _pendingResetRequest = false;
+                _pendingLayout = false;
+                _pendingReset = false;
             }
 
             _nextControlIdx = 0;
@@ -238,6 +238,12 @@ namespace Vexe.Editor.GUIs
                 Height = main.height.Value;
                 _currentPhase = GUIPhase.Draw;
 
+                if (_pendingRepaint)
+                {
+                    EditorHelper.RepaintAllInspectors();
+                    _pendingRepaint = false;
+                }
+
                 #if dbg_level_1
                     Debug.Log("Done layout. Deepest Block depth: {0}. Total number of blocks created: {1}. Total number of controls {2}"
                                 .FormatWith(dbgMaxDepth, _blocks.Count, _controls.Count));
@@ -245,7 +251,7 @@ namespace Vexe.Editor.GUIs
             }
             else
             {
-                if (_pendingResetRequest || _nextControlIdx != _controls.Count || _nextBlockIdx != _blocks.Count)
+                if (_pendingReset || _nextControlIdx != _controls.Count || _nextBlockIdx != _blocks.Count)
                 {
                     #if dbg_level_1
                     if (pendingResetRequest)
@@ -255,9 +261,10 @@ namespace Vexe.Editor.GUIs
                     _controls.Clear();
                     _blocks.Clear();
                     _allocatedMemory = false;
+                    _pendingRepaint = true;
                     _currentPhase = GUIPhase.Layout;
                 }
-                else if (_pendingLayoutRequest)
+                else if (_pendingLayout)
                 {
                     #if dbg_level_1
                         Debug.Log("Pending layout request. Doing layout in next phase");
@@ -282,7 +289,7 @@ namespace Vexe.Editor.GUIs
 
         private T BeginBlock<T>(GUIStyle style) where T : GUIBlock, new()
         {
-            if (_pendingResetRequest)
+            if (_pendingReset)
             {
                 #if dbg_level_1
                     Debug.Log("Pending reset. Can't begin block of type: " + typeof(T).Name);
@@ -296,7 +303,7 @@ namespace Vexe.Editor.GUIs
                     Debug.Log("Requesting Reset. Can't begin block {0}. We seem to have created controls yet nextBlockIdx {1} > blocks.Count {2}"
                                 .FormatWith(typeof(T).Name, _nextBlockIdx, _blocks.Count));
                 #endif
-                _pendingResetRequest = true;
+                _pendingReset = true;
                 return null;
             }
 
@@ -343,7 +350,7 @@ namespace Vexe.Editor.GUIs
                                          "This is probably due to the occurance of new blocks revealed by a foldout for ex. " +
                                          "Requesting Reset".FormatWith(requestedType.Name, resultType.Name, _nextBlockIdx));
                         #endif
-                        _pendingResetRequest = true;
+                        _pendingReset = true;
                         return null;
                     }
 
@@ -370,7 +377,7 @@ namespace Vexe.Editor.GUIs
             _blockStack.Push(result);
 
             #if dbg_level_2
-                Debug.Log("Pushed {0}. Stack {1}. Total {2}. Next {3}".FormatWith(result.GetType().Name, blockStack.Count, blocks.Count, nextBlockIdx));
+                Debug.Log("Pushed {0}. Stack {1}. Total {2}. Next {3}".FormatWith(result.GetType().Name, _blockStack.Count, _blocks.Count, _nextBlockIdx));
             #endif
 
             #if dbg_level_1
@@ -383,7 +390,7 @@ namespace Vexe.Editor.GUIs
 
         private void EndBlock()
         {
-            if (!_pendingResetRequest)
+            if (!_pendingReset)
                 _blockStack.Pop();
         }
 
@@ -391,7 +398,7 @@ namespace Vexe.Editor.GUIs
         {
             position = kDummyRect;
 
-            if (_pendingResetRequest)
+            if (_pendingReset)
             {
                 #if dbg_level_1
                     Debug.Log("Can't draw control of type " + data.type + " There's a Reset pending.");
@@ -405,7 +412,7 @@ namespace Vexe.Editor.GUIs
                     Debug.Log("Can't draw control of type {0} nextControlIdx {1} is >= controls.Count {2}. Requesting reset".FormatWith(data.type, _nextControlIdx, _controls.Count));
                     LogCallStack();
                 #endif
-                _pendingResetRequest = true;
+                _pendingReset = true;
                 return false;
             }
 
@@ -426,19 +433,19 @@ namespace Vexe.Editor.GUIs
             parent.controls.Add(control);
             _controls.Add(control);
             #if dbg_level_2
-                Debug.Log("Created control {0}. Count {1}".FormatWith(data.type, controls.Count));
+                Debug.Log("Created control {0}. Count {1}".FormatWith(data.type, _controls.Count));
             #endif
             return control;
         }
 
         public void RequestReset()
         {
-            _pendingResetRequest = true;
+            _pendingReset = true;
         }
 
         public void RequestLayout()
         {
-            _pendingLayoutRequest = true;
+            _pendingLayout = true;
         }
 
         public void Dispose()
@@ -496,7 +503,7 @@ namespace Vexe.Editor.GUIs
             {
                 if (value == null)
                     value = new Gradient();
-                return _doGradientField(null, new object[] { content, position, value });
+                return _gradientField(null, new object[] { content, position, value });
             }
 
             return value;
