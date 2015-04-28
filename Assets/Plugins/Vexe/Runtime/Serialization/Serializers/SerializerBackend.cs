@@ -59,6 +59,8 @@ namespace Vexe.Runtime.Serialization
                 var memberKey = GetMemberKey(member);
                 member.Target = target;
 
+                ConvertLegacyKeys(data);
+
                 try
                 {
                     string result;
@@ -79,21 +81,29 @@ namespace Vexe.Runtime.Serialization
             }
         }
 
+        private static void ConvertLegacyKeys(SerializationData data)
+        {
+            var keys = data.serializedStrings.Keys;
+            for (int i = 0; i < keys.Count; i++)
+            {
+                var key = keys[i];
+                key = key.Replace("Field: ", string.Empty);
+                key = key.Replace("Property: ", string.Empty);
+                keys[i] = key;
+            }
+        }
+
         private static Func<RuntimeMember, string> cachedGetMemberKey;
 
         /// <summary>
         /// Gets the serialization key used to serialize the specified member
-        /// The key in general is: "MemberType: MemberDataTypeNiceName MemberName"
-        /// Ex: "Field: int someValue", "Property: GameObject go"
+        /// The key in general is: "TypeNiceName MemberName"
+        /// Ex: "int someValue", "GameObject go"
         /// </summary>
         public static string GetMemberKey(RuntimeMember member)
         {
             if (cachedGetMemberKey == null)
-            {
-                cachedGetMemberKey = new Func<RuntimeMember, string>(x =>
-                    "{0}: {1} {2}".FormatWith(x.Info.MemberType.ToString(), x.TypeNiceName, x.Name)
-                ).Memoize();
-            }
+                cachedGetMemberKey = new Func<RuntimeMember, string>(x => x.TypeNiceName + " " + x.Name).Memoize();
             return cachedGetMemberKey(member);
         }
 

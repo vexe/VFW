@@ -18,7 +18,7 @@ namespace Vexe.Runtime.Serialization
 
         /// A serializable key-value pair list data structure that holds the serialized values of members
         /// in a BetterBehaviour/BetterScriptableObject.  Let's say we had a int field called 'x' = 10,
-        /// then we'd have an entry with "Field: int x" as key and '10' as value.
+        /// then we'd have an entry with "int x" as key and '10' as value.
         [Display(Dict.Readonly)]
         public StrStrDict serializedStrings = new StrStrDict();
 
