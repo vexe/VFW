@@ -149,6 +149,15 @@ namespace Vexe.Editor.Types
 			return member != null && this.Id == member.Id;
 		}
 
+        public static EditorMember WrapMember(string memberName, Type targetType, object rawTarget, UnityObject unityTarget, int id)
+        {
+            var members = targetType.GetMember(memberName, MemberTypes.Field | MemberTypes.Property, Flags.StaticInstanceAnyVisibility);
+            if (members.IsNullOrEmpty())
+                throw new vMemberNotFound(targetType, memberName);
+
+            return WrapMember(members[0], rawTarget, unityTarget, id);
+        }
+
         public static EditorMember WrapMember(MemberInfo memberInfo, object rawTarget, UnityObject unityTarget, int id)
         {
             var field = memberInfo as FieldInfo;

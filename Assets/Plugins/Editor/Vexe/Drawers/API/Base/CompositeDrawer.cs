@@ -1,4 +1,5 @@
 ﻿using System;
+using Vexe.Editor.Types;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
 
@@ -26,6 +27,11 @@ namespace Vexe.Editor.Drawers
         public override bool CanHandle(Type memberType)
         {
             return memberType.IsA<T>() || memberType.IsSubclassOrImplementerOfRawGeneric(typeof(T));
+        }
+
+        protected EditorMember FindRelativeMember(string memberName)
+        {
+            return EditorMember.WrapMember(memberName, typeof(T), memberValue, unityTarget, id);
         }
 	}
 }

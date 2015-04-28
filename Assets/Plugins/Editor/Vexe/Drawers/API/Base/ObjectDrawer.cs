@@ -38,6 +38,11 @@ namespace Vexe.Editor.Drawers
             return memberType.IsA<T>() || memberType.IsSubclassOrImplementerOfRawGeneric(typeof(T));
         }
 
+        protected EditorMember FindRelativeMember(string memberName)
+        {
+            return EditorMember.WrapMember(memberName, typeof(T), memberValue, unityTarget, id);
+        }
+
 		public sealed override void OnLeftGUI() { }
 		public sealed override void OnRightGUI() { }
 		public sealed override void OnUpperGUI() { }
