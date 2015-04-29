@@ -145,7 +145,7 @@ namespace Vexe.Runtime.Helpers
         /// </summary>
         public static Type[] GetAllUserTypesOf(Type type)
         {
-            return CachedGetRuntimeTypes().Where(type.IsA).ToArray();
+            return CachedGetRuntimeTypes().Where(type.IsAssignableFrom).ToArray();
         }
 
         /// <summary>
