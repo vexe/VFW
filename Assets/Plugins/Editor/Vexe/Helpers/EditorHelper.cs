@@ -19,6 +19,14 @@ namespace Vexe.Editor.Helpers
 	/// </summary>
 	public static class EditorHelper
 	{
+        /// <summary>
+        /// Returns true if this rect contains the current mouse position
+        /// </summary>
+        public static bool ContainsMouse(this Rect rect)
+        {
+            return rect.Contains(Event.current.mousePosition);
+        }
+
 		/// <summary>
 		/// Returns the specified animator's variables names
 		/// </summary>
