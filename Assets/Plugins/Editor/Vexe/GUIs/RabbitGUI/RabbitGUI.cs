@@ -627,7 +627,7 @@ namespace Vexe.Editor.GUIs
             Rect position;
             if (CanDrawControl(out position, label))
             {
-                GUI.Label(position, content, style);
+                EditorGUI.LabelField(position, content, style);
             }
         }
 
