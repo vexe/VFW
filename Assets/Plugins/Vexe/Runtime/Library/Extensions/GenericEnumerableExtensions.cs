@@ -592,12 +592,18 @@ namespace Vexe.Runtime.Extensions
 			return i > -1 && i < list.Count;
 		}
 
-		public static bool IsEqualTo<T>(this IList<T> list, IList<T> other)
+		public static bool IsEqualTo<T>(this IList<T> left, IList<T> right)
 		{
-			if (list == null || other == null)
-				throw new ArgumentNullException();
-			if (list.Count != other.Count) return false;
-			return list.Zip(other, (v1, v2) => v1.Equals(v2)).All(x => x);
+			if (left == null)
+				throw new ArgumentNullException("left");
+            if (right == null)
+				throw new ArgumentNullException("right");
+
+			if (left.Count != right.Count) return false;
+            for (int i = 0; i < left.Count; i++)
+                if (!left[i].GenericEquals(right[i]))
+                    return false;
+            return true;
 		}
 
 		public static void Push<T>(this IList<T> list, T value)
