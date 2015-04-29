@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 045a66da4c2389849ab2fe95eadb7208
+labels:
+- customeditor
+- custominspector
+- inspector
+- betterinspector
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
