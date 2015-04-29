@@ -4,18 +4,59 @@ using System.Linq;
 using System.Reflection;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
+using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Runtime.Helpers
 {
     public static class ReflectionHelper
     {
-        public readonly static Func<Type, List<MemberInfo>> CachedGetMembers;
-
-        readonly static Func<Tuple<Type, string>, MemberInfo> _getCachedMember;
-
-        public static MemberInfo GetCachedMember(Type objType, string memberName)
+        public static List<string> IgnoredAssemblies = new List<string>
         {
-            return _getCachedMember(Tuple.Create(objType, memberName));
+            "UnityScript.Lang",
+            "Boo.Lang.Parser",
+            "Boo.Lang",
+            "Boo.Lang.Compiler",
+            "System.ComponentModel.DataAnnotations",
+            "System.Xml.Linq",
+            "ICSharpCode.NRefactory",
+            "UnityScript",
+            "Mono.Cecil",
+            "nunit.framework",
+            "AssetStoreToolsExtra",
+            "AssetStoreTools",
+            "Unity.PackageManager",
+            "Unity.SerializationLogic",
+            "Mono.Security",
+            "System.Xml",
+            "System.Configuration",
+            "System",
+            "Unity.IvyParser",
+            "System.Core",
+            "Unity.DataContract",
+            "I18N.West",
+            "I18N",
+            "Unity.Locator",
+            "mscorlib",
+            "nunit.core",
+            "nunit.core.interfaces",
+            "Mono.Cecil.Mdb",
+            "NSubstitute",
+            "UnityVS.VersionSpecific",
+            "SyntaxTree.VisualStudio.Unity.Bridge",
+            "SyntaxTree.VisualStudio.Unity.Messaging",
+            "UnityEngine.UI",
+            "UnityEngine",
+            "FullSerializer",
+        };
+
+        public readonly static Func<Type, List<MemberInfo>> CachedGetMembers;
+        public readonly static Func<Type[]> CachedGetRuntimeTypes;
+
+        readonly static Func<Tuple<Type, string>, MemberInfo> _cachedGetMember;
+
+        public static MemberInfo CachedGetMember(Type objType, string memberName)
+        {
+            return _cachedGetMember(Tuple.Create(objType, memberName));
         }
 
         static ReflectionHelper()
@@ -23,12 +64,23 @@ namespace Vexe.Runtime.Helpers
             CachedGetMembers = new Func<Type, List<MemberInfo>>(type =>
                 GetMembers(type).ToList()).Memoize();
 
-            _getCachedMember = new Func<Tuple<Type, string>, MemberInfo>(tup =>
+            _cachedGetMember = new Func<Tuple<Type, string>, MemberInfo>(tup =>
             {
                 var members = tup.Item1.GetMember(tup.Item2, Flags.StaticInstanceAnyVisibility);
                 if (members.IsNullOrEmpty())
                     return null;
                 return members[0];
+            }).Memoize();
+
+            CachedGetRuntimeTypes = new Func<Type[]>(() =>
+            {
+                Predicate<string> isIgnoredAssembly = name =>
+                    name.Contains("Dbg") || name.Contains("Editor") || IgnoredAssemblies.Contains(name);
+
+                return AppDomain.CurrentDomain.GetAssemblies()
+                                              .Where(x => !isIgnoredAssembly(x.GetName().Name))
+                                              .SelectMany(x => x.GetTypes())
+                                              .ToArray();
             }).Memoize();
         }
 
@@ -53,7 +105,7 @@ namespace Vexe.Runtime.Helpers
         /// </summary>
         public static Assembly GetUnityEngineAssembly()
         {
-            return typeof(UnityEngine.Object).Assembly;
+            return typeof(UnityObject).Assembly;
         }
 
         /// <summary>
@@ -75,9 +127,9 @@ namespace Vexe.Runtime.Helpers
         /// <summary>
         /// Retruns all UnityEngine types of the specified wantedType
         /// </summary>
-        public static Type[] GetAllUnityEngineTypesOf(Type wantedType)
+        public static Type[] GetAllUnityEngineTypesOf(Type type)
         {
-            return GetAllUnityEngineTypes().Where(t => wantedType.IsAssignableFrom(t)).ToArray();
+            return GetAllUnityEngineTypes().Where(type.IsA).ToArray();
         }
 
         /// <summary>
@@ -91,9 +143,9 @@ namespace Vexe.Runtime.Helpers
         /// <summary>
         /// Returns all user-types of the specified wantedType
         /// </summary>
-        public static Type[] GetAllUserTypesOf(Type wantedType)
+        public static Type[] GetAllUserTypesOf(Type type)
         {
-            return wantedType.Assembly.GetTypes().Where(t => wantedType.IsAssignableFrom(t)).ToArray();
+            return CachedGetRuntimeTypes().Where(type.IsA).ToArray();
         }
 
         /// <summary>
