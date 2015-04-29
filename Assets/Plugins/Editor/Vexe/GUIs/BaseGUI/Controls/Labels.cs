@@ -73,6 +73,11 @@ namespace Vexe.Editor.GUIs
 			Label(GetContent(text), style, option);
 		}
 
+		public void Label(GUIContent content, GUIStyle style)
+        {
+            Label(content, style, null);
+        }
+
 		public abstract void Label(GUIContent content, GUIStyle style, Layout option);
 	}
 }

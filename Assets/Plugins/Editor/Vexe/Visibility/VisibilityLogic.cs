@@ -52,25 +52,33 @@ namespace Vexe.Editor.Visibility
             if (member is MethodInfo)
                 return Attributes.Show.Any(member.IsDefined);
 
-            var serialization = VFWSerializationLogic.Instance;
+            var logic = VFWSerializationLogic.Instance;
             var field = member as FieldInfo;
             if (field != null)
                 return !Attributes.Hide.Any(field.IsDefined)
-                    && (serialization.IsSerializableField(field) || Attributes.Show.Any(field.IsDefined));
+                    && (logic.IsSerializableField(field) || Attributes.Show.Any(field.IsDefined));
 
             var property = member as PropertyInfo;
             if (property == null || Attributes.Hide.Any(property.IsDefined))
                 return false;
 
+            // accept properties such as transform.position, rigidbody.mass, etc
+            // exposing unity properties is useful when inlining objects via [Inline]
+            // (which is the only use-case these couple of lines are meant for)
             var declType = property.DeclaringType;
-            bool isValidUnityType = declType.IsA<UnityObject>() && !declType.IsA<MonoBehaviour>() && !declType.IsA<ScriptableObject>();
-            bool unityProp = property.CanReadWrite() && isValidUnityType; // ex transform.position, rigidbody.mass, etc exposing unity properties is useful when inlining objects via [Inline]
+            bool isValidUnityType = declType.IsA<Component>() && !declType.IsA<MonoBehaviour>();
+            bool unityProp =   isValidUnityType && !IgnoredUnityProperties.Contains(property.Name) && property.CanReadWrite();
             if (unityProp) return true;
 
-            bool serializable = serialization.IsSerializableProperty(property);
+            bool serializable = logic.IsSerializableProperty(property);
             if (serializable) return true;
 
             return Attributes.Show.Any(property.IsDefined);
         }
+
+        static HashSet<string> IgnoredUnityProperties = new HashSet<string>()
+        {
+            "tag", "enabled", "name", "hideFlags"
+        };
     }
 }
