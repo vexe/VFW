@@ -1,8 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
-using Vexe.Runtime.Extensions;
 
-namespace Vexe.Runtime.Helpers
+namespace Vexe.Editor.Helpers
 {
 	public static class DirectoryHelper
 	{
