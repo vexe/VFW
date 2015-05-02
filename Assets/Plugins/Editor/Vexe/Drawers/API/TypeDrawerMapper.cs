@@ -86,6 +86,12 @@ namespace Vexe.Editor
                     .Add(typeof(Array), typeof(ArrayDrawer<>), true, (a, d) => d.MakeGenericType(a.GetElementType()))
                     .Add(typeof(IDictionary<,>), typeof(IDictionaryDrawer<,,>), true, (a, d) =>
                     {
+                        if (a.GetConstructor(Type.EmptyTypes) == null)
+                        {
+                            Debug.LogError("Mapping error: IDictionary type {0} must have a public empty constructor in order for it to be mapped with {1}. " +
+                                "Falling back to RecursiveDrawer".FormatWith(a, d));
+                            return typeof(RecursiveDrawer);
+                        }
                         var typeArgs = a.GetGenericArgsInThisOrAbove();
                         var drawerArgs = new Type[typeArgs.Length + 1];
                         drawerArgs[0] = a;

@@ -14,7 +14,7 @@ using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Editor.Drawers
 {
-    public class IDictionaryDrawer<TD, TK, TV> : ObjectDrawer<TD> where TD : class, IDictionary<TK, TV>, new() where TK : new()
+    public class IDictionaryDrawer<TD, TK, TV> : ObjectDrawer<TD> where TD : class, IDictionary<TK, TV>, new()
     {
         private List<EditorMember> _keyElements;
         private List<EditorMember> _valueElements;
