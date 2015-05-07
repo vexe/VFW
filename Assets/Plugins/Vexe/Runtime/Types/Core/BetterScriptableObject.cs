@@ -1,10 +1,42 @@
-﻿using UnityEngine;
+using System;
+using UnityEngine;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Serialization;
 
 namespace Vexe.Runtime.Types
 {
+    [Serializable]
+    public class SerializableType
+    {
+        [SerializeField] private string _name;
+
+        private Type _value;
+
+        public Type Value
+        {
+            get
+            {
+                if(_value == null)
+                    _value = Type.GetType(_name);
+                return _value;
+            }
+            set
+            {
+                if (_value != value)
+                {
+                    _name = value.AssemblyQualifiedName;
+                    _value = value;
+                }
+            }
+        }
+
+        public SerializableType(Type type)
+        {
+            Value = type;
+        }
+    }
+
     [DefineCategory("", 0, MemberType = CategoryMemberType.All, Exclusive = false, AlwaysHideHeader = true)]
     [DefineCategory("Dbg", 3f, Pattern = "^dbg")]
     public abstract class BetterScriptableObject : ScriptableObject, ISerializationCallbackReceiver
@@ -19,7 +51,7 @@ namespace Vexe.Runtime.Types
         private static SerializerBackend _serializer;
         public static SerializerBackend Serializer
         {
-            get { return _serializer ?? (_serializer = new FullSerializerBackend()); }
+            get { return _serializer ?? (_serializer = new FastSerializerBackend()); }
         }
 
         /// <summary>

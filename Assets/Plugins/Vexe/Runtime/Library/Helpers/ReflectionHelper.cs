@@ -92,6 +92,11 @@ namespace Vexe.Runtime.Helpers
             return members;
         }
 
+        public static Type[] GetUnityEngineTypes()
+        {
+            return GetUnityEngineAssembly().GetTypes();
+        }
+
         /// <summary>
         /// Returns the types of the specified members
         /// </summary>

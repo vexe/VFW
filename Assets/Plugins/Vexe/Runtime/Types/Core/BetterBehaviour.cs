@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Serialization;
@@ -20,7 +20,7 @@ namespace Vexe.Runtime.Types
         static SerializerBackend _serializer;
         public static SerializerBackend Serializer
         {
-            get { return _serializer ?? (_serializer = new FullSerializerBackend()); }
+            get { return _serializer ?? (_serializer = new FastSerializerBackend()); }
         }
 
         /// <summary>
