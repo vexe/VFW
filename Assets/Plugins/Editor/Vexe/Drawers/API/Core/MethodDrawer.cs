@@ -20,6 +20,8 @@ namespace Vexe.Editor.Drawers
 		private string niceName;
 		private bool initialized;
 
+        private string comment;
+
 		private object rawTarget;
 		private int id;
 		private BaseGUI gui;
@@ -40,6 +42,10 @@ namespace Vexe.Editor.Drawers
 
 			if (initialized) return;
 			initialized = true;
+
+            var commentAttr = method.GetCustomAttribute<CommentAttribute>();
+            if (commentAttr != null)
+                comment = commentAttr.comment;
 
 			niceName = method.GetNiceName();
 
@@ -78,6 +84,9 @@ namespace Vexe.Editor.Drawers
 
 		public bool OnGUI()
 		{
+            if (comment != null)
+                gui.HelpBox(comment);
+
 			bool changed = false;
 			if (Header() && argMembers.Length > 0)
 			{
