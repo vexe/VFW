@@ -15,24 +15,23 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
+      - string _serializer
       - CategoryDisplay DefaultDisplay
       - int DefaultSpacing
-      - string DefaultMemberFormat
-      - string DefaultSequenceFormat
-      - string DefaultDictionaryFormat
+      - string _memberFormat
+      - string _sequenceFormat
+      - string _dictionaryFormat
       - bool DisplayReadonlyIfTrue
       values:
-      - '"BoxedMembersArea"'
-      - 10
-      - '"$nicename"'
-      - '"$nicename ($nicetype)"'
-      - '"$nicename ($nicetype)"'
-      - true
-  _id: -1
+      - CQAAAAAAAAAAMAAAAEYAYQBzAHQAIABTAGUAcgBpAGEAbABpAHoAZQByACAAKABCAGkAbgBhAHIAeQApAA==
+      - DwEAAAQAAAA=
+      - BgAAAAoAAAA=
+      - CQAAAAAAAAAAEgAAACQAbgBpAGMAZQBuAGEAbQBlAA==
+      - CQAAAAAAAAAAKgAAACQAbgBpAGMAZQBuAGEAbQBlACAAKAAkAG4AaQBjAGUAdAB5AHAAZQApAA==
+      - CQAAAAAAAAAAKgAAACQAbgBpAGMAZQBuAGEAbQBlACAAKAAkAG4AaQBjAGUAdAB5AHAAZQApAA==
+      - GAAAAAE=
+  _id: 412
   dbg: 0
   DefaultDisplay: 4
   DefaultSpacing: 10
-  DefaultMemberFormat: $nicename
-  DefaultSequenceFormat: $nicename ($nicetype)
-  DefaultDictionaryFormat: $nicename ($nicetype)
   DisplayReadonlyIfTrue: 1

@@ -74,10 +74,10 @@ namespace Vexe.Editor.Types
             if (displayFormat == null)
             {
                 if (Type.IsImplementerOfRawGeneric(typeof(IDictionary<,>)))
-                    displayFormat = settings.DefaultDictionaryFormat;
+                    displayFormat = settings.DictionaryFormat;
                 else if (Type.IsImplementerOfRawGeneric(typeof(IList<>)))
-                    displayFormat = settings.DefaultSequenceFormat;
-                else displayFormat = settings.DefaultMemberFormat;
+                    displayFormat = settings.SequenceFormat;
+                else displayFormat = settings.MemberFormat;
             }
 
             var iter = Formatters.GetEnumerator();
