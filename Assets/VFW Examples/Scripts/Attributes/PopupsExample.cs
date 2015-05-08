@@ -47,7 +47,7 @@ namespace VFWExamples
 
 	public struct SomeStruct
 	{
-		[Popup("target.GetFactors")] // get it from the UnityEngine.Object target (in this case, PopupsExample script)
+		[Popup("target.Factors")] // get it from the UnityEngine.Object target (in this case, PopupsExample script)
 		public string factor;
 	}
 }
