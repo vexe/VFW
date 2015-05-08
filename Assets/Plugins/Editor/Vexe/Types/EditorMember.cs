@@ -51,6 +51,7 @@ namespace Vexe.Editor.Types
 		private double _undoTimer, _undoLastTime;
         private const double kUndoTick = .5;
 		private SetVarOp<object> _setVar;
+        private static Attribute[] Empty = new Attribute[0];
 
         private EditorMember(MemberInfo memberInfo, Type memberType, string memberName,
             object rawTarget, UnityObject unityTarget, int targetId, Attribute[] attributes)
@@ -61,11 +62,11 @@ namespace Vexe.Editor.Types
             Name         = memberName;
             TypeNiceName = memberType.GetNiceName();
             UnityTarget  = unityTarget;
-            Attributes   = attributes;
+            Attributes   = attributes ?? Empty;
 
             string displayFormat = null;
 
-            var formatAttr = attributes.GetAttribute<DisplayAttribute>();
+            var formatAttr = Attributes.GetAttribute<DisplayAttribute>();
             if (formatAttr != null && !string.IsNullOrEmpty(formatAttr.FormatLabel))
                 displayFormat = formatAttr.FormatLabel;
 

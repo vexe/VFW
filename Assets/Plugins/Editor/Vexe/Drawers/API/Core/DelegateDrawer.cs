@@ -227,7 +227,7 @@ namespace Vexe.Editor.Drawers
                                 var uniqueNames     = components.Select(c => c.GetType().Name).ToList().Uniqify();
                                 var targetSelection = gui.Popup("Target", targetIdx, uniqueNames.ToArray());
                                 {
-                                    if (targetIdx != targetSelection || (Component)adding.target != components[targetSelection])
+                                    if (targetIdx != targetSelection || adding.target as Component != components[targetSelection])
                                         adding.target = components[targetSelection];
                                 }
                             }
@@ -497,7 +497,7 @@ namespace Vexe.Editor.Drawers
                                 var uniqueNames     = components.Select(c => c.GetType().Name).ToList().Uniqify();
                                 var targetSelection = gui.Popup("Target", cIndex, uniqueNames.ToArray());
                                 {
-                                    if (cIndex != targetSelection || adding.target != components[targetSelection])
+                                    if (cIndex != targetSelection || adding.target as Component != components[targetSelection])
                                         adding.target = components[targetSelection];
                                 }
                             }
