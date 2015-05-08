@@ -15,7 +15,7 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
-      - string _serializer
+      - string SerializerPopup
       - CategoryDisplay DefaultDisplay
       - int DefaultSpacing
       - string _memberFormat
@@ -23,15 +23,19 @@ MonoBehaviour:
       - string _dictionaryFormat
       - bool DisplayReadonlyIfTrue
       values:
-      - CQAAAAAAAAAAMAAAAEYAYQBzAHQAIABTAGUAcgBpAGEAbABpAHoAZQByACAAKABCAGkAbgBhAHIAeQApAA==
-      - DwEAAAQAAAA=
-      - BgAAAAoAAAA=
-      - CQAAAAAAAAAAEgAAACQAbgBpAGMAZQBuAGEAbQBlAA==
-      - CQAAAAAAAAAAKgAAACQAbgBpAGMAZQBuAGEAbQBlACAAKAAkAG4AaQBjAGUAdAB5AHAAZQApAA==
-      - CQAAAAAAAAAAKgAAACQAbgBpAGMAZQBuAGEAbQBlACAAKAAkAG4AaQBjAGUAdAB5AHAAZQApAA==
-      - GAAAAAE=
+      - '"Fast Serializer (Binary)"'
+      - '"BoxedMembersArea"'
+      - 10
+      - '"$nicename"'
+      - '"$nicename ($nicetype)"'
+      - '"$nicename ($nicetype)"'
+      - true
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 412
   dbg: 0
+  SerializerPopup: Fast Serializer (Binary)
   DefaultDisplay: 4
   DefaultSpacing: 10
   DisplayReadonlyIfTrue: 1

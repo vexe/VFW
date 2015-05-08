@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
@@ -17,10 +18,34 @@ namespace Vexe.Runtime.Types
             set { _serializationData = value; }
         }
 
-        static SerializerBackend _serializer;
-        public static SerializerBackend Serializer
+        private static Type DefaultSerializerType = typeof(FullSerializerBackend);
+
+        [SerializeField]
+        private SerializableType _serializerType;
+
+        [Display("Serializer Backend"), ShowType(typeof(SerializerBackend))]
+        public Type SerializerType
         {
-            get { return _serializer ?? (_serializer = new FastSerializerBackend()); }
+            get
+            {
+                if (_serializerType == null || !_serializerType.IsValid())
+                    _serializerType = new SerializableType(DefaultSerializerType);
+                return _serializerType.Value;
+            }
+            set
+            {
+                if (_serializerType.Value != value && value != null)
+                {
+                    _serializerType.Value = value;
+                    _serializer = value.ActivatorInstance<SerializerBackend>();
+                }
+            }
+        }
+
+        private SerializerBackend _serializer;
+        public SerializerBackend Serializer
+        {
+            get { return _serializer ?? (_serializer = SerializerType.ActivatorInstance<SerializerBackend>()); }
         }
 
         /// <summary>

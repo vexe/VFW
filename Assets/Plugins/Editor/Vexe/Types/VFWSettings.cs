@@ -1,51 +1,24 @@
 using System;
 using System.IO;
 using UnityEditor;
+using UnityEngine;
+using Vexe.Runtime.Serialization;
 using Vexe.Runtime.Types;
 
 namespace Vexe.Editor.Types
 {
     public class VFWSettings : BetterScriptableObject
     {
-        const string kFast = "Fast Serializer (Binary)";
-        const string kFull = "Full Serializer (JSON)";
+        const string kFastSerializer = "Fast Serializer (Binary)";
+        const string kFullSerializer = "Full Serializer (JSON)";
 
         const string kDefaultMemberFormat = "$nicename";
         const string kDefaultSequenceFormat = "$nicename ($nicetype)";
         const string kDefaultDictionaryFormat = "$nicename ($nicetype)";
 
-        [Hide, Serialize] string _serializer = kFull;
-
         [Comment("The serializer of use when serializing Better[Behaviour|ScriptableObject]s"),
-        Display(0f), Show, Popup(kFull, kFast)]
-        public string Serializer
-        {
-            get { return _serializer; }
-            set
-            {
-                if (_serializer != value)
-                {
-                    _serializer = value;
-
-                    // this is a bit naughty, I know :p
-                    Action<string> switchSerializer = script =>
-                    {
-                        var path = "Assets/Plugins/Vexe/Runtime/Types/Core/" + script + ".cs";
-                        var code = File.ReadAllText(path);
-                        if (value.StartsWith("Fast"))
-                            code = code.Replace("new Full", "new Fast");
-                        else 
-                            code = code.Replace("new Fast", "new Full");
-
-                        File.WriteAllText(path, code);
-                        AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
-                    };
-
-                    switchSerializer("BetterBehaviour");
-                    switchSerializer("BetterScriptableObject");
-                }
-            }
-        }
+        Display(201f, FormatLabel = "Serializer"), Show, Popup(kFullSerializer, kFastSerializer)]
+        public string SerializerPopup = kFullSerializer;
 
         [EnumMask, Comment("These are the default settings that will be applied to newly instantiated BetterBehaviours and BetterScriptableObjects")]
         public CategoryDisplay DefaultDisplay = CategoryDisplay.BoxedMembersArea;
@@ -58,7 +31,12 @@ namespace Vexe.Editor.Types
         [Comment("The following are formatting options for sequences (array/list), dictionaries and general members. Available patterns are $nicename, $name, $type and $nicetype")]
         [Show] public string MemberFormat
         {
-            get { return _memberFormat; }
+            get
+            {
+                if (string.IsNullOrEmpty(_memberFormat))
+                    _memberFormat = kDefaultMemberFormat;
+                return _memberFormat;
+            }
             set
             {
                 if (!string.IsNullOrEmpty(value) && value != _memberFormat)
@@ -68,7 +46,12 @@ namespace Vexe.Editor.Types
 
         [Show] public string SequenceFormat
         {
-            get { return _sequenceFormat; }
+            get
+            {
+                if (string.IsNullOrEmpty(_sequenceFormat))
+                    _sequenceFormat = kDefaultSequenceFormat;
+                return _sequenceFormat;
+            }
             set
             {
                 if (!string.IsNullOrEmpty(value) && value != _sequenceFormat)
@@ -78,7 +61,12 @@ namespace Vexe.Editor.Types
 
         [Show] public string DictionaryFormat
         {
-            get { return _dictionaryFormat; }
+            get
+            {
+                if (string.IsNullOrEmpty(_dictionaryFormat))
+                    _dictionaryFormat = kDefaultDictionaryFormat;
+                return _dictionaryFormat;
+            }
             set
             {
                 if (!string.IsNullOrEmpty(value) && value != _dictionaryFormat)
@@ -91,6 +79,18 @@ namespace Vexe.Editor.Types
 
         private const string SettingsPath = "Assets/Plugins/Editor/Vexe/ScriptableAssets/VFWSettings.asset";
 
+        [Show, Comment("Finds all loaded Better[Behaviour|ScripableObject]s and set their serializer type to the selected serializer from the popup above")]
+        public void ApplySelectedSerializer()
+        {
+            var bb = Resources.FindObjectsOfTypeAll<BetterBehaviour>();
+            for (int i = 0; i < bb.Length; i++)
+                bb[i].SerializerType = SerializerPopup.StartsWith("Fast") ? typeof(FastSerializerBackend) : typeof(FullSerializerBackend);
+
+            var bso = Resources.FindObjectsOfTypeAll<BetterScriptableObject>();
+            for (int i = 0; i < bso.Length; i++)
+                bso[i].SerializerType = SerializerPopup.StartsWith("Fast") ? typeof(FastSerializerBackend) : typeof(FullSerializerBackend);
+        }
+
         [Show]
         public void Reset()
         {
@@ -98,6 +98,7 @@ namespace Vexe.Editor.Types
             _sequenceFormat = kDefaultSequenceFormat;
             _dictionaryFormat = kDefaultDictionaryFormat;
 
+            SerializerPopup = kFullSerializer;
             DefaultDisplay = CategoryDisplay.BoxedMembersArea;
             DefaultSpacing = 10;
             DisplayReadonlyIfTrue = true;

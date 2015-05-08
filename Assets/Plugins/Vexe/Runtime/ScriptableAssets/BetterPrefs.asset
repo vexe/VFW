@@ -28,5 +28,8 @@ MonoBehaviour:
       - '{}'
       - '{}'
       - '{}'
-  _id: -1
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  _id: 464
   dbg: 0
