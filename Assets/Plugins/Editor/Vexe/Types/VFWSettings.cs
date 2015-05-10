@@ -16,6 +16,9 @@ namespace Vexe.Editor.Types
         const string kDefaultSequenceFormat = "$nicename ($nicetype)";
         const string kDefaultDictionaryFormat = "$nicename ($nicetype)";
 
+        [Comment("Omit the type prefix in the member display. Eg m_fValue/_fValue/fValue will be displayed as Value")]
+        public bool UseHungarianNotation;
+
         [Comment("The serializer of use when serializing Better[Behaviour|ScriptableObject]s"),
         Display(201f, FormatLabel = "Serializer"), Show, Popup(kFullSerializer, kFastSerializer)]
         public string SerializerPopup = kFullSerializer;
