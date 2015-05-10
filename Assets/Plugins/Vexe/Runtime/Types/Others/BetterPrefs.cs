@@ -28,7 +28,8 @@ namespace Vexe.Runtime.Types
         public Dictionary<int, Vector3> Vector3s = new Dictionary<int, Vector3>();
         public Dictionary<int, Color>   Colors   = new Dictionary<int, Color>();
 
-        [Show] void Clear()
+        [Show]
+        void Clear()
         {
             Ints.Clear();
             Strings.Clear();
@@ -45,17 +46,31 @@ namespace Vexe.Runtime.Types
         static BetterPrefs editorInstance;
         public static BetterPrefs GetEditorInstance()
         {
-            if (editorInstance == null)
+            if ( editorInstance == null )
             {
                 editorInstance = AssetDatabase.LoadAssetAtPath(EditorPrefsPath, typeof(BetterPrefs)) as BetterPrefs;
-                if (editorInstance == null)
+                if ( editorInstance == null )
                 {
                     editorInstance = ScriptableObject.CreateInstance<BetterPrefs>();
                     AssetDatabase.CreateAsset(editorInstance, EditorPrefsPath);
                     AssetDatabase.ImportAsset(EditorPrefsPath, ImportAssetOptions.ForceUpdate);
                 }
             }
+
+            AssignIfNull(ref editorInstance.Ints);
+            AssignIfNull(ref editorInstance.Strings);
+            AssignIfNull(ref editorInstance.Floats);
+            AssignIfNull(ref editorInstance.Bools);
+            AssignIfNull(ref editorInstance.Colors);
+            AssignIfNull(ref editorInstance.Vector3s);
+
             return editorInstance;
+        }
+
+        static void AssignIfNull<T>(ref Dictionary<int, T> value)
+        {
+            if (value == null)
+                value = new Dictionary<int, T>();
         }
 
         public static class BetterPrefsMenus
