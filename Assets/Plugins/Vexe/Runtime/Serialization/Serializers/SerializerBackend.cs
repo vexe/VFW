@@ -50,7 +50,7 @@ namespace Vexe.Runtime.Serialization
         /// Fetches the serialized state of the specified target from the specified serialization data
         /// to use it to deserialize/reload the target reassigning all the target's member values
         /// </summary>
-        public void DeserializeDataIntoTarget(object target, SerializationData data)
+        public void DeserializeTargetFromData(object target, SerializationData data)
         {
             var members = Logic.CachedGetSerializableMembers(target.GetType());
             for(int i = 0; i < members.Count; i++)
