@@ -15,6 +15,7 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
+      - bool UseHungarianNotation
       - string SerializerPopup
       - CategoryDisplay DefaultDisplay
       - int DefaultSpacing
@@ -23,6 +24,7 @@ MonoBehaviour:
       - string _dictionaryFormat
       - bool DisplayReadonlyIfTrue
       values:
+      - true
       - '"Fast Serializer (Binary)"'
       - '"BoxedMembersArea"'
       - 10
@@ -35,6 +37,7 @@ MonoBehaviour:
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 412
   dbg: 0
+  UseHungarianNotation: 1
   SerializerPopup: Fast Serializer (Binary)
   DefaultDisplay: 4
   DefaultSpacing: 10
