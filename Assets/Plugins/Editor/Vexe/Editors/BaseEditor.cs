@@ -72,7 +72,16 @@ namespace Vexe.Editor.Editors
         private int _repaintCount, _spacing;
         private CategoryDisplay _display;
         private Action _onGUIFunction;
+        private string[] _membersDrawnByUnityLayout;
         static int guiKey = "UnityGUI".GetHashCode();
+
+        /// <summary>
+        /// Members of these types will be drawn by Unity's Layout system
+        /// </summary>
+        private static readonly Type[] DrawnByUnityTypes = new Type[]
+        {
+            typeof(UnityEngine.Events.UnityEventBase)
+        };
 
         private static bool useUnityGUI
         {
@@ -137,6 +146,10 @@ namespace Vexe.Editor.Editors
             if (_onGUIFunction == null)
                 _onGUIFunction = OnGUI;
 
+            var rabbit = gui as RabbitGUI;
+            if (rabbit != null && rabbit.OnFinishedLayoutReserve == null && _membersDrawnByUnityLayout.Length > 0)
+                rabbit.OnFinishedLayoutReserve = DoUnityLayout;
+
             // I found 25 to be a good padding value such that there's not a whole lot of empty space wasted
             // and the vertical inspector scrollbar doesn't obstruct our controls
             gui.OnGUI(_onGUIFunction, new Vector2(0f, 25f), id);
@@ -147,6 +160,41 @@ namespace Vexe.Editor.Editors
                 _repaintCount++;
                 Repaint();
             }
+        }
+
+        private void DoUnityLayout()
+        {
+            serializedObject.Update();
+
+            for(int i = 0; i < _membersDrawnByUnityLayout.Length; i++)
+            {
+                var memberName = _membersDrawnByUnityLayout[i];
+                var property = serializedObject.FindProperty(memberName);
+                if (property == null)
+                {
+                    Debug.Log("Member cannot be drawn by Unity: " + memberName);
+                    continue;
+                }
+
+                EditorGUI.BeginChangeCheck();
+
+                EditorGUILayout.PropertyField(property, true);
+
+                if (EditorGUI.EndChangeCheck())
+                { 
+                    var bb = target as BetterBehaviour;
+                    if (bb != null)
+                        bb.DelayNextDeserialize();
+                    else
+                    { 
+                        var bso = target as BetterScriptableObject;
+                        if (bso != null)
+                        bso.DelayNextDeserialize();
+                    }
+                }
+            }
+
+            serializedObject.ApplyModifiedProperties();
         }
 
         protected static void LogFormat(string msg, params object[] args)
@@ -178,6 +226,13 @@ namespace Vexe.Editor.Editors
 
             // fetch visible members
             _visibleMembers = VFWVisibilityLogic.CachedGetVisibleMembers(targetType).ToList();
+
+            var drawnByUnity =  _visibleMembers
+                .Where(x => x.IsDefined<DrawByUnityAttribute>() || DrawnByUnityTypes.Any(x.GetDataType().IsA));
+
+            _visibleMembers = _visibleMembers.Except(drawnByUnity).ToList();
+
+            _membersDrawnByUnityLayout = drawnByUnity.Select(x => x.Name).ToArray();
 
             // allocate categories
             _categories = new List<MembersCategory>();

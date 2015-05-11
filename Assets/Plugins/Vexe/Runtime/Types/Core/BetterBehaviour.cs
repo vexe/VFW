@@ -52,6 +52,14 @@ namespace Vexe.Runtime.Types
 
         public void OnAfterDeserialize()
         {
+#if UNITY_EDITOR
+            if (_delayDeserialize)
+            {
+                _delayDeserialize = false;
+                return;
+            }
+#endif
+
             DeserializeBehaviour();
         }
 
@@ -102,7 +110,7 @@ namespace Vexe.Runtime.Types
         [ContextMenu("Load behaviour state")]
         public void DeserializeBehaviour()
         {
-            Serializer.DeserializeDataIntoTarget(this, BehaviourData);
+            Serializer.DeserializeTargetFromData(this, BehaviourData);
         }
 
         [ContextMenu("Save behaviour state")]
@@ -111,5 +119,19 @@ namespace Vexe.Runtime.Types
             BehaviourData.Clear();
             Serializer.SerializeTargetIntoData(this, BehaviourData);
         }
+
+#if UNITY_EDITOR
+        // this editor hack is needed to make it possible to let Unity Layout draw things after RabbitGUI
+        // for some reason, if I try to let Unity draw things via obj.Update(), PropertyField(...) and obj.ApplyModifiedProperties(),
+        // it will send deserialization requests which will deserialize the behaviour overriding the new changes made in the property
+        // which means, the property will not be modified. so we delay deserialization for a single editor frame
+
+        private bool _delayDeserialize;
+
+        public void DelayNextDeserialize()
+        {
+            _delayDeserialize = true;
+        }
+#endif
     }
 }

@@ -37,7 +37,7 @@ namespace Vexe.Runtime.Helpers
                 var value = member.Value;
 
                 string prevState;
-                if (!data.serializedStrings.TryGetValue(memberKey, out prevState))// && !value.IsObjectNull())
+                if (!data.serializedStrings.TryGetValue(memberKey, out prevState))
                     return true;
 
                 if (value.IsObjectNull())

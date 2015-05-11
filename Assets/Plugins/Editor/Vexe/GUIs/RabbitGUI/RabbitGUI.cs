@@ -16,6 +16,8 @@ namespace Vexe.Editor.GUIs
 {
     public class RabbitGUI : BaseGUI, IDisposable
     {
+        public Action OnFinishedLayoutReserve;
+
         public float Height { private set; get; }
 
         public float Width  { private set; get; }
@@ -190,6 +192,8 @@ namespace Vexe.Editor.GUIs
             }
 
             GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth - 35f, Height);
+
+            OnFinishedLayoutReserve.SafeInvoke();
         }
 
         public RabbitGUI Begin(Rect start)

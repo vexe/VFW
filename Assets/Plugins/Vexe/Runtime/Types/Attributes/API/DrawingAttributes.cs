@@ -50,4 +50,12 @@ namespace Vexe.Runtime.Types
 	/// your attributes to be applied on each value instead of the dictionary itself
 	/// </summary>
 	public class PerValueAttribute : Attribute { }
+
+    /// <summary>
+    /// Annotate a field with this to let it be drawn by Unity's Layout system
+    /// Note: fields marked with this attribute will have the lowest display order
+    /// so they will appear last after all other members are drawn
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field)]
+    public class DrawByUnityAttribute : Attribute { }
 }

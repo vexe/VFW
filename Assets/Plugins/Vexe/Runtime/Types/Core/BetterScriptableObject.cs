@@ -48,6 +48,13 @@ namespace Vexe.Runtime.Types
 
         public void OnAfterDeserialize()
         {
+#if UNITY_EDITOR
+            if (_delayDeserialize)
+            {
+                _delayDeserialize = false;
+                return;
+            }
+#endif
             DeserializeObject();
         }
 
@@ -96,7 +103,7 @@ namespace Vexe.Runtime.Types
 
         public void DeserializeObject()
         {
-            Serializer.DeserializeDataIntoTarget(this, ObjectData);
+            Serializer.DeserializeTargetFromData(this, ObjectData);
         }
 
         public void SerializeObject()
@@ -104,5 +111,14 @@ namespace Vexe.Runtime.Types
             ObjectData.Clear();
             Serializer.SerializeTargetIntoData(this, ObjectData);
         }
+
+#if UNITY_EDITOR
+        private bool _delayDeserialize;
+
+        public void DelayNextDeserialize()
+        {
+            _delayDeserialize = true;
+        }
+#endif
     }
 }
