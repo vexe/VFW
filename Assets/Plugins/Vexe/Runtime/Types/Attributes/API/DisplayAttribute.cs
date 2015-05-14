@@ -67,6 +67,8 @@ namespace Vexe.Runtime.Types
     {
         None = 0,
         Readonly = 1,
+        ForceExpand = 1 << 1,
+        HideHeader = 1 << 2,
     }
 
 	[Flags]

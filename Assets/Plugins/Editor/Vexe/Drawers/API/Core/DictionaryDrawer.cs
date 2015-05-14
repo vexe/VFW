@@ -21,7 +21,7 @@ namespace Vexe.Editor.Drawers
         private KVPList<TK, TV> _kvpList;
         private string _formatPairPattern;
         private bool _perKeyDrawing, _perValueDrawing;
-        private bool _invalidKeyType, _isReadonly;
+        private bool _invalidKeyType, _isReadonly, _hideHeader, _forceExpand;
 
         protected override void Initialize()
         {
@@ -40,6 +40,8 @@ namespace Vexe.Editor.Drawers
             { 
                 _formatPairPattern = displayAttr.FormatKVPair;
                 _isReadonly = (displayAttr.DictOpt & Dict.Readonly) != 0;
+                _forceExpand = (displayAttr.DictOpt & Dict.ForceExpand) != 0;
+                _hideHeader = (displayAttr.DictOpt & Dict.HideHeader) != 0;
             }
 
             if (_formatPairPattern.IsNullOrEmpty())
@@ -90,33 +92,37 @@ namespace Vexe.Editor.Drawers
             Profiler.BeginSample("DictionaryDrawer Header");
             #endif
 
-            using (gui.Horizontal())
-            {
-                foldout = gui.Foldout(displayText, foldout, Layout.sExpandWidth());
-
-                if (!_isReadonly)
+            if (!_hideHeader)
+                using (gui.Horizontal())
                 {
-                    gui.FlexibleSpace();
+                    if (_forceExpand)
+                        gui.Label(displayText);
+                    else
+                        foldout = gui.Foldout(displayText, foldout, Layout.sExpandWidth());
 
-                    using (gui.State(_kvpList.Count > 0))
+                    if (!_isReadonly)
                     {
-                        if (gui.ClearButton("dictionary"))
-                            _kvpList.Clear();
+                        gui.FlexibleSpace();
 
-                        if (gui.RemoveButton("last dictionary pair"))
-                            _kvpList.RemoveFirst();
+                        using (gui.State(_kvpList.Count > 0))
+                        {
+                            if (gui.ClearButton("dictionary"))
+                                _kvpList.Clear();
+
+                            if (gui.RemoveButton("last dictionary pair"))
+                                _kvpList.RemoveFirst();
+                        }
+
+                        if (gui.AddButton("pair", MiniButtonStyle.ModRight))
+                            AddNewPair();
                     }
-
-                    if (gui.AddButton("pair", MiniButtonStyle.ModRight))
-                        AddNewPair();
                 }
-            }
 
             #if PROFILE
             Profiler.EndSample();
             #endif
 
-            if (!foldout)
+            if (!foldout && !_forceExpand)
                 return;
 
             if (memberValue.Count == 0)
