@@ -338,15 +338,12 @@ namespace Vexe.Editor.Drawers
 
 			public SequenceOptions(Seq options)
 			{
-				Func<Seq, bool> contains = value =>
-					(options & value) != 0;
-
-				Readonly      = contains(Seq.Readonly);
-				Advanced      = contains(Seq.Advanced);
-				LineNumbers   = contains(Seq.LineNumbers);
-				PerItemRemove = contains(Seq.PerItemRemove);
-				GuiBox        = contains(Seq.GuiBox);
-				UniqueItems   = contains(Seq.UniqueItems);
+				Readonly      = options.HasFlag(Seq.Readonly);
+				Advanced      = options.HasFlag(Seq.Advanced);
+				LineNumbers   = options.HasFlag(Seq.LineNumbers);
+				PerItemRemove = options.HasFlag(Seq.PerItemRemove);
+				GuiBox        = options.HasFlag(Seq.GuiBox);
+				UniqueItems   = options.HasFlag(Seq.UniqueItems);
 			}
 		}
 	}

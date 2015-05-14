@@ -39,9 +39,11 @@ namespace Vexe.Editor.Drawers
             if (displayAttr != null)
             { 
                 _formatPairPattern = displayAttr.FormatKVPair;
-                _isReadonly = (displayAttr.DictOpt & Dict.Readonly) != 0;
-                _forceExpand = (displayAttr.DictOpt & Dict.ForceExpand) != 0;
-                _hideHeader = (displayAttr.DictOpt & Dict.HideHeader) != 0;
+
+                var dict = displayAttr.DictOpt;
+                _isReadonly = dict.HasFlag(Dict.Readonly);
+                _forceExpand = dict.HasFlag(Dict.ForceExpand);
+                _hideHeader = dict.HasFlag(Dict.HideHeader);
             }
 
             if (_formatPairPattern.IsNullOrEmpty())
