@@ -16,7 +16,10 @@ namespace Vexe.Editor.Windows
         protected virtual void OnEnable()
         {
             if (gui == null)
+            { 
                 gui = new RabbitGUI();
+                gui.OnRepaint = Repaint;
+            }
         }
 
 		public void OnGUI()

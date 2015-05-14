@@ -16,7 +16,7 @@ namespace Vexe.Editor.GUIs
 {
     public class RabbitGUI : BaseGUI, IDisposable
     {
-        public Action OnFinishedLayoutReserve;
+        public Action OnFinishedLayoutReserve, OnRepaint;
 
         public float Height { private set; get; }
 
@@ -254,6 +254,7 @@ namespace Vexe.Editor.GUIs
                 if (_pendingRepaint)
                 {
                     EditorHelper.RepaintAllInspectors();
+                    OnRepaint.SafeInvoke();
                     _pendingRepaint = false;
                 }
 
