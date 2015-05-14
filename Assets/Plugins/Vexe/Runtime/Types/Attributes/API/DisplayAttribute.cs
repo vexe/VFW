@@ -21,6 +21,16 @@ namespace Vexe.Runtime.Types
         public string FormatLabel;
 
         /// <summary>
+        /// Specifies a method to use that returns a string representing the format label of the annotated member
+        /// Just like FormatLabel but gives you more control.
+        /// Eg you could use a format method that returns the count of a dictionary/array to be added in the display text
+        /// (see DisplayExample.cs) The method must return string and take no parameters
+        /// Note this doesn't take any patterns into consideration ($name etc).
+        /// The exact return value is used as display text
+        /// </summary>
+        public string FormatMethod;
+
+        /// <summary>
         /// Specifies a pattern to format the text display of a key-value pair
         /// Possible patterns (case-sensitive): "$key", "$keytype", "$value", "$valuetype"
         /// See FormatsExample.cs for an example

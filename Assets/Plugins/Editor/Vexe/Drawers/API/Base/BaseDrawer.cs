@@ -27,7 +27,8 @@ namespace Vexe.Editor.Drawers
         protected static BetterPrefs prefs;
         protected static Foldouts foldouts;
 
-        private bool initialized;
+        private bool _hasInit;
+        private MethodCaller<object, string> _dynamicFormatter;
 
         protected bool foldout
         {
@@ -58,7 +59,10 @@ namespace Vexe.Editor.Drawers
             this.attributes = attributes;
             this.gui        = gui;
 
-            if (initialized)
+            if (_dynamicFormatter != null)
+                displayText = _dynamicFormatter(rawTarget, null);
+
+            if (_hasInit)
             {
 #if DBG
                 Log(this + " is Already initialized");
@@ -68,7 +72,21 @@ namespace Vexe.Editor.Drawers
 #if DBG
             Log("Initializing: " + this);
 #endif
-            initialized = true;
+            var displayAttr = attributes.GetAttribute<DisplayAttribute>();
+            if (displayAttr != null && !string.IsNullOrEmpty(displayAttr.FormatMethod))
+            {
+                var method = targetType.GetMethod(displayAttr.FormatMethod, Flags.StaticInstanceAnyVisibility);
+                if (method == null)
+                {
+                    Debug.Log("Couldn't find format method: " + displayAttr.FormatMethod);
+                }
+                else
+                {
+                    _dynamicFormatter = method.DelegateForCall<object, string>();
+                }
+            }
+
+            _hasInit = true;
             InternalInitialize();
             Initialize();
             return this;

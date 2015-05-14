@@ -156,7 +156,7 @@ namespace Vexe.Editor.Drawers
 								using (gui.Vertical())
 								{
 									var element = GetElement(i);
-									gui.Member(element, attributes, !_perItemDrawing);
+									gui.Member(element, !_perItemDrawing);
 								}
 							}
 
@@ -268,7 +268,7 @@ namespace Vexe.Editor.Drawers
 			if (index >= _elements.Count)
 			{
 				var element = EditorMember.WrapIListElement(
-					@attributes  : attributes,
+					@attributes  : _perItemDrawing ? attributes : null,
 					@elementName : string.Empty,
                     @elementType : typeof(TElement),
 					@elementId   : RuntimeHelper.CombineHashCodes(id, index)

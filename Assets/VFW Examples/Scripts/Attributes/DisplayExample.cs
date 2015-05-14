@@ -26,6 +26,23 @@ namespace VFWExamples
 		public Dictionary<string, Transform> Transforms { get; set; }
 
         public DisplayOrderExample example = new DisplayOrderExample();
+
+        [Display(FormatMethod = "FormatArray")]
+        public string[] array;
+
+        // gets called from editor
+        string FormatArray()
+        {
+            return "Array of string (" + array.Length + ")";
+        }
+
+        [Display(FormatMethod = "FormatDictionary")]
+        public Dictionary<string, float> dictionary;
+
+        string FormatDictionary()
+        {
+            return "Lookup (Count: " + dictionary.Count + ")";
+        }
     }
 
     public class Health

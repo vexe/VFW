@@ -197,11 +197,17 @@ namespace Vexe.Editor.Drawers
         {
             if (index >= elements.Count)
             {
+                Attribute[] attrs;
+                if (typeof(T) == typeof(TK))
+                    attrs = _perKeyDrawing ? attributes : null;
+                else 
+                    attrs = _perValueDrawing ? attributes : null;
+
                 var element = EditorMember.WrapIListElement(
                     @elementName : string.Empty,
                     @elementType : typeof(T),
                     @elementId   : RuntimeHelper.CombineHashCodes(id, index),
-                    @attributes  : attributes
+                    @attributes  : attrs
                 );
                 element.InitializeIList(source, index, rawTarget, unityTarget);
                 elements.Add(element);

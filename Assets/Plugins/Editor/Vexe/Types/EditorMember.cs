@@ -88,9 +88,9 @@ namespace Vexe.Editor.Types
 
             string displayFormat = null;
 
-            var formatAttr = Attributes.GetAttribute<DisplayAttribute>();
-            if (formatAttr != null)
-                displayFormat = formatAttr.FormatLabel;
+            var displayAttr = Attributes.GetAttribute<DisplayAttribute>();
+            if (displayAttr != null)
+                displayFormat = displayAttr.FormatLabel;
 
             var settings = VFWSettings.GetInstance();
 
