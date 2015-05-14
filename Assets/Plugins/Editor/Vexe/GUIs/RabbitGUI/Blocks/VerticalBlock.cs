@@ -8,7 +8,10 @@ namespace Vexe.Editor.GUIs
 		{
 			int nControls = controls.Count;
 			if (nControls == 0)
+            { 
+                width = height = 0;
 				return;
+            }
 
 			RectOffset blockMargin = data.style.margin;
 

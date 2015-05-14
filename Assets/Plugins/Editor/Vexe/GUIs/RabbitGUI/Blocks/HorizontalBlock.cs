@@ -23,9 +23,11 @@ namespace Vexe.Editor.GUIs
 #endif
 
 			int totalControls = controls.Count;
-
 			if (totalControls == 0)
+            { 
+                height = width = 0;
 				return;
+            }
 
 			var margin = data.style.margin;
 
