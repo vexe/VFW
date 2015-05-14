@@ -55,12 +55,6 @@ namespace Vexe.Editor.Drawers
             #endif
         }
 
-        public class AddInfo
-        {
-            public TK key;
-            public TV value;
-        }
-
         public override void OnGUI()
         {
             if (_invalidKeyType)

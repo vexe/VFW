@@ -61,7 +61,7 @@ namespace Vexe.Editor.GUIs
         private int _id;
         private static BetterPrefs _prefs;
 
-        static MethodCaller<object, object> _scrollableTextArea;
+        static MethodCaller<object, string> _scrollableTextArea;
         static MethodCaller<object, Gradient> _gradientField;
 
 #if dbg_level_1
@@ -118,7 +118,7 @@ namespace Vexe.Editor.GUIs
                     new Type[] { typeof(Rect), typeof(string), typeof(Vector2).MakeByRefType(), typeof(GUIStyle) },
                     Flags.StaticAnyVisibility);
 
-                _scrollableTextArea = method.DelegateForCall();
+                _scrollableTextArea = method.DelegateForCall<object, string>();
             }
             // GradientField
             {
@@ -874,7 +874,7 @@ namespace Vexe.Editor.GUIs
         public override string ScrollableTextArea(string value, ref Vector2 scrollPos, GUIStyle style, Layout option)
         {
             if (option == null)
-                option = new Layout();
+                option = Layout.None;
 
             if (!option.height.HasValue)
                 option.height = 50f;
@@ -886,7 +886,7 @@ namespace Vexe.Editor.GUIs
             if (CanDrawControl(out position, data))
             {
                 var args = new object[] { position, value, scrollPos, style };
-                var newValue = _scrollableTextArea.Invoke(null, args) as string;
+                var newValue = _scrollableTextArea.Invoke(null, args);
                 scrollPos = (Vector2)args[2];
                 return newValue;
             }

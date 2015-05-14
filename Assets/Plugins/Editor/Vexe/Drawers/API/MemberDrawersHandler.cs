@@ -21,7 +21,7 @@ namespace Vexe.Editor
 
         public static readonly TypeDrawerMapper Mapper;
 
-		public static readonly Func<Type, BaseDrawer> GetCachedObjectDrawer;
+		public static readonly Func<Type, BaseDrawer> CachedGetObjectDrawer;
 
 		static MemberDrawersHandler()
 		{
@@ -38,7 +38,7 @@ namespace Vexe.Editor
             };
 
             //TODO: check if this is still needed
-            GetCachedObjectDrawer = new Func<Type, BaseDrawer>(Mapper.GetDrawer).Memoize();
+            CachedGetObjectDrawer = new Func<Type, BaseDrawer>(Mapper.GetDrawer).Memoize();
 		}
 
 		public static List<BaseDrawer> GetCompositeDrawers(EditorMember member, Attribute[] attributes)

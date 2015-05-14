@@ -225,7 +225,7 @@ namespace Vexe.Editor.Drawers
             }
             else
             {
-                var drawer = MemberDrawersHandler.GetCachedObjectDrawer.Invoke(_polymorphicType);
+                var drawer = MemberDrawersHandler.CachedGetObjectDrawer.Invoke(_polymorphicType);
                 var drawerType = drawer.GetType();
                 if (drawerType == typeof(RecursiveDrawer) || drawerType == typeof(UnityObjectDrawer))
                 {
