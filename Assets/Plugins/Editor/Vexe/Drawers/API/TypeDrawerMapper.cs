@@ -60,6 +60,7 @@ namespace Vexe.Editor
                     .Add<uint, UIntDrawer>()
                     .Add<float, FloatDrawer>()
                     .Add<double, DoubleDrawer>()
+                    .Add<long, LongDrawer>()
                     .Add<bool, BoolDrawer>()
                     .Add<Color, ColorDrawer>()
                     .Add<Color32, Color32Drawer>()

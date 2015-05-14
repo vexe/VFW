@@ -225,5 +225,15 @@ namespace Vexe.Editor.GUIs
         {
             throw new NotImplementedException();
         }
+
+        public override double Double(GUIContent content, double value, Layout option)
+        {
+            return EditorGUILayout.DoubleField(content, value, option);
+        }
+
+        public override long Long(GUIContent content, long value, Layout option)
+        {
+            return EditorGUILayout.LongField(content, value, option);
+        }
     }
 }

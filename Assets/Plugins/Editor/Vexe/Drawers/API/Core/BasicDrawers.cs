@@ -43,11 +43,19 @@ namespace Vexe.Editor.Drawers
         }
     }
 
+    public class LongDrawer : BasicDrawer<long>
+    {
+        protected override long DoField(string text, long value)
+        {
+            return gui.Long(text, value);
+        }
+    }
+
     public class DoubleDrawer : BasicDrawer<double>
     {
         protected override double DoField(string text, double value)
         {
-            return gui.Float(text, (float)value);
+            return gui.Double(text, value);
         }
     }
 

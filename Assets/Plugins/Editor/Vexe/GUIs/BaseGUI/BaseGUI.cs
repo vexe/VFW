@@ -266,7 +266,9 @@ namespace Vexe.Editor.GUIs
             ColorField,
             CurveField,
             GradientField,
-            TextFieldDropDown
+            TextFieldDropDown,
+            Double,
+            Long
         }
 	}
 }

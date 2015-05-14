@@ -919,5 +919,25 @@ namespace Vexe.Editor.GUIs
 
             return value;
         }
+
+        public override double Double(GUIContent content, double value, Layout option)
+        {
+            var data = new ControlData(content, Styles.NumberField, option, ControlType.Double);
+
+            Rect position;
+            if (CanDrawControl(out position, data))
+                return EditorGUI.DoubleField(position, content, value);
+            return value;
+        }
+
+        public override long Long(GUIContent content, long value, Layout option)
+        {
+            var data = new ControlData(content, Styles.NumberField, option, ControlType.Long);
+
+            Rect position;
+            if (CanDrawControl(out position, data))
+                return EditorGUI.LongField(position, content, value);
+            return value;
+        }
     }
 }
