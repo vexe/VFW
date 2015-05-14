@@ -236,36 +236,37 @@ namespace Vexe.Editor.GUIs
 			}
 		}
 
-		public enum ControlType
-		{
-			Button,
-			Label,
-			PrefixLabel,
-			TextField,
-			ObjectField,
-			IntField,
-			Float,
-			Popup,
-			FlexibleSpace,
-			HorizontalBlock,
-			VerticalBlock,
-			MiniButton,
-			Vector3Field,
-			Toggle,
-			Space,
-			MaskField,
-			Slider,
-			Vector2Field,
-			HelpBox,
-			Foldout,
-			Box,
-			EnumPopup,
-			RectField,
-			Bounds,
-			TextArea,
-			ColorField,
-			CurveField,
-			GradientField
-		}
+        public enum ControlType
+        {
+            Button,
+            Label,
+            PrefixLabel,
+            TextField,
+            ObjectField,
+            IntField,
+            Float,
+            Popup,
+            FlexibleSpace,
+            HorizontalBlock,
+            VerticalBlock,
+            MiniButton,
+            Vector3Field,
+            Toggle,
+            Space,
+            MaskField,
+            Slider,
+            Vector2Field,
+            HelpBox,
+            Foldout,
+            Box,
+            EnumPopup,
+            RectField,
+            Bounds,
+            TextArea,
+            ColorField,
+            CurveField,
+            GradientField,
+            TextFieldDropDown
+        }
 	}
 }
