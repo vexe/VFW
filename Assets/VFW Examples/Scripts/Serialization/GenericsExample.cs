@@ -16,6 +16,8 @@ namespace VFWExamples
 
 		public IOwner<GameObject> GoOwner { get; set; }
 		public IOwner<Vector3> VecOwner   { get; set; }
+
+        public Dictionary<string, GameObject> Dict;
 	}
 
 	public interface IOwner<T>

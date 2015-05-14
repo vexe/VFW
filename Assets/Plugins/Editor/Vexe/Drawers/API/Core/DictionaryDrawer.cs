@@ -14,7 +14,7 @@ using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Editor.Drawers
 {
-    public class IDictionaryDrawer<TD, TK, TV> : ObjectDrawer<TD> where TD : class, IDictionary<TK, TV>, new()
+    public class IDictionaryDrawer<TK, TV> : ObjectDrawer<IDictionary<TK, TV>>
     {
         private List<EditorMember> _keyElements;
         private List<EditorMember> _valueElements;
@@ -69,7 +69,7 @@ namespace Vexe.Editor.Drawers
             }
 
             if (memberValue == null)
-                memberValue = new TD();
+                memberValue = memberType.Instance<IDictionary<TK, TV>>();
 
             if (_kvpList == null)
                 _kvpList = new KVPList<TK, TV>();

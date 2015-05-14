@@ -29,7 +29,29 @@ namespace Vexe.Editor.Types
             { @"\$type"    , x => x.Type.Name },
             { @"\$nicetype", x => x.TypeNiceName },
             { @"\$name"    , x => x.Name },
-            { @"\$nicename", x => x.Name.Replace("m_", "").Replace("_", "").SplitPascalCase() },
+            { @"\$nicename", x =>
+                {
+                    var settings = VFWSettings.GetInstance();
+                    var name = x.Name;
+                    if (!settings.UseHungarianNotation)
+                        return name.Replace("m_", "").Replace("_", "").SplitPascalCase();;
+
+                    string result = name.Replace("m_", "").Replace("_", "");
+
+                    if (name.Length > 1 && char.IsLower(result[0]) && char.IsUpper(result[1]))
+                    {
+                        var lowerResultInitial = char.ToLower(result[0]);
+                        var nicetype = x.TypeNiceName;
+
+                        // check for n as well, eg nSize
+                        if ((nicetype == "int" && lowerResultInitial == 'i' || lowerResultInitial == 'n')
+                            || char.ToLower(nicetype[0]) == lowerResultInitial)
+                            return result.Remove(0, 1).SplitPascalCase();
+                    }
+
+                    return result.SplitPascalCase();
+                }
+            },
         };
 
         public object Value
@@ -75,10 +97,10 @@ namespace Vexe.Editor.Types
             if (displayFormat == null)
             {
                 if (Type.IsImplementerOfRawGeneric(typeof(IDictionary<,>)))
-                    displayFormat = settings.DefaultDictionaryFormat;
+                    displayFormat = settings.DictionaryFormat;
                 else if (Type.IsImplementerOfRawGeneric(typeof(IList<>)))
-                    displayFormat = settings.DefaultSequenceFormat;
-                else displayFormat = settings.DefaultMemberFormat;
+                    displayFormat = settings.SequenceFormat;
+                else displayFormat = settings.MemberFormat;
             }
 
             var iter = Formatters.GetEnumerator();

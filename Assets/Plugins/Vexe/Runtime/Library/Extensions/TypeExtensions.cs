@@ -56,6 +56,12 @@ namespace Vexe.Runtime.Extensions
             return result;
         }
 
+        public static MemberInfo GetMemberFromAll(this Type type, string memberName, Type peak, BindingFlags flags)
+        {
+            var result = GetAllMembers(type, peak, flags).FirstOrDefault(x => x.Name == memberName);
+            return result;
+        }
+
         /// <summary>
         /// Returns all members (including private ones) from this type till peak
         /// http://stackoverflow.com/questions/1155529/not-getting-fields-from-gettype-getfields-with-bindingflag-default/1155549#1155549

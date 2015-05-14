@@ -138,7 +138,7 @@ namespace Vexe.Editor
 
 		static class MenuItems
 		{
-			[MenuItem("Tools/Vexe/BetterBehaviour/Clear drawers cache")]
+			[MenuItem("Tools/Vexe/Debug/Clear drawers cache")]
 			public static void ClearCache()
 			{
 				MemberDrawersHandler.ClearCache();

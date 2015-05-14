@@ -23,7 +23,7 @@ namespace VFWExamples
 		[SelectEnum]
 		public KeyCode Jump { get; set; }
 
-		[BetterV2]
+		[BetterV3]
 		public Vector3 Target { get; set; }
 
 		[Show]

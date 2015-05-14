@@ -1,10 +1,47 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Serialization;
 
 namespace Vexe.Runtime.Types
 {
+    [Serializable]
+    public class SerializableType
+    {
+        [SerializeField] private string _name;
+
+        private Type _value;
+
+        public Type Value
+        {
+            get
+            {
+                if(_value == null)
+                    _value = Type.GetType(_name);
+                return _value;
+            }
+            set
+            {
+                if (_value != value)
+                {
+                    _name = value.AssemblyQualifiedName;
+                    _value = value;
+                }
+            }
+        }
+
+        public SerializableType(Type type)
+        {
+            Value = type;
+        }
+
+        public bool IsValid()
+        {
+            return _name != null;
+        }
+    }
+
     [DefineCategory("", 0, MemberType = CategoryMemberType.All, Exclusive = false, AlwaysHideHeader = true)]
     [DefineCategory("Dbg", 3f, Pattern = "^dbg")]
     public abstract class BetterScriptableObject : ScriptableObject, ISerializationCallbackReceiver
@@ -16,10 +53,34 @@ namespace Vexe.Runtime.Types
             get { return _serializationData ?? (_serializationData = new SerializationData()); }
         }
 
-        private static SerializerBackend _serializer;
-        public static SerializerBackend Serializer
+        private static Type DefaultSerializerType = typeof(FullSerializerBackend);
+
+        [SerializeField]
+        private SerializableType _serializerType;
+
+        [Display("Serializer Backend"), ShowType(typeof(SerializerBackend))]
+        public Type SerializerType
         {
-            get { return _serializer ?? (_serializer = new FullSerializerBackend()); }
+            get
+            {
+                if (_serializerType == null || !_serializerType.IsValid())
+                    _serializerType = new SerializableType(DefaultSerializerType);
+                return _serializerType.Value;
+            }
+            set
+            {
+                if (_serializerType.Value != value && value != null)
+                {
+                    _serializerType.Value = value;
+                    _serializer = value.ActivatorInstance<SerializerBackend>();
+                }
+            }
+        }
+
+        private SerializerBackend _serializer;
+        public SerializerBackend Serializer
+        {
+            get { return _serializer ?? (_serializer = SerializerType.ActivatorInstance<SerializerBackend>()); }
         }
 
         /// <summary>

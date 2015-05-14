@@ -15,24 +15,30 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
+      - bool UseHungarianNotation
+      - string SerializerPopup
       - CategoryDisplay DefaultDisplay
       - int DefaultSpacing
-      - string DefaultMemberFormat
-      - string DefaultSequenceFormat
-      - string DefaultDictionaryFormat
+      - string _memberFormat
+      - string _sequenceFormat
+      - string _dictionaryFormat
       - bool DisplayReadonlyIfTrue
       values:
+      - true
+      - '"Fast Serializer (Binary)"'
       - '"BoxedMembersArea"'
       - 10
       - '"$nicename"'
       - '"$nicename ($nicetype)"'
       - '"$nicename ($nicetype)"'
       - true
-  _id: -1
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  _id: 412
   dbg: 0
+  UseHungarianNotation: 1
+  SerializerPopup: Fast Serializer (Binary)
   DefaultDisplay: 4
   DefaultSpacing: 10
-  DefaultMemberFormat: $nicename
-  DefaultSequenceFormat: $nicename ($nicetype)
-  DefaultDictionaryFormat: $nicename ($nicetype)
   DisplayReadonlyIfTrue: 1

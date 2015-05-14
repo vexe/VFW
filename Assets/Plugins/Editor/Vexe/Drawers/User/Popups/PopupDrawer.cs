@@ -10,20 +10,22 @@ namespace Vexe.Editor.Drawers
 {
 	public class PopupDrawer : AttributeDrawer<string, PopupAttribute>
 	{
-		private string[] values;
-		private int? currentIndex;
-		private MethodCaller<object, object> populateMethod;
-		private MemberGetter<object, object> populateMember;
-		private bool populateFromTarget, populateFromType;
+		private string[] _values;
+		private int? _currentIndex;
+		private MethodCaller<object, object> _populateMethod;
+		private MemberGetter<object, object> _populateMember;
+		private bool _populateFromTarget, _populateFromType;
 		private static string[] NA = new string[1] { "NA" };
-		private const string OwnerTypePrefix = "target";
+		private const string kOwnerTypePrefix = "target";
+        private bool _showUpdateButton = true;
 
 		protected override void Initialize()
 		{
 			string fromMember = attribute.PopulateFrom;
 			if (fromMember.IsNullOrEmpty())
 			{
-				values = attribute.values;
+				_values = attribute.values;
+                _showUpdateButton = false;
 			}
 			else
 			{
@@ -35,10 +37,10 @@ namespace Vexe.Editor.Drawers
 				}
 				else
 				{
-					if (split[0].ToLower() == OwnerTypePrefix) // populate from unityTarget
+					if (split[0].ToLower() == kOwnerTypePrefix) // populate from unityTarget
 					{ 
 						populateFrom = unityTarget.GetType();
-						populateFromTarget = true;
+						_populateFromTarget = true;
 					}
 					else // populate from type (member should be static)
 					{
@@ -50,7 +52,7 @@ namespace Vexe.Editor.Drawers
 						if (populateFrom == null)
 							throw new InvalidOperationException("Couldn't find type " + typeName);
 
-						populateFromType = true;
+						_populateFromType = true;
 					}
 
 					fromMember = split[1];
@@ -63,19 +65,19 @@ namespace Vexe.Editor.Drawers
 
 				var field = member as FieldInfo;
 				if (field != null)
-					populateMember = (member as FieldInfo).DelegateForGet();
+					_populateMember = (member as FieldInfo).DelegateForGet();
 				else
 				{
 					var prop = member as PropertyInfo;
 					if (prop != null)
-						populateMember = (member as PropertyInfo).DelegateForGet();
+						_populateMember = (member as PropertyInfo).DelegateForGet();
 					else
 					{
 						var method = member as MethodInfo;
 						if (method == null)
 							throw new Exception("{0} is not a field, nor a property nor a method!".FormatWith(fromMember));
 
-						populateMethod = (member as MethodInfo).DelegateForCall();
+						_populateMethod = (member as MethodInfo).DelegateForCall();
 					}
 				}
 			}
@@ -86,33 +88,30 @@ namespace Vexe.Editor.Drawers
 			if (memberValue == null)
 				memberValue = string.Empty;
 
-			if (values == null)
+			if (_values == null)
 				UpdateValues();
 
-			//if (!currentIndex.HasValue)
-			{
-				currentIndex = values.IndexOf(memberValue);
-				if (currentIndex == -1)
-				{
-					currentIndex = 0;
-					if (values.Length > 0)
-						memberValue = values[0];
-				}
-			}
+            _currentIndex = _values.IndexOf(memberValue);
+            if (_currentIndex == -1)
+            {
+                _currentIndex = 0;
+                if (_values.Length > 0)
+                    memberValue = _values[0];
+            }
 
 			using (gui.Horizontal())
 			{
-				int x = gui.Popup(displayText, currentIndex.Value, values);
+				int x = gui.Popup(displayText, _currentIndex.Value, _values);
 				{
-					if (currentIndex != x || (values.InBounds(x) && memberValue != values[x]))
+					if (_currentIndex != x || (_values.InBounds(x) && memberValue != _values[x]))
 					{
-						memberValue = values[x];
-						currentIndex = x;
+						memberValue = _values[x];
+						_currentIndex = x;
 						gui.RequestResetIfRabbit();
 					}
 				}
 
-				if (gui.MiniButton("U", "Update popup values", MiniButtonStyle.Right))
+				if (_showUpdateButton && gui.MiniButton("U", "Update popup values", MiniButtonStyle.Right))
 					UpdateValues();
 			}
 		}
@@ -120,25 +119,25 @@ namespace Vexe.Editor.Drawers
 		void UpdateValues()
 		{
 			object target;
-			if (populateFromTarget)
+			if (_populateFromTarget)
 				target = unityTarget;
-			else if (populateFromType)
+			else if (_populateFromType)
 				target = null;
 			else target = rawTarget;
 
-			if (populateMember != null)
+			if (_populateMember != null)
 			{
-				var pop = populateMember(target);
+				var pop = _populateMember(target);
 				if (pop != null)
-					values = ProcessPopulation(pop);
+					_values = ProcessPopulation(pop);
 			}
-			else if (populateMethod != null)
+			else if (_populateMethod != null)
 			{
-				var pop = populateMethod(target, null);
+				var pop = _populateMethod(target, null);
 				if (pop != null)
-					values = ProcessPopulation(pop);
+					_values = ProcessPopulation(pop);
 			}
-			else values = NA;
+			else _values = NA;
 		}
 
 		string[] ProcessPopulation(object obj)
@@ -153,6 +152,5 @@ namespace Vexe.Editor.Drawers
 
 			return list.ToArray();
 		}
-
 	}
 }

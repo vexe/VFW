@@ -10,15 +10,18 @@ namespace Vexe.Runtime.Serialization
     /// </summary>
     public class FullSerializerBackend : SerializerBackend
     {
-        public readonly fsSerializer Serializer;
+        public static readonly fsSerializer Serializer;
 
         public FullSerializerBackend()
+        {
+            Logic = VFWSerializationLogic.Instance;
+        }
+
+        static FullSerializerBackend()
         {
             Serializer = new fsSerializer();
             Serializer.AddConverter(new UnityObjectConverter());
             Serializer.AddConverter(new MethodInfoConverter());
-
-            Logic = VFWSerializationLogic.Instance;
 
             fsConfig.SerializeAttributes = VFWSerializationLogic.Instance.Attributes.SerializeMember;
             fsConfig.IgnoreSerializeAttributes = VFWSerializationLogic.Instance.Attributes.DontSerializeMember;

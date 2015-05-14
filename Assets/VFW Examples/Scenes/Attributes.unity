@@ -123,11 +123,9 @@ MonoBehaviour:
       keys:
       - string playerTag
       - Vector3[] vectors
-      - Dictionary<string, Vector3> dictionary
       values:
-      - '""'
-      - '[]'
-      - '{}'
+      - CQAAAAAAAAAAAAAAAA==
+      - eAAAAAAAAAAAAAAAAA==
   _id: 7906
   dbg: 0
   playerTag: 
@@ -222,9 +220,9 @@ MonoBehaviour:
       - string playerTag
       - string enemyTag
       values:
-      - '"None"'
-      - '""'
-      - '"Player"'
+      - YAAAAAAAAAA=
+      - CQAAAAAAAAAAAAAAAA==
+      - CQAAAAAAAAAADAAAAFAAbABhAHkAZQByAA==
   _id: 7918
   dbg: 0
   jumpKey: 0
@@ -310,13 +308,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _serializationData:
-    serializedObjects:
-    - {fileID: 6841602}
+    serializedObjects: []
     serializedStrings:
       keys:
       - GameObject dragMe1
       values:
-      - 0
+      - UwAAAAAAAAAA
   _id: 7930
   dbg: 0
   dragMe1: {fileID: 6841602}
@@ -351,17 +348,11 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
-      - GameObject[] gameObjs
-      - Dictionary<string, Transform> Transforms
       - int secret
-      - ItemInfo[] items
       - DisplayOrderExample example
       values:
-      - '[]'
-      - '{}'
-      - 0
-      - '[]'
-      - '{"three":0,"one":0,"four":0,"zero":0,"two":0,"five":{"seven":0.0,"six":null,"eight":{"r":0.0,"g":0.0,"b":0.0,"a":0.0}}}'
+      - BgAAAAAAAAA=
+      - agAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////wAAAAAAAAAAAAAAAAAAAAA=
   _id: -25674
   dbg: 0
   secret: 0
@@ -432,12 +423,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _serializationData:
-    serializedObjects:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
+    serializedObjects: []
     serializedStrings:
       keys: []
       values: []
@@ -518,11 +504,9 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
-      - string P2
       - string p1
       values:
-      - '""'
-      - '""'
+      - CQAAAAAAAAAAAAAAAA==
   _id: 7954
   dbg: 0
   p1: 
@@ -571,11 +555,9 @@ MonoBehaviour:
       keys:
       - string playerTag
       - Vector3[] vectors
-      - Dictionary<string, Vector3> dictionary
       values:
-      - '"Finish"'
-      - '[]'
-      - '{}'
+      - CQAAAAEAAAAADAAAAEYAaQBuAGkAcwBoAA==
+      - eAAAAAAAAAAAAAAAAA==
   _id: 7960
   dbg: 0
   playerTag: Finish
@@ -679,8 +661,8 @@ MonoBehaviour:
       - Permissions Permission
       - KeyCode actionKey
       values:
-      - '"Read,Write"'
-      - '"Backslash"'
+      - bgAAAAAAAAA=
+      - YAAAAFwAAAA=
   _id: 7974
   dbg: 0
   actionKey: 92
@@ -720,10 +702,10 @@ MonoBehaviour:
       - Vector2 vector2Field
       - Vector3 vector3Field
       values:
-      - '{"x":0.0,"y":0.0}'
-      - '{"x":0.0,"y":0.0,"z":0.0}'
-      - '{"x":3.27999997138977,"y":4.17000007629395}'
-      - '{"x":2.10999989509583,"y":0.119999997317791,"z":1.3400000333786}'
+      - WAAAAAAAAAAAAAAA
+      - WQAAAAAAAAAAAAAAAAAAAA==
+      - WAAAAIXrUUCkcIVA
+      - WQAAAD0KB0CPwvU9H4WrPw==
   _id: 7978
   dbg: 0
   vector2Field: {x: 3.27999997, y: 4.17000008}
@@ -821,9 +803,9 @@ MonoBehaviour:
       - Color bigColor
       - Color smallColor
       values:
-      - -171
-      - '{"r":0.0,"g":0.0,"b":0.0,"a":0.0}'
-      - '{"r":0.0,"g":0.0,"b":0.0,"a":0.0}'
+      - BgAAAFX///8=
+      - WwAAAAAAAAAAAAAAAAAAAAAAAAA=
+      - WwAAAAAAAAAAAAAAAAAAAAAAAAA=
   _id: 7990
   dbg: 0
   number: -171
@@ -886,19 +868,19 @@ MonoBehaviour:
       - Color dbgColor
       - float dbgFloat
       values:
-      - 0.0
-      - 0.0
-      - 0.0
-      - '""'
-      - '""'
-      - '""'
-      - '""'
-      - '""'
-      - 0
-      - 0
-      - 0
-      - '{"r":0.0,"g":0.0,"b":0.0,"a":0.0}'
-      - 0.0
+      - OAAAAAAAAAA=
+      - OAAAAAAAAAA=
+      - OAAAAAAAAAA=
+      - CQAAAAAAAAAAAAAAAA==
+      - CQAAAAAAAAAAAAAAAA==
+      - CQAAAAAAAAAAAAAAAA==
+      - CQAAAAAAAAAAAAAAAA==
+      - CQAAAAAAAAAAAAAAAA==
+      - BgAAAAAAAAA=
+      - BgAAAAAAAAA=
+      - BgAAAAAAAAA=
+      - WwAAAAAAAAAAAAAAAAAAAAAAAAA=
+      - OAAAAAAAAAA=
   _id: 7996
   dbg: 0
   nonExString1: 
@@ -966,21 +948,15 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
-      - string Factor
-      - string[] EnemyTags
       - string strings
-      - int count
       - string playerTag
       - string[] items
       - SomeStruct someObj
       values:
-      - '"Ork"'
-      - '["Finish","Player"]'
-      - '"String1"'
-      - 3
-      - '"MainCamera"'
-      - '[]'
-      - '{"factor":null}'
+      - CQAAAAAAAAAADgAAAFMAdAByAGkAbgBnADEA
+      - CQAAAAAAAAAAFAAAAE0AYQBpAG4AQwBhAG0AZQByAGEA
+      - JgAAAAAAAAAAAAAAAA==
+      - fQAAAP////8=
   _id: 8010
   dbg: 0
   strings: String1
@@ -1032,8 +1008,8 @@ MonoBehaviour:
       - int RandomIntProperty
       - float randomFloat
       values:
-      - 59
-      - 12.7272710800171
+      - BgAAAAAAAAA=
+      - OAAAAOeiS0E=
   _id: 8016
   dbg: 0
   randomFloat: 12.7272711
@@ -1079,17 +1055,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _serializationData:
-    serializedObjects:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
+    serializedObjects: []
     serializedStrings:
       keys:
       - KeyCode jumpKey
       values:
-      - '"None"'
+      - YAAAAAAAAAA=
   _id: -1
   dbg: 0
   boxCollider: {fileID: 0}
@@ -1125,13 +1096,11 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
-      - string FullPath
       - string simplePath
       - string someAssetPath
       values:
-      - '"Draggable"'
-      - '""'
-      - '""'
+      - CQAAAAAAAAAAAAAAAA==
+      - CQAAAAAAAAAAAAAAAA==
   _id: 8026
   dbg: 0
   simplePath: 
@@ -1179,7 +1148,6 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
-      - string StringProperty
       - int IntProperty
       - float FloatProperty
       - bool BoolProperty
@@ -1195,21 +1163,20 @@ MonoBehaviour:
       - int[] intArray
       - bool[] boolArray
       values:
-      - '""'
-      - 0
-      - 0.0
-      - false
-      - '{"x":0.0,"y":0.0,"z":0.0}'
-      - '[]'
-      - '[]'
-      - 10
-      - '""'
-      - 10
-      - 10.75
-      - '{"x":1.0,"y":2.0}'
-      - '"Space"'
-      - '[1,2,3]'
-      - '[true,true,false,true]'
+      - BgAAAAAAAAA=
+      - OAAAAAAAAAA=
+      - GAAAAAA=
+      - WQAAAAAAAAAAAAAAAAAAAA==
+      - XwAAAAAAAAAAAAAAAA==
+      - JgAAAAAAAAAAAAAAAA==
+      - BgAAAAoAAAA=
+      - CQAAAAAAAAAAAAAAAA==
+      - BgAAAAoAAAA=
+      - OAAAAAAALEE=
+      - WAAAAAAAgD8AAABA
+      - YAAAACAAAAA=
+      - PwAAAAMAAAAAAAAAAAEAAAACAAAAAwAAAA==
+      - YQAAAAQAAAAAAAAAAAEBAAE=
   _id: 8032
   dbg: 0
   defIntX: 10
@@ -1303,19 +1270,11 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
-      - List<GameObject> Gos
-      - List<string> Strings
-      - List<Vector3> BetterVectors
-      - List<Vector3> RegularVectors
       - Transform[] transforms
       - string[] tags
       values:
-      - '{"$content":[]}'
-      - '{"$content":[]}'
-      - '{"$content":[{"x":0.0,"y":0.0,"z":0.0},{"x":0.0,"y":0.0,"z":0.0},{"x":0.0,"y":0.0,"z":0.0},{"x":0.0,"y":0.0,"z":0.0},{"x":0.0,"y":0.0,"z":0.0},{"x":0.0,"y":0.0,"z":0.0}]}'
-      - '{"$content":[{"x":0.0,"y":0.0,"z":0.0},{"x":0.0,"y":0.0,"z":0.0},{"x":0.0,"y":0.0,"z":0.0},{"x":0.0,"y":0.0,"z":0.0}]}'
-      - '[]'
-      - '["GameController","Finish"]'
+      - iAAAAAAAAAAAAAAAAA==
+      - JgAAAAIAAAAAAAAAAAAAAAAAHAAAAEcAYQBtAGUAQwBvAG4AdAByAG8AbABsAGUAcgABAAAAAAwAAABGAGkAbgBpAHMAaAA=
   _id: 8044
   dbg: 0
   transforms: []
@@ -1457,7 +1416,7 @@ MonoBehaviour:
       keys:
       - string scene
       values:
-      - '""'
+      - CQAAAAAAAAAAAAAAAA==
   _id: 8062
   dbg: 0
   scene: 
@@ -1554,15 +1513,15 @@ MonoBehaviour:
       - float clampedFloat
       - string mustStartWithName
       values:
-      - 0.0
-      - 0
-      - 3
-      - '""'
-      - 100
-      - 1.5
-      - '""'
-      - 1.5
-      - '""'
+      - OAAAAAAAAAA=
+      - BgAAAAAAAAA=
+      - BgAAAAAAAAA=
+      - CQAAAAAAAAAAAAAAAA==
+      - BgAAAGQAAAA=
+      - OAAAAAAAwD8=
+      - CQAAAAAAAAAAAAAAAA==
+      - OAAAAAAAwD8=
+      - CQAAAAAAAAAAAAAAAA==
   _id: 8080
   dbg: 0
   ip: 
@@ -1605,8 +1564,8 @@ MonoBehaviour:
       - int IntSlider
       - float floatSlider
       values:
-      - 3
-      - 4.6399998664856
+      - BgAAAAAAAAA=
+      - OAAAAOF6lEA=
   _id: 8084
   dbg: 0
   floatSlider: 4.63999987
@@ -1650,17 +1609,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _serializationData:
-    serializedObjects:
-    - {fileID: 1856093235}
+    serializedObjects: []
     serializedStrings:
       keys:
-      - string SomeString
       - int SomeInt
-      - GameObject SomeGameObject
       values:
-      - '""'
-      - 0
-      - 0
+      - BgAAAAAAAAA=
   _id: 8090
   dbg: 0
 --- !u!4 &1856093237
@@ -1729,21 +1683,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _serializationData:
-    serializedObjects:
-    - {fileID: 6841604}
-    - {fileID: 1877090479}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
+    serializedObjects: []
     serializedStrings:
       keys:
       - MeshRenderer meshrend
       - BoxCollider col
       values:
-      - 0
-      - 1
+      - cwAAAAAAAAAA
+      - dgAAAAAAAAAA
   _id: 8100
   dbg: 0
   trans: {fileID: 0}
@@ -1765,13 +1712,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _serializationData:
-    serializedObjects:
-    - {fileID: 1357484841}
+    serializedObjects: []
     serializedStrings:
       keys:
       - GameObject target
       values:
-      - 0
+      - UwAAAAAAAAAA
   _id: 8102
   dbg: 0
   target: {fileID: 1357484841}
@@ -1891,13 +1837,11 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
-      - string[] Variables
       - string isDeadVar
       - string anotherVar
       values:
-      - '[]'
-      - '"IsDead"'
-      - '"Speed"'
+      - CQAAAAAAAAAADAAAAEkAcwBEAGUAYQBkAA==
+      - CQAAAAAAAAAACgAAAFMAcABlAGUAZAA=
   _id: 8118
   dbg: 0
   isDeadVar: IsDead
