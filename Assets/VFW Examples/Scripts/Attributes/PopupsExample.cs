@@ -11,7 +11,9 @@ namespace VFWExamples
 		// populate from the method GetFactors - which should return a string[]
 		// (access modifier on the method doesn't matter)
 		// also use a filter to quickly select values
-        [Popup("Factors")]
+        // we also tell it to use a text field so we can input values that are not
+        // in the popup should we want that
+        [Popup("Factors", TextField = true)]
 		public string Factor { get; set; }
 
 		// PerItem indicates that the attributes are applied per element, and not on the array

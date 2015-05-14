@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Vexe.Editor.GUIs;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
 
@@ -15,7 +14,7 @@ namespace Vexe.Editor.Drawers
 		private MethodCaller<object, object> _populateMethod;
 		private MemberGetter<object, object> _populateMember;
 		private bool _populateFromTarget, _populateFromType;
-		private static string[] NA = new string[1] { "NA" };
+		private static string[] Empty = new string[1] { "--empty--" };
 		private const string kOwnerTypePrefix = "target";
         private bool _showUpdateButton = true;
 
@@ -92,31 +91,38 @@ namespace Vexe.Editor.Drawers
 				UpdateValues();
 
             _currentIndex = _values.IndexOf(memberValue);
-            if (_currentIndex == -1)
+            if (_currentIndex == -1 && !attribute.TextField)
             {
                 _currentIndex = 0;
                 if (_values.Length > 0)
                     memberValue = _values[0];
             }
 
-			using (gui.Horizontal())
-			{
-				int x = gui.Popup(displayText, _currentIndex.Value, _values);
-				{
-					if (_currentIndex != x || (_values.InBounds(x) && memberValue != _values[x]))
-					{
-						memberValue = _values[x];
-						_currentIndex = x;
-						gui.RequestResetIfRabbit();
-					}
-				}
+            using (gui.Horizontal())
+            {
+                if (attribute.TextField)
+                {
+                    memberValue = gui.TextFieldDropDown(displayText, memberValue, _values);
+                }
+                else
+                {
+                    int x = gui.Popup(displayText, _currentIndex.Value, _values);
+                    {
+                        if (_currentIndex != x || (_values.InBounds(x) && memberValue != _values[x]))
+                        {
+                            memberValue = _values[x];
+                            _currentIndex = x;
+                            gui.RequestResetIfRabbit();
+                        }
+                    }
+                }
 
-				if (_showUpdateButton && gui.MiniButton("U", "Update popup values", MiniButtonStyle.Right))
+                if (_showUpdateButton && gui.MiniButton("U", "Update popup values", MiniButtonStyle.Right))
 					UpdateValues();
 			}
 		}
 
-		void UpdateValues()
+		public void UpdateValues()
 		{
 			object target;
 			if (_populateFromTarget)
@@ -137,7 +143,7 @@ namespace Vexe.Editor.Drawers
 				if (pop != null)
 					_values = ProcessPopulation(pop);
 			}
-			else _values = NA;
+			else _values = Empty;
 		}
 
 		string[] ProcessPopulation(object obj)
@@ -147,10 +153,10 @@ namespace Vexe.Editor.Drawers
 				return arr;
 
 			var list = obj as List<string>;
-			if (list == null)
-				return NA;
+			if (list != null)
+			    return list.ToArray();
 
-			return list.ToArray();
+            return Empty;
 		}
 	}
 }

@@ -44,5 +44,27 @@ namespace Vexe.Editor.GUIs
 		}
 
 		public abstract string Tag(GUIContent content, string tag, GUIStyle style, Layout layout);
+        
+		public string TextFieldDropDown(string text, string[] displayedOptions)
+		{
+			return TextFieldDropDown(text, displayedOptions, null);
+		}
+
+		public string TextFieldDropDown(string text, string[] displayedOptions, Layout option)
+		{
+			return TextFieldDropDown(string.Empty, text, displayedOptions, option);
+		}
+
+		public string TextFieldDropDown(string label, string text, string[] displayedOptions)
+		{
+			return TextFieldDropDown(label, text, displayedOptions, null);
+		}
+
+		public string TextFieldDropDown(string label, string text, string[] displayedOptions, Layout option)
+		{
+			return TextFieldDropDown(GetContent(label), text, displayedOptions, option);
+		}
+
+		public abstract string TextFieldDropDown(GUIContent label, string text, string[] displayedOptions, Layout option);
 	}
 }

@@ -63,6 +63,7 @@ namespace Vexe.Editor.GUIs
 
         static MethodCaller<object, string> _scrollableTextArea;
         static MethodCaller<object, Gradient> _gradientField;
+        static MethodCaller<object, string> _textFieldDropDown;
 
 #if dbg_level_1
             private bool _pendingReset;
@@ -127,6 +128,14 @@ namespace Vexe.Editor.GUIs
                     Flags.StaticAnyVisibility);
 
                 _gradientField = method.DelegateForCall<object, Gradient>();
+            }
+            // TextFieldDropDown
+            {
+                var method = editorGUIType.GetMethod("TextFieldDropDown",
+                    new Type[] { typeof(Rect), typeof(GUIContent), typeof(string), typeof(string[]) },
+                    Flags.StaticAnyVisibility);
+
+                _textFieldDropDown = method.DelegateForCall<object, string>();
             }
         }
 
@@ -888,6 +897,22 @@ namespace Vexe.Editor.GUIs
                 var args = new object[] { position, value, scrollPos, style };
                 var newValue = _scrollableTextArea.Invoke(null, args);
                 scrollPos = (Vector2)args[2];
+                return newValue;
+            }
+
+            return value;
+        }
+
+        public override string TextFieldDropDown(GUIContent label, string value, string[] dropDownElements, Layout option)
+        {
+            var content = GetContent(value);
+            var data = new ControlData(label, Styles.TextFieldDropDown, option, ControlType.TextFieldDropDown);
+
+            Rect position;
+            if (CanDrawControl(out position, data))
+            {
+                var args = new object[] { position, label, value, dropDownElements };
+                var newValue = _textFieldDropDown.Invoke(null, args);
                 return newValue;
             }
 

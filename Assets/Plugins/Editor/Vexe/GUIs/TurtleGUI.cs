@@ -220,5 +220,10 @@ namespace Vexe.Editor.GUIs
         {
             throw new NotImplementedException();
         }
+
+        public override string TextFieldDropDown(GUIContent label, string text, string[] displayedOptions, Layout option)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

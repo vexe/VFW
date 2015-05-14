@@ -22,6 +22,11 @@ namespace Vexe.Runtime.Types
 		/// </summary>
 		public bool CaseSensitive { get; set; }
 
+        /// <summary>
+        /// Use a text field dropdown/popup? (same one used setting up Mecanim's conditions)
+        /// </summary>
+        public bool TextField { get; set; }
+
 		/// <summary>
 		/// The popup values
 		/// </summary>
