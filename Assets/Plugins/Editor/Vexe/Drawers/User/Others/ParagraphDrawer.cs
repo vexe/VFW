@@ -19,13 +19,19 @@ namespace Vexe.Editor.Drawers
 		}
 
 		public override void OnGUI()
-		{
-			gui.Label(displayText);
+        {
+            memberValue = OnGUI(displayText, memberValue, attribute.minNumLines, attribute.maxNumLines, gui as RabbitGUI);
+        }
 
-			content.text = memberValue;
-			float height = EditorStyles.textArea.CalcHeight(content, (gui as RabbitGUI).Width);
+		public string OnGUI(string label, string text, int minLines, int maxLines, RabbitGUI gui)
+		{
+            if (!string.IsNullOrEmpty(label))
+			    gui.Label(label);
+
+			content.text = text;
+			float height = Styles.TextArea.CalcHeight(content, gui.Width);
 			int numLines = (int)(height / 13f);
-			numLines = Mathf.Clamp(numLines, attribute.minNumLines, attribute.maxNumLines);
+			numLines = Mathf.Clamp(numLines, minLines, maxLines);
 			height = 20 + ((numLines - 1) * 13f);
 
 			if (_prevHeight != height)
@@ -35,7 +41,8 @@ namespace Vexe.Editor.Drawers
 			}
 
 			var layout = Layout.sHeight(height);
-			memberValue = gui.ScrollableTextArea(memberValue, ref _scrollPos, layout);
+			var result = gui.ScrollableTextArea(text, ref _scrollPos, layout);
+            return result;
 		}
 	}
 }
