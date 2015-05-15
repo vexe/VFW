@@ -5,10 +5,20 @@ namespace Vexe.Runtime.Types
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
     public class DisplayAttribute : Attribute
     {
+        private float _order;
+
         /// <summary>
         /// Specifies the drawing/display order of a member
         /// </summary>
-        public float Order;
+        public float Order
+        {
+            get { return _order; }
+            set
+            {
+                _order = value;
+                DisplayOrder = value;
+            }
+        }
 
         /// <summary>
         /// Specifies a pattern to format the text display of a member
@@ -46,6 +56,8 @@ namespace Vexe.Runtime.Types
         /// Customizes the display of dictionaries
         /// </summary>
         public Dict DictOpt;
+
+        public float? DisplayOrder;
 
         public DisplayAttribute()
         {

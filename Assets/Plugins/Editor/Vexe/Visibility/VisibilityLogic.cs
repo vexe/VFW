@@ -35,7 +35,7 @@ namespace Vexe.Editor.Visibility
         public static float GetMemberDisplayOrder(MemberInfo member)
         {
             var attribute = member.GetCustomAttribute<DisplayAttribute>();
-            if (attribute != null)
+            if (attribute != null && attribute.DisplayOrder.HasValue)
                 return attribute.Order;
 
             switch (member.MemberType)

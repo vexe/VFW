@@ -70,20 +70,22 @@ namespace VFWExamples
 	/// <summary>
 	/// An example showing how to explictly state the order that members are displayed in
 	/// </summary>
-	public class DisplayOrderExample
+	public struct DisplayOrderExample
 	{
 		[Display(2.5f)] public int three;
-		[Display]       public int one; // if no order is explicitly specified then 0 is used
+		[Display(-1)]   public int one;
 		[Display(10f)]  public int four;
-		[Display(-1)]   public int zero;
-		[Display(2f)]   public int two;
-		[Display(11)]   public Five five;
+		[Display(-2)]   public int zero;
+		[Display(0f)]   public int two;
+		[Display(11f)]  public Five five;
 
 		public struct Five
 		{
 			[Display(1f)] public float seven;
-			[Display] public string six;
-			[Display(2f)] public Color eight;
+			[Display(0f)] public string six;
+			[Display] public Color eight; // if no order is specified the member will be drawn in the remaining order
+            public double nine;
+            public string ten;
 		}
 	}
 }
