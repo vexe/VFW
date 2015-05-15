@@ -21,11 +21,15 @@ namespace VFWExamples
 
 		// PerItem indicates that you want to apply your attributes on each element
 		// and not the array itself
-		[PerItem, Tags]
-		public string[] tags;
-
 		[PerItem, BetterV3]
 		public List<Vector3> BetterVectors { get; set; }
+
+        // Here, we're telling PerItem that we only want to apply 'Tags' per item
+        // leaving Comment to be applied on the array itself
+        // this gives you more control how you want your attributes to be applied
+        // for more details see CollectionElementExample.cs
+		[PerItem("Tags"), Tags, Comment("This comment is applied on the array")]
+		public string[] tags;
 
 		// Notice here we're not using PerItem, which means any attribute we mention would be applied
 		// on the sequence (array/list) itself, and not its elements

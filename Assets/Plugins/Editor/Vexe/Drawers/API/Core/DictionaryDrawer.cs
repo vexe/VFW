@@ -16,11 +16,10 @@ namespace Vexe.Editor.Drawers
 {
     public class IDictionaryDrawer<TK, TV> : ObjectDrawer<IDictionary<TK, TV>>
     {
-        private List<EditorMember> _keyElements;
-        private List<EditorMember> _valueElements;
+        private List<EditorMember> _keyElements, _valueElements;
         private KVPList<TK, TV> _kvpList;
+        private Attribute[] _perKeyAttributes, _perValueAttributes;
         private string _formatPairPattern;
-        private bool _perKeyDrawing, _perValueDrawing;
         private bool _invalidKeyType, _isReadonly, _hideHeader, _forceExpand;
 
         protected override void Initialize()
@@ -32,8 +31,21 @@ namespace Vexe.Editor.Drawers
             _keyElements   = new List<EditorMember>();
             _valueElements = new List<EditorMember>();
 
-            _perKeyDrawing   = attributes.AnyIs<PerKeyAttribute>();
-            _perValueDrawing = attributes.AnyIs<PerValueAttribute>();
+            var perKey = attributes.GetAttribute<PerKeyAttribute>();
+            if (perKey != null)
+            {
+                if (perKey.ExplicitAttributes == null)
+                    _perKeyAttributes = attributes.Where(x => !(x is PerKeyAttribute)).ToArray();
+                else _perKeyAttributes = attributes.Where(x => perKey.ExplicitAttributes.Contains(x.GetType().Name.Replace("Attribute", ""))).ToArray();
+            }
+
+            var perValue = attributes.GetAttribute<PerValueAttribute>();
+            if (perValue != null)
+            {
+                if (perValue.ExplicitAttributes == null)
+                    _perValueAttributes = attributes.Where(x => !(x is PerValueAttribute)).ToArray();
+                else _perValueAttributes = attributes.Where(x => perValue.ExplicitAttributes.Contains(x.GetType().Name.Replace("Attribute", ""))).ToArray();
+            }
 
             var displayAttr = attributes.GetAttribute<DisplayAttribute>();
             if (displayAttr != null)
@@ -159,10 +171,10 @@ namespace Vexe.Editor.Drawers
                         using (gui.Indent())
                         {
                             var keyMember = GetElement(_keyElements, _kvpList.Keys, i, entryKey + 1);
-                            gui.Member(keyMember, !_perKeyDrawing);
+                            gui.Member(keyMember, @ignoreComposition: _perKeyAttributes == null);
 
                             var valueMember = GetElement(_valueElements, _kvpList.Values, i, entryKey + 2);
-                            gui.Member(valueMember, !_perValueDrawing);
+                            gui.Member(valueMember, @ignoreComposition: _perValueAttributes == null);
                         }
                         #if PROFILE
                         Profiler.EndSample();
@@ -199,9 +211,9 @@ namespace Vexe.Editor.Drawers
             {
                 Attribute[] attrs;
                 if (typeof(T) == typeof(TK))
-                    attrs = _perKeyDrawing ? attributes : null;
+                    attrs = _perKeyAttributes;
                 else 
-                    attrs = _perValueDrawing ? attributes : null;
+                    attrs = _perValueAttributes;
 
                 var element = EditorMember.WrapIListElement(
                     @elementName : string.Empty,

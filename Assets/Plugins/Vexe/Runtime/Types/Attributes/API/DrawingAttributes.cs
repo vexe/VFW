@@ -34,23 +34,63 @@ namespace Vexe.Runtime.Types
 	}
 
 	/// <summary>
-	/// Annotate sequences (array/list) with this to signify that you want 
-	/// your attributes to be applied on each element instead of the sequence itself
+	/// Annotate sequences (array/list) with this to specify exactly which attributes to apply
+    /// to each element. If none is specified (empty constructor is used) then all attributes
+    /// are used per element. See CollectionElementExample.cs
 	/// </summary>
-	public class PerItemAttribute : Attribute { }
+	public class PerItemAttribute : Attribute
+    {
+        public readonly string[] ExplicitAttributes;
+
+        public PerItemAttribute()
+        {
+        }
+
+        public PerItemAttribute(params string[] attributes)
+        {
+            ExplicitAttributes = attributes;
+        }
+    }
 
 	/// <summary>
-	/// Annotate dictionaries with this to signify that you want 
-	/// your attributes to be applied on each key instead of the dictionary itself
+	/// Annotate dictionaries with this to specify which attributes to apply on each key
+    /// instead of the dictionary itself. If none is specified then all annoated attributes
+    /// will be used on each key
+    /// See CollectionElementExample.cs
 	/// </summary>
-	public class PerKeyAttribute : Attribute { }
+	public class PerKeyAttribute : Attribute
+    {
+        public readonly string[] ExplicitAttributes;
+
+        public PerKeyAttribute()
+        {
+        }
+
+        public PerKeyAttribute(params string[] attributes)
+        {
+            ExplicitAttributes = attributes;
+        }
+    }
 
 	/// <summary>
-	/// Annotate dictionaries with this to signify that you want 
-	/// your attributes to be applied on each value instead of the dictionary itself
+	/// Annotate dictionaries with this to specify which attributes to apply on each value
+    /// instead of the dictionary itself. If none is specified then all annoated attributes
+    /// will be used on each value
+    /// See CollectionElementExample.cs
 	/// </summary>
-	public class PerValueAttribute : Attribute { }
+	public class PerValueAttribute : Attribute
+    {
+        public readonly string[] ExplicitAttributes;
 
+        public PerValueAttribute()
+        {
+        }
+
+        public PerValueAttribute(params string[] attributes)
+        {
+            ExplicitAttributes = attributes;
+        }
+    }
     /// <summary>
     /// Annotate a field with this to let it be drawn by Unity's Layout system
     /// Note: fields marked with this attribute will have the lowest display order

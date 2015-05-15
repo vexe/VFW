@@ -49,15 +49,13 @@ namespace Vexe.Editor
 
 			drawers = new List<BaseDrawer>();
 
-			// consider composition only if the member type isn't a collection type,
-			// or it is a collection type but it doesn't have any per attribute that signifies drawing per element
-			// (in other words, the composition is applied on the collection itself, and not its elements)
-			var considerComposition = !member.Type.IsCollection() || !attributes.Any(x => _definesElementDrawingAttributes.Contains(x.GetType()));
-			if (considerComposition)
+
+            var applied = GetAppliedAttributes(member.Type, attributes);
+			if (applied != null)
 			{
-				var compositeAttributes = attributes.OfType<CompositeAttribute>()
-													.OrderBy(x => x.id)
-													.ToList();
+				var compositeAttributes = applied.OfType<CompositeAttribute>()
+												 .OrderBy(x => x.id)
+												 .ToList();
 
 				for (int i = 0; i < compositeAttributes.Count; i++)
                 {
@@ -82,12 +80,15 @@ namespace Vexe.Editor
 			if (_cachedMemberDrawers.TryGetValue(member.Id, out drawer))
 				return drawer;
 
-			var canApplyDrawer = !member.Type.IsCollection() || !attributes.Any(x => _definesElementDrawingAttributes.Contains(x.GetType()));
-            if (canApplyDrawer && !ignoreAttributes)
+            if (!ignoreAttributes)
             {
-                var drawingAttribute = attributes.GetAttribute<DrawnAttribute>();
-                if (drawingAttribute != null)
-                    drawer = NewDrawer(drawingAttribute.GetType());
+                var applied = GetAppliedAttributes(member.Type, attributes);
+                if (applied != null)
+                { 
+                    var drawingAttribute = applied.GetAttribute<DrawnAttribute>();
+                    if (drawingAttribute != null)
+                        drawer = NewDrawer(drawingAttribute.GetType());
+                }
             }
 
             if (drawer == null)
@@ -105,6 +106,66 @@ namespace Vexe.Editor
 
 			return drawer;
 		}
+
+        private static Attribute[] GetAppliedAttributes(Type memberType, Attribute[] attributes)
+        {
+            if (!memberType.IsCollection())
+                return attributes;
+
+            PerKeyAttribute perKey = null;
+            PerValueAttribute perValue = null;
+
+            var isDictionary = memberType.IsImplementerOfRawGeneric(typeof(IDictionary<,>));
+
+            for (int i = 0; i < attributes.Length; i++)
+            {
+                var attr = attributes[i];
+                var perItem = attr as PerItemAttribute;
+                if (perItem != null)
+                {
+                    if (isDictionary)
+                    {
+                        Debug.LogError("PerItem should be applied on lists or arrays, not dictionaries!");
+                        return null;
+                    }
+
+                    if (perItem.ExplicitAttributes == null)
+                        return null;
+
+                    return attributes.Where(x => !perItem.ExplicitAttributes.Contains(x.GetType().Name.Replace("Attribute", ""))).ToArray();
+                }
+
+                if (!isDictionary)
+                    continue;
+
+                if (perKey != null && perValue != null)
+                    break;
+
+                if (perKey == null)
+                    perKey = attr as PerKeyAttribute;
+
+                if (perValue == null)
+                    perValue = attr as PerValueAttribute;
+            }
+
+            if (perKey == null && perValue == null)
+                return attributes;
+
+            if (perKey != null && perValue != null &&
+                (perKey.ExplicitAttributes == null || perValue.ExplicitAttributes == null))
+            {
+                Debug.LogError("Confusion: If you use both PerKey and PerValue, then you should explictly mention which attributes are applied per key and which per value! (Info: MemberType ({0}) Attributes({1})".FormatWith(memberType.GetNiceName(), string.Join(", ", attributes.Select(x=>x.GetType().Name).ToArray())));
+                return null;
+            }
+
+            if (perKey != null && perKey.ExplicitAttributes != null)
+                attributes = attributes.Where(x => !perKey.ExplicitAttributes.Contains(x.GetType().Name.Replace("Attribute", ""))).ToArray();
+
+            if (perValue != null && perValue.ExplicitAttributes != null)
+                attributes = attributes.Where(x => !perValue.ExplicitAttributes.Contains(x.GetType().Name.Replace("Attribute", ""))).ToArray();
+
+            return attributes;
+        }
 
 		public static MethodDrawer GetMethodDrawer(int methodId)
 		{

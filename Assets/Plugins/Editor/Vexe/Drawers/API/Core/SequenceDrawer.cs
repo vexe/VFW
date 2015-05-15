@@ -20,9 +20,9 @@ namespace Vexe.Editor.Drawers
 		private int _advancedKey;
 		private List<EditorMember> _elements;
 		private SequenceOptions _options;
-		private bool _perItemDrawing;
 		private bool _shouldDrawAddingArea;
 		private int _newSize;
+        private Attribute[] _perItemAttributes;
 
 		private bool isAdvancedChecked
 		{
@@ -47,8 +47,15 @@ namespace Vexe.Editor.Drawers
                 displayText += " (Readonly)";
 
 			_advancedKey          = RuntimeHelper.CombineHashCodes(id, "advanced");
-			_perItemDrawing       = attributes.AnyIs<PerItemAttribute>();
 			_shouldDrawAddingArea = !_options.Readonly && _elementType.IsA<UnityObject>();
+
+            var perItem = attributes.GetAttribute<PerItemAttribute>();
+            if (perItem != null)
+            {
+                if (perItem.ExplicitAttributes == null)
+                    _perItemAttributes = attributes.Where(x => !(x is PerItemAttribute)).ToArray();
+                else _perItemAttributes = attributes.Where(x => perItem.ExplicitAttributes.Contains(x.GetType().Name.Replace("Attribute", ""))).ToArray();
+            }
 		}
 
 		public override void OnGUI()
@@ -156,7 +163,7 @@ namespace Vexe.Editor.Drawers
 								using (gui.Vertical())
 								{
 									var element = GetElement(i);
-									gui.Member(element, !_perItemDrawing);
+									gui.Member(element, @ignoreComposition: _perItemAttributes == null);
 								}
 							}
 
@@ -268,7 +275,7 @@ namespace Vexe.Editor.Drawers
 			if (index >= _elements.Count)
 			{
 				var element = EditorMember.WrapIListElement(
-					@attributes  : _perItemDrawing ? attributes : null,
+					@attributes  : _perItemAttributes,
 					@elementName : string.Empty,
                     @elementType : typeof(TElement),
 					@elementId   : RuntimeHelper.CombineHashCodes(id, index)
