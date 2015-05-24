@@ -13,15 +13,35 @@ namespace Vexe.Runtime.Helpers
 {
     public static class RuntimeHelper
     {
+        public static void Swap<T>(ref T value0, ref T value1)
+        {
+            T tmp = value0;
+            value0 = value1;
+            value1 = tmp;
+        }
+
+        public static string GetCurrentSceneName()
+        {
+            string sceneName;
+
+#if UNITY_EDITOR
+            sceneName = Application.isPlaying ? Application.loadedLevelName : System.IO.Path.GetFileNameWithoutExtension(UnityEditor.EditorApplication.currentScene);
+            if ( string.IsNullOrEmpty(sceneName) )
+            {
+                sceneName = "Unnamed";
+            }
+#else
+            sceneName = Application.loadedLevelName;
+#endif
+
+            return sceneName;
+        }
+
         public static int GetTargetID(object target)
         {
-            var bb = target as BetterBehaviour;
-            if (bb != null)
-                return bb.Id;
-
-            var bso = target as BetterScriptableObject;
-            if (bso != null)
-                return bso.Id;
+            var obj = target as IVFWObject;
+            if (obj != null)
+                return obj.GetPersistentId();
 
             return target.GetHashCode();
         }
