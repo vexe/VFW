@@ -8,28 +8,30 @@ namespace Vexe.Runtime.Types
 {
     [DefineCategory("", 0, MemberType = CategoryMemberType.All, Exclusive = false, AlwaysHideHeader = true)]
     [DefineCategory("Dbg", 3f, Pattern = "^dbg")]
-    public abstract class BetterBehaviour : MonoBehaviour, ISerializationCallbackReceiver
+    public abstract class BetterBehaviour : MonoBehaviour, IVFWObject, ISerializationCallbackReceiver
     {
         [SerializeField]
         private SerializationData _serializationData;
-        public SerializationData BehaviourData
-        {
-            get { return _serializationData ?? (_serializationData = new SerializationData()); }
-            set { _serializationData = value; }
-        }
-
-        private static Type DefaultSerializerType = typeof(FullSerializerBackend);
 
         [SerializeField]
         private SerializableType _serializerType;
 
+        /// <summary>
+        /// A persistent identifier used primarly from editor scripts to have editor data persist
+        /// Could be used at runtime as well if you have any usages of a unique id
+        /// Note this is not the same as GetInstanceID, as it seems to change when you reload scenes
+        /// This id gets assigned only once and then serialized.
+        /// </summary>
+        [SerializeField, HideInInspector]
+        private int _id = -1;
+
         [Display("Serializer Backend"), ShowType(typeof(SerializerBackend))]
-        public Type SerializerType
+        private Type SerializerType
         {
             get
             {
-                if (_serializerType == null || !_serializerType.IsValid())
-                    _serializerType = new SerializableType(DefaultSerializerType);
+                if (_serializerType == null || !_serializerType.HasValidName())
+                    _serializerType = new SerializableType(GetSerializerType());
                 return _serializerType.Value;
             }
             set
@@ -48,30 +50,12 @@ namespace Vexe.Runtime.Types
             get { return _serializer ?? (_serializer = SerializerType.ActivatorInstance<SerializerBackend>()); }
         }
 
-        /// <summary>
-        /// A persistent identifier used primarly from editor scripts to have editor data persist
-        /// Could be used at runtime as well if you have any usages of a unique id
-        /// Note this is not the same as GetInstanceID, as it seems to change when you reload scenes
-        /// This id gets assigned only once and then serialized.
-        /// </summary>
-        [SerializeField, HideInInspector]
-        private int _id = -1;
-        public int Id
-        {
-            get
-            {
-                if (_id == -1)
-                    _id = GetInstanceID();
-                return _id;
-            }
-        }
-
         public void OnBeforeSerialize()
         {
-            if (RuntimeHelper.IsModified(this, Serializer, BehaviourData))
+            if (RuntimeHelper.IsModified(this, Serializer, GetSerializationData()))
             {
                 dLog("Serializing: " + GetType().Name);
-                SerializeBehaviour();
+                SerializeObject();
             }
         }
 
@@ -84,8 +68,12 @@ namespace Vexe.Runtime.Types
                 return;
             }
 #endif
+            DeserializeObject();
+        }
 
-            DeserializeBehaviour();
+        public virtual void Reset()
+        {
+            RuntimeHelper.ResetTarget(this);
         }
 
         // Logging
@@ -127,30 +115,11 @@ namespace Vexe.Runtime.Types
 
         #endregion
 
-        public virtual void Reset()
-        {
-            RuntimeHelper.ResetTarget(this);
-        }
-
-        [ContextMenu("Load behaviour state")]
-        public void DeserializeBehaviour()
-        {
-            Serializer.DeserializeTargetFromData(this, BehaviourData);
-        }
-
-        [ContextMenu("Save behaviour state")]
-        public void SerializeBehaviour()
-        {
-            BehaviourData.Clear();
-            Serializer.SerializeTargetIntoData(this, BehaviourData);
-        }
-
 #if UNITY_EDITOR
-        // this editor hack is needed to make it possible to let Unity Layout draw things after RabbitGUI
-        // for some reason, if I try to let Unity draw things via obj.Update(), PropertyField(...) and obj.ApplyModifiedProperties(),
+        // this editor hack is needed to make it possible to let Unity Layout draw things after RabbitGUI.
+        // For some reason, if I try to let Unity draw things via obj.Update(), PropertyField(...) and obj.ApplyModifiedProperties(),
         // it will send deserialization requests which will deserialize the behaviour overriding the new changes made in the property
-        // which means, the property will not be modified. so we delay deserialization for a single editor frame
-
+        // which means that the property will not be modified. so we delay deserialization for a single editor frame
         private bool _delayDeserialize;
 
         public void DelayNextDeserialize()
@@ -158,5 +127,54 @@ namespace Vexe.Runtime.Types
             _delayDeserialize = true;
         }
 #endif
+
+        // IVFWObject implementation
+        #region
+        public virtual Type GetSerializerType()
+        {
+            return SerializerBackend.DefaultType;
+        }
+
+        public virtual ISerializationLogic GetSerializationLogic()
+        {
+            return VFWSerializationLogic.Instance;
+        }
+
+        public virtual RuntimeMember[] GetSerializableMembers()
+        {
+            var logic = GetSerializationLogic();
+            var members = logic.CachedGetSerializableMembers(GetType());
+            return members;
+        }
+
+        public SerializationData GetSerializationData()
+        {
+            return _serializationData ?? (_serializationData = new SerializationData());
+        }
+
+        public virtual int GetPersistentId()
+        {
+            if (_id == -1)
+                _id = GetInstanceID();
+            return _id;
+        }
+
+        public virtual CategoryDisplay GetDisplayOptions()
+        {
+            return CategoryDisplay.BoxedMembersArea | CategoryDisplay.Headers | CategoryDisplay.BoxedHeaders;
+        }
+
+        [ContextMenu("Load behaviour state")]
+        public void DeserializeObject()
+        {
+            Serializer.DeserializeTargetFromData(this);
+        }
+
+        [ContextMenu("Save behaviour state")]
+        public void SerializeObject()
+        {
+            Serializer.SerializeTargetIntoData(this);
+        }
+        #endregion
     }
 }

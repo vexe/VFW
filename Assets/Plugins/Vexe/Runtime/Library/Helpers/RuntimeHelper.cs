@@ -29,7 +29,7 @@ namespace Vexe.Runtime.Helpers
         public static bool IsModified(UnityObject target, SerializerBackend serializer, SerializationData data)
         {
             var members = serializer.Logic.CachedGetSerializableMembers(target.GetType());
-            for (int i = 0; i < members.Count; i++)
+            for (int i = 0; i < members.Length; i++)
             {
                 var member    = members[i];
                 var memberKey = SerializerBackend.GetMemberKey(member);

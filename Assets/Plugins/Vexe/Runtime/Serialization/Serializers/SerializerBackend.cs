@@ -8,6 +8,11 @@ namespace Vexe.Runtime.Serialization
     public abstract class SerializerBackend
     {
         /// <summary>
+        /// The default serializer backend type to use
+        /// </summary>
+        public static readonly Type DefaultType = typeof(FullSerializerBackend);
+
+        /// <summary>
         /// The serialization logic that this serializer use to fetch the serializable members of a given target
         /// </summary>
         public ISerializationLogic Logic;
@@ -17,10 +22,13 @@ namespace Vexe.Runtime.Serialization
         /// such that all Unity object references are stored in the data's serializedObjects list,
         /// and the serializable members' values in the data's serializedStrings
         /// </summary>
-        public void SerializeTargetIntoData(object target, SerializationData data)
+        public void SerializeTargetIntoData(IVFWObject target)
         {
-            var members = Logic.CachedGetSerializableMembers(target.GetType());
-            for (int i = 0; i < members.Count; i++)
+            var data = target.GetSerializationData();
+            data.Clear();
+
+            var members = target.GetSerializableMembers();
+            for (int i = 0; i < members.Length; i++)
             {
                 var member    = members[i];
                 member.Target = target;
@@ -50,10 +58,11 @@ namespace Vexe.Runtime.Serialization
         /// Fetches the serialized state of the specified target from the specified serialization data
         /// to use it to deserialize/reload the target reassigning all the target's member values
         /// </summary>
-        public void DeserializeTargetFromData(object target, SerializationData data)
+        public void DeserializeTargetFromData(IVFWObject target)
         {
-            var members = Logic.CachedGetSerializableMembers(target.GetType());
-            for(int i = 0; i < members.Count; i++)
+            var data = target.GetSerializationData();
+            var members = target.GetSerializableMembers();
+            for(int i = 0; i < members.Length; i++)
             {
                 var member    = members[i];
                 var memberKey = GetMemberKey(member);

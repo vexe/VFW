@@ -23,12 +23,12 @@ namespace Vexe.Runtime.Serialization
         /// Returns a list of RuntimeMember wrapping all the serializable members in the specified type.
         /// Caches the result so that we only do the query once for a certain type.
         /// </summary>
-        public readonly Func<Type, List<RuntimeMember>> CachedGetSerializableMembers;
+        public readonly Func<Type, RuntimeMember[]> CachedGetSerializableMembers;
 
         public ISerializationLogic()
         {
-            CachedGetSerializableMembers = new Func<Type, List<RuntimeMember>>(type =>
-                GetSerializableMembers(type, null).ToList()).Memoize();
+            CachedGetSerializableMembers = new Func<Type, RuntimeMember[]>(type =>
+                GetSerializableMembers(type, null).ToArray()).Memoize();
         }
 
         /// <summary>

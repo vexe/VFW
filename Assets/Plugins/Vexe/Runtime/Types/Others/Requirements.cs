@@ -52,9 +52,8 @@ namespace Vexe.Runtime.Types
 #if dbg
 			Debug.Log("resovling " + target);
 #endif
-
 			var members = VFWSerializationLogic.Instance.CachedGetSerializableMembers(target.GetType());
-			for (int i = 0; i < members.Count; i++)
+			for (int i = 0; i < members.Length; i++)
 			{
 				var member = members[i];
 				member.Target = target;
