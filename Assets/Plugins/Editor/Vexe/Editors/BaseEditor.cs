@@ -320,8 +320,7 @@ namespace Vexe.Editor.Editors
             _spacing = prefs.Ints.ValueOrDefault(spacingKey, vfwSettings.DefaultSpacing);
             prefs.Ints[spacingKey] = _spacing;
 
-            var peak = targetType.IsA<MonoBehaviour>() ? typeof(MonoBehaviour) : typeof(ScriptableObject);
-            var field = targetType.GetMemberFromAll("_serializationData", peak, Flags.InstancePrivate);
+            var field = targetType.GetMemberFromAll("_serializationData", Flags.InstancePrivate);
             if (field == null)
                 throw new vMemberNotFound(targetType, "_serializationData");
 
@@ -333,7 +332,7 @@ namespace Vexe.Editor.Editors
 
             _debug = EditorMember.WrapMember(field, target, target, id);
 
-            var serializerType = targetType.GetProperty("SerializerType");
+            var serializerType = targetType.GetMemberFromAll("SerializerType", Flags.InstanceAnyVisibility);
             if (serializerType == null)
                 throw new vMemberNotFound(targetType, "SerializerType");
 

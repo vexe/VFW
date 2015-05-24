@@ -25,7 +25,7 @@ namespace VFWExamples
 		// Otherwise Inline will try to hide a target that's not there yet!
 		// So we use an id of 0 to the first attribute, and 1 to the second.
 		// 0 comes before 1 :)
-		[RequiredFromThis(0, true), Inline(1, HideTarget = true)]
+		[RequiredFromThis(0, true), Inline(1, HideButton = true)]
 		public BoxCollider col;
 
 		// inlining a game object will draw the editor for all its components

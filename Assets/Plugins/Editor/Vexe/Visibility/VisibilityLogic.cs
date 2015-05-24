@@ -7,7 +7,6 @@ using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Serialization;
 using Vexe.Runtime.Types;
-using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Editor.Visibility
 { 
@@ -67,11 +66,13 @@ namespace Vexe.Editor.Visibility
             // (which is the only use-case these couple of lines are meant for)
             var declType = property.DeclaringType;
             bool isValidUnityType = declType.IsA<Component>() && !declType.IsA<MonoBehaviour>();
-            bool unityProp =   isValidUnityType && !IgnoredUnityProperties.Contains(property.Name) && property.CanReadWrite();
-            if (unityProp) return true;
+            bool unityProp = isValidUnityType && property.CanReadWrite() && !IgnoredUnityProperties.Contains(property.Name);
+            if (unityProp)
+                return true;
 
             bool serializable = logic.IsSerializableProperty(property);
-            if (serializable) return true;
+            if (serializable)
+                return true;
 
             return Attributes.Show.Any(property.IsDefined);
         }

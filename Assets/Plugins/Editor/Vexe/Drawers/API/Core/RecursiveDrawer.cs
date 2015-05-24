@@ -7,6 +7,7 @@ using UnityEngine;
 using Vexe.Editor.Extensions;
 using Vexe.Editor.GUIs;
 using Vexe.Editor.Helpers;
+using Vexe.Editor.Internal;
 using Vexe.Editor.Types;
 using Vexe.Editor.Visibility;
 using Vexe.Editor.Windows;
@@ -130,7 +131,7 @@ namespace Vexe.Editor.Drawers
                 var labelRect = gui.LastRect;
 
                 gui.Cursor(labelRect, MouseCursor.Link);
-                if (!isEmpty && labelRect.ContainsMouse() && e.IsLMBDown())
+                if (!isEmpty && e.IsMouseContained(labelRect) && e.IsLMBDown())
                     foldout = !foldout;
 
                 gui.Space(2.3f);
@@ -187,7 +188,7 @@ namespace Vexe.Editor.Drawers
 
                 // Selection/thumb button
                 { 
-                    if (thumbRect.ContainsMouse() && e.IsMouseDown())
+                    if (e.IsMouseContained(thumbRect) && e.IsMouseDown())
                     {
                         if (e.IsLMB())
                         {
@@ -201,7 +202,7 @@ namespace Vexe.Editor.Drawers
                             }
                             catch(Exception ex)
                             {
-                                Debug.Log("Error creating instance new instance of type `{0}`: {1}".FormatWith(memberType.GetNiceName(), ex.Message));
+                                Debug.Log("Error creating new instance of type `{0}`: {1}".FormatWith(memberType.GetNiceName(), ex.Message));
                             }
                         }
                     }
@@ -225,7 +226,7 @@ namespace Vexe.Editor.Drawers
             }
             else
             {
-                var drawer = MemberDrawersHandler.CachedGetObjectDrawer.Invoke(_polymorphicType);
+                var drawer = MemberDrawersHandler.CachedGetObjectDrawer(_polymorphicType);
                 var drawerType = drawer.GetType();
                 if (drawerType == typeof(RecursiveDrawer) || drawerType == typeof(UnityObjectDrawer))
                 {
