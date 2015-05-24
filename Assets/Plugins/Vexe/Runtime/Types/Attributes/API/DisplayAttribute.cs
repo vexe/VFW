@@ -88,9 +88,31 @@ namespace Vexe.Runtime.Types
     public enum Dict
     {
         None = 0,
+
+        /// <summary>
+        /// Whether or not the dictionary is readonly (non-editable in the inspector)
+        /// </summary>
         Readonly = 1,
+
+        /// <summary>
+        /// Forceed expansion of the dictionary header foldout?
+        /// </summary>
         ForceExpand = 1 << 1,
+
+        /// <summary>
+        /// Hide the dictionary header?
+        /// </summary>
         HideHeader = 1 << 2,
+
+        /// <summary>
+        /// Display pairs in a single horizontal block?
+        /// </summary>
+        HorizontalPairs = 1 << 5,
+
+        /// <summary>
+        /// Show a search box to filter elements? (uses element.ToString() when matching)
+        /// </summary>
+        Filter = 1 << 6,
     }
 
 	[Flags]

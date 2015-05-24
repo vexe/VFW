@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
+using UnityEngine;
 using Vexe.Editor.Types;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
@@ -19,8 +20,10 @@ namespace Vexe.Editor.Drawers
         private List<EditorMember> _keyElements, _valueElements;
         private KVPList<TK, TV> _kvpList;
         private Attribute[] _perKeyAttributes, _perValueAttributes;
+        private DictionaryOptions _options;
         private string _formatPairPattern;
-        private bool _invalidKeyType, _isReadonly, _hideHeader, _forceExpand;
+        private bool _invalidKeyType;
+        private TextFilter _filter;
 
         protected override void Initialize()
         {
@@ -49,24 +52,23 @@ namespace Vexe.Editor.Drawers
 
             var displayAttr = attributes.GetAttribute<DisplayAttribute>();
             if (displayAttr != null)
-            { 
                 _formatPairPattern = displayAttr.FormatKVPair;
 
-                var dict = displayAttr.DictOpt;
-                _isReadonly = dict.HasFlag(Dict.Readonly);
-                _forceExpand = dict.HasFlag(Dict.ForceExpand);
-                _hideHeader = dict.HasFlag(Dict.HideHeader);
-            }
+			_options = new DictionaryOptions(displayAttr != null ? displayAttr.DictOpt : Dict.None);
 
             if (_formatPairPattern.IsNullOrEmpty())
                 _formatPairPattern = "[$key, $value]";
 
-            if (_isReadonly)
+            if (_options.Readonly)
                 displayText += " (Readonly)";
+
+            if (_options.Filter)
+                _filter = new TextFilter(null, id, null);
 
             #if DBG
             Log("Dictionary drawer Initialized (" + dictionaryName + ")");
             #endif
+
         }
 
         public override void OnGUI()
@@ -100,15 +102,22 @@ namespace Vexe.Editor.Drawers
             Profiler.BeginSample("DictionaryDrawer Header");
             #endif
 
-            if (!_hideHeader)
+            // header
+            if (!_options.HideHeader)
                 using (gui.Horizontal())
                 {
-                    if (_forceExpand)
+                    if (_options.ForceExpand)
                         gui.Label(displayText);
                     else
                         foldout = gui.Foldout(displayText, foldout, Layout.sExpandWidth());
 
-                    if (!_isReadonly)
+                    if (_options.Filter)
+                    {
+                        gui.Space(-10f);
+                        _filter.Field(gui, 70f);
+                    }
+
+                    if (!_options.Readonly)
                     {
                         gui.FlexibleSpace();
 
@@ -130,7 +139,7 @@ namespace Vexe.Editor.Drawers
             Profiler.EndSample();
             #endif
 
-            if (!foldout && !_forceExpand)
+            if (!foldout && !_options.ForceExpand)
                 return;
 
             if (memberValue.Count == 0)
@@ -139,7 +148,7 @@ namespace Vexe.Editor.Drawers
                     gui.HelpBox("Dictionary is empty");
             }
             else
-            { 
+            {
                 #if PROFILE
                 Profiler.BeginSample("DictionaryDrawer Pairs");
                 #endif
@@ -154,28 +163,46 @@ namespace Vexe.Editor.Drawers
                         Profiler.BeginSample("DictionaryDrawer KVP assignments");
                         #endif
 
-                        var pairStr        = FormatPair(dKey, dValue);
-                        var entryKey       = RuntimeHelper.CombineHashCodes(id, i, "entry");
-                        foldouts[entryKey] = gui.Foldout(pairStr, foldouts[entryKey], Layout.sExpandWidth());
+                        int entryKey = RuntimeHelper.CombineHashCodes(id, i, "entry");
+
+                        string pairStr = null;
+
+                        if (_filter != null)
+                        {
+                            pairStr = FormatPair(dKey, dValue);
+                            if (!_filter.IsMatch(pairStr))
+                                continue;
+                        }
+
+                        if (!_options.HorizontalPairs)
+                        {
+                            if (pairStr == null)
+                                pairStr = FormatPair(dKey, dValue);
+                            foldouts[entryKey] = gui.Foldout(pairStr, foldouts[entryKey], Layout.sExpandWidth());
+                        }
 
                         #if PROFILE
                         Profiler.EndSample();
                         #endif
 
-                        if (!foldouts[entryKey])
+                        if (!foldouts[entryKey] && !_options.HorizontalPairs)
                             continue;
 
                         #if PROFILE
                         Profiler.BeginSample("DictionaryDrawer SinglePair");
                         #endif
-                        using (gui.Indent())
-                        {
-                            var keyMember = GetElement(_keyElements, _kvpList.Keys, i, entryKey + 1);
-                            gui.Member(keyMember, @ignoreComposition: _perKeyAttributes == null);
-
-                            var valueMember = GetElement(_valueElements, _kvpList.Values, i, entryKey + 2);
-                            gui.Member(valueMember, @ignoreComposition: _perValueAttributes == null);
-                        }
+                        if (_options.HorizontalPairs)
+                            using (gui.Horizontal())
+                            {
+                                DrawKey(i, entryKey + 1);
+                                DrawValue(i, entryKey + 2);
+                            }
+                        else
+                            using (gui.Indent())
+                            {
+                                DrawKey(i, entryKey + 1);
+                                DrawValue(i, entryKey + 2);
+                            }
                         #if PROFILE
                         Profiler.EndSample();
                         #endif
@@ -185,6 +212,9 @@ namespace Vexe.Editor.Drawers
                 Profiler.EndSample();
                 #endif
 
+                #if PROFILE
+                Profiler.BeginSample("DictionaryDrawer Write");
+                #endif
                 // Write
                 {
                     memberValue.Clear();
@@ -202,7 +232,20 @@ namespace Vexe.Editor.Drawers
                         }
                     }
                 }
+                Profiler.EndSample();
             }
+        }
+
+        public void DrawKey(int index, int id)
+        {
+            var keyMember = GetElement(_keyElements, _kvpList.Keys, index, id + 1);
+            gui.Member(keyMember, @ignoreComposition: _perKeyAttributes == null);
+        }
+
+        public void DrawValue(int index, int id)
+        {
+            var valueMember = GetElement(_valueElements, _kvpList.Values, index, id + 2);
+            gui.Member(valueMember, @ignoreComposition: _perValueAttributes == null);
         }
 
         private EditorMember GetElement<T>(List<EditorMember> elements, List<T> source, int index, int id)
@@ -212,7 +255,7 @@ namespace Vexe.Editor.Drawers
                 Attribute[] attrs;
                 if (typeof(T) == typeof(TK))
                     attrs = _perKeyAttributes;
-                else 
+                else
                     attrs = _perValueAttributes;
 
                 var element = EditorMember.WrapIListElement(
@@ -301,7 +344,7 @@ namespace Vexe.Editor.Drawers
 
             try
             {
-                var defValue = default(TV); 
+                var defValue = default(TV);
                 _kvpList.Insert(0, defKey, defValue);
                 memberValue.Add(defKey, defValue);
 
@@ -313,5 +356,23 @@ namespace Vexe.Editor.Drawers
                 Log("Key already exists: " + defKey);
             }
         }
+
+		private struct DictionaryOptions
+		{
+            public readonly bool Readonly;
+            public readonly bool ForceExpand;
+            public readonly bool HideHeader;
+            public readonly bool HorizontalPairs;
+            public readonly bool Filter;
+
+			public DictionaryOptions(Dict options)
+			{
+                Readonly        = options.HasFlag(Dict.Readonly);
+                ForceExpand     = options.HasFlag(Dict.ForceExpand);
+                HideHeader      = options.HasFlag(Dict.HideHeader);
+                HorizontalPairs = options.HasFlag(Dict.HorizontalPairs);
+                Filter          = options.HasFlag(Dict.Filter);
+			}
+		}
     }
 }
