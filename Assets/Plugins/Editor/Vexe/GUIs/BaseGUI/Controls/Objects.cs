@@ -71,7 +71,12 @@ namespace Vexe.Editor.GUIs
 
         public UnityObject Object(UnityObject value, Layout option)
         {
-            return Object(string.Empty, value, typeof(UnityObject), option);
+            return Object(string.Empty, value, option);
+        }
+
+        public UnityObject Object(string label, UnityObject value, Layout option)
+        {
+            return Object(label, value, typeof(UnityObject), option);
         }
 
 		public UnityObject Object(string label, UnityObject value, Type type, Layout option)
