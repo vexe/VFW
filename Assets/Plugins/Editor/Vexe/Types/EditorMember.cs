@@ -172,16 +172,32 @@ namespace Vexe.Editor.Types
 			return member != null && this.Id == member.Id;
 		}
 
+        public static EditorMember WrapMember(string memberName, Type targetType, object rawTarget, UnityObject unityTarget, int id, Attribute[] attributes)
+        {
+            var member = GetMember(memberName, targetType);
+            return WrapMember(member, rawTarget, unityTarget, id, attributes);
+        }
+
         public static EditorMember WrapMember(string memberName, Type targetType, object rawTarget, UnityObject unityTarget, int id)
+        {
+            var member = GetMember(memberName, targetType);
+            return WrapMember(member, rawTarget, unityTarget, id, member.GetAttributes());
+        }
+
+        private static MemberInfo GetMember(string memberName, Type targetType)
         {
             var members = targetType.GetMember(memberName, MemberTypes.Field | MemberTypes.Property, Flags.StaticInstanceAnyVisibility);
             if (members.IsNullOrEmpty())
                 throw new vMemberNotFound(targetType, memberName);
-
-            return WrapMember(members[0], rawTarget, unityTarget, id);
+            return members[0];
         }
 
         public static EditorMember WrapMember(MemberInfo memberInfo, object rawTarget, UnityObject unityTarget, int id)
+        {
+            return WrapMember(memberInfo, rawTarget, unityTarget, id, memberInfo.GetAttributes());
+        }
+
+        public static EditorMember WrapMember(MemberInfo memberInfo, object rawTarget, UnityObject unityTarget, int id, Attribute[] attributes)
         {
             var field = memberInfo as FieldInfo;
             if (field != null)
@@ -189,7 +205,7 @@ namespace Vexe.Editor.Types
                 if (field.IsLiteral)
                     throw new InvalidOperationException("Field is const, this is not supported: " + field);
 
-                var result = new EditorMember(field, field.FieldType, field.Name, rawTarget, unityTarget, id, field.GetAttributes());
+                var result = new EditorMember(field, field.FieldType, field.Name, rawTarget, unityTarget, id, attributes);
                 result.InitGetSet(result.GetWrappedMemberValue, result.SetWrappedMemberValue);
                 result._memberGetter = field.DelegateForGet();
                 result._memberSetter = field.DelegateForSet();
@@ -208,7 +224,7 @@ namespace Vexe.Editor.Types
                 if(property.IsIndexer())
                     throw new InvalidOperationException("Property is an indexer, this is not supported: " + property);
 
-                var result = new EditorMember(property, property.PropertyType, property.Name, rawTarget, unityTarget, id, property.GetAttributes());
+                var result = new EditorMember(property, property.PropertyType, property.Name, rawTarget, unityTarget, id, attributes);
                 result.InitGetSet(result.GetWrappedMemberValue, result.SetWrappedMemberValue);
 
                 result._memberGetter = property.DelegateForGet();
