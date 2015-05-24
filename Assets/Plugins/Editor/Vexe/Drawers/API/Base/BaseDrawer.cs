@@ -1,6 +1,7 @@
 ﻿//#define DBG
 
 using System;
+using System.Reflection;
 using UnityEngine;
 using Vexe.Editor.GUIs;
 using Vexe.Editor.Types;
@@ -75,14 +76,17 @@ namespace Vexe.Editor.Drawers
             var displayAttr = attributes.GetAttribute<DisplayAttribute>();
             if (displayAttr != null && !string.IsNullOrEmpty(displayAttr.FormatMethod))
             {
-                var method = targetType.GetMethod(displayAttr.FormatMethod, Flags.StaticInstanceAnyVisibility);
+                var method = targetType.GetMemberFromAll(displayAttr.FormatMethod, Flags.StaticInstanceAnyVisibility) as MethodInfo;
                 if (method == null)
                 {
                     Debug.Log("Couldn't find format method: " + displayAttr.FormatMethod);
                 }
                 else
                 {
-                    _dynamicFormatter = method.DelegateForCall<object, string>();
+                    if (method.ReturnType != typeof(string) && method.GetParameters().Length > 0)
+                        Debug.Log("Format Method should return a string and take no parameters: " + method);
+                    else
+                        _dynamicFormatter = method.DelegateForCall<object, string>();
                 }
             }
 
