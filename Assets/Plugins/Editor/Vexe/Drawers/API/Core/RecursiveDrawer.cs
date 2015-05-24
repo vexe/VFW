@@ -287,6 +287,10 @@ namespace Vexe.Editor.Drawers
                 for (int i = 0; i < members.Count; i++)
                 {
                     MemberInfo member = members[i];
+
+                    if (!ConditionalVisibility.IsVisible(member, target))
+                        continue;
+
                     EditorMember em;
                     changed |= gui.Member(member, target, unityTarget, id, false, out em);
                     target = em.RawTarget;

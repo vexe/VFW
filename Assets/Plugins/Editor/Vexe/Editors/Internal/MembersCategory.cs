@@ -16,7 +16,6 @@ namespace Vexe.Editor.Internal
 
         private readonly int _id;
         private CategoryDisplay _display;
-        private UnityObject _prevTarget;
 
         public readonly string FullPath;
         public readonly string Name;
@@ -91,14 +90,6 @@ namespace Vexe.Editor.Internal
 
             Indent = !(AlwaysHideHeader || HideHeader);
 
-            bool changedTarget;
-            if (target != _prevTarget)
-            {
-                _prevTarget = target;
-                changedTarget = true;
-            }
-            else changedTarget = false;
-
             gui.Space(1f);
 
             bool showGuiBox   = (Display & CategoryDisplay.BoxedMembersArea) > 0;
@@ -111,7 +102,8 @@ namespace Vexe.Editor.Internal
                 {
                     var member = Members[i];
 
-                    if (!IsVisible(member, target, changedTarget))
+                    var isVisible = ConditionalVisibility.IsVisible(member, target);
+                    if (!isVisible)
                         continue;
 
                     using (gui.Horizontal())
@@ -148,31 +140,6 @@ namespace Vexe.Editor.Internal
                     }
                 }
             }
-        }
-
-        static Dictionary<MemberInfo, MethodCaller<UnityObject, bool>> _isVisibleCache = new Dictionary<MemberInfo, MethodCaller<UnityObject, bool>>();
-
-        public static bool IsVisible(MemberInfo member, UnityObject target, bool changedTarget)
-        {
-            MethodCaller<UnityObject, bool> isVisible;
-            if (changedTarget || !_isVisibleCache.TryGetValue(member, out isVisible))
-            {
-                var vis = member.GetCustomAttribute<VisibleWhenAttribute>();
-                if (vis == null)
-                    return true;
-
-                var method = target.GetType().GetMethod(vis.ConditionMethod, Flags.StaticInstanceAnyVisibility);
-                if (method == null)
-                {
-                    Debug.LogError("Method not found: " + vis.ConditionMethod);
-                    _isVisibleCache[member] = null;
-                    return true;
-                }
-
-                _isVisibleCache[member] = isVisible = method.DelegateForCall<UnityObject, bool>();
-            }
-
-            return isVisible.Invoke(target, null);
         }
     }
 }

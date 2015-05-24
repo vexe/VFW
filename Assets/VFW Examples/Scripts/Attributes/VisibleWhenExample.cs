@@ -3,35 +3,35 @@ using Vexe.Runtime.Types;
 
 namespace VFWExamples
 {
-	
 	public class VisibleWhenExample : BetterBehaviour
 	{
-		[Display(0f), Comment(
-			"The visibility of the other members are determined by this value. " +
-			"< 5 SetBig and smallColor will be visible. " + 
-			"> 10 SetSmall and bigColor will be visible. " +
-			"]5, 10[ nothing will be visible")]
-		public int number;
+        public int value;
 
-		[VisibleWhen("IsBig")]
-		public Color bigColor;
+        [Comment("// visible when Flag1 == true")]
+        [VisibleWhen("Flag1")]
+        public int member1;
 
-		[VisibleWhen("IsSmall")]
-		public Color smallColor;
+        [Comment("// visible when Flag1 == true && Flag2 == false")]
+        [VisibleWhen("Flag1", "!Flag2")]
+        public int member2;
 
-		[Show, VisibleWhen("IsSmall")]
-		void SetBig()
-		{
-			number = 100;
-		}
+        [Comment("// visible when Flag1 == true || Flag2 == true || Flag3 == true")]
+        [VisibleWhen('|', "Flag1", "Flag2", "Flag3")]
+        public int member3;
 
-		[Show, VisibleWhen("IsBig")]
-		void SetSmall()
-		{
-			number = 0;
-		}
+        public bool Flag1;
+        public bool Flag2 { get { return value > 10; } }
+        public bool Flag3() { return value < 5; }
 
-		bool IsSmall() { return number < 5; }
-		bool IsBig() { return number > 10; }
+        // just to make sure visibility works on system objects too and not just behaviours
+        public NestedObject[] array;
 	}
+
+    public struct NestedObject
+    {
+        [VisibleWhen("Flag4")]
+        public int member4;
+
+        public bool Flag4;
+    }
 }

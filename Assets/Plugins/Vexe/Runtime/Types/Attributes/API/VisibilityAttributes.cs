@@ -20,17 +20,26 @@ namespace Vexe.Runtime.Types
 	}
 
 	/// <summary>
-	/// Annotate members with this attribute to make then visible only when a certain condition is met
-	/// The name of the condition method must be passed as an argument to the attribute constructor
-	/// The method should return a boolean, and take no parameters
+	/// Annotate members with this attribute to make them visible only when certain (a) condition(s) is/are met
+    /// The result is evaluated by performing 'Operator' on the return expression of 'ConditionMembers'
+    /// A condition member could either be a field/property that returns bool, or a method that returns bool and take no parameters
+    /// Possible values for 'Operator' are '&' (AND), '|' (OR) (Defaults to '&')
+    /// Member names could also be prefixed with '!' (negation operator) e.g. "!IsDead"
 	/// </summary>
 	public class VisibleWhenAttribute : Attribute
 	{
-		public readonly string ConditionMethod;
+		public readonly string[] ConditionMembers;
+        public readonly char Operator;
 
-		public VisibleWhenAttribute(string conditionMethod)
+		public VisibleWhenAttribute(params string[] conditionMembers):
+            this('&', conditionMembers)
+        {
+        }
+
+		public VisibleWhenAttribute(char operand, params string[] conditionMembers)
 		{
-			this.ConditionMethod = conditionMethod;
+			this.ConditionMembers = conditionMembers;
+            this.Operator = operand;
 		}
 	}
 }
