@@ -31,7 +31,15 @@ namespace Vexe.Runtime.Types
             get
             {
                 if (_serializerType == null || !_serializerType.HasValidName())
-                    _serializerType = new SerializableType(GetSerializerType());
+                { 
+                    var type = GetSerializerType();
+                    if (!type.IsA<SerializerBackend>())
+                    {
+                        Debug.LogError("Serializer type must inherit BackendSerializer: " + type.Name);
+                        type = SerializerBackend.DefaultType;
+                    }
+                    _serializerType = new SerializableType(type);
+                }
                 return _serializerType.Value;
             }
             set
