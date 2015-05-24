@@ -293,7 +293,8 @@ namespace Vexe.Editor.Drawers
 
                     EditorMember em;
                     changed |= gui.Member(member, target, unityTarget, id, false, out em);
-                    target = em.RawTarget;
+                    if (em != null)
+                        target = em.RawTarget;
                 }
             }
 
