@@ -63,7 +63,6 @@ namespace Vexe.Editor.GUIs
 
         static MethodCaller<object, string> _scrollableTextArea;
         static MethodCaller<object, Gradient> _gradientField;
-        static MethodCaller<object, string> _textFieldDropDown;
 
 #if dbg_level_1
             private bool _pendingReset;
@@ -128,14 +127,6 @@ namespace Vexe.Editor.GUIs
                     Flags.StaticAnyVisibility);
 
                 _gradientField = method.DelegateForCall<object, Gradient>();
-            }
-            // TextFieldDropDown
-            {
-                var method = editorGUIType.GetMethod("TextFieldDropDown",
-                    new Type[] { typeof(Rect), typeof(GUIContent), typeof(string), typeof(string[]) },
-                    Flags.StaticAnyVisibility);
-
-                _textFieldDropDown = method.DelegateForCall<object, string>();
             }
         }
 
@@ -904,18 +895,46 @@ namespace Vexe.Editor.GUIs
             return value;
         }
 
+        static bool hoveringOnPopup;
+        static readonly string[] emptyStringArray = new string[0];
+
         public override string TextFieldDropDown(GUIContent label, string value, string[] dropDownElements, Layout option)
         {
             var data = new ControlData(label, GUIStyles.TextFieldDropDown, option, ControlType.TextFieldDropDown);
 
-            Rect position;
-            if (CanDrawControl(out position, data))
+            Rect totalRect;
+            if (CanDrawControl(out totalRect, data))
             {
-                var args = new object[] { position, label, value, dropDownElements };
-                var newValue = _textFieldDropDown.Invoke(null, args);
-                return newValue;
-            }
+                Rect textRect = new Rect(totalRect.x, totalRect.y, totalRect.width - GUIStyles.TextFieldDropDown.fixedWidth, totalRect.height);
+                Rect popupRect = new Rect(textRect.xMax, textRect.y, GUIStyles.TextFieldDropDown.fixedWidth, totalRect.height);
 
+                value = EditorGUI.TextField(textRect, "", value, GUIStyles.TextFieldDropDownText);
+
+                string[] displayedOptions;
+                if (dropDownElements.Length > 0)
+                    displayedOptions = dropDownElements;
+                else
+                    (displayedOptions = new string[1])[0] = "--empty--";
+
+                if (popupRect.Contains(Event.current.mousePosition))
+                    hoveringOnPopup = true;
+
+                // if there were a lot of options to be displayed, we don't need to always invoke
+                // Popup cause Unity does a lot of allocation inside and it would have a huge negative impact
+                // on editor performance so we only display the options when we're hoving over it
+                if (!hoveringOnPopup)
+                    EditorGUI.Popup(popupRect, string.Empty, -1, emptyStringArray, GUIStyles.TextFieldDropDown);
+                else
+                {
+                    EditorGUI.BeginChangeCheck();
+                    int selection = EditorGUI.Popup(popupRect, string.Empty, -1, displayedOptions, GUIStyles.TextFieldDropDown);
+                    if (EditorGUI.EndChangeCheck() && displayedOptions.Length > 0)
+                    {
+                        hoveringOnPopup = false;
+                        value = displayedOptions[selection];
+                    }
+                }
+            }
             return value;
         }
 
