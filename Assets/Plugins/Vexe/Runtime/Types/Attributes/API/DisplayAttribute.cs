@@ -3,7 +3,7 @@
 namespace Vexe.Runtime.Types
 {
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-    public class DisplayAttribute : Attribute
+    public class DisplayAttribute : ShowAttribute
     {
         private float _order;
 
