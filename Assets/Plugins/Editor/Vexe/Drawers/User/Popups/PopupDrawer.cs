@@ -1,7 +1,10 @@
-﻿using System;
+﻿#define PROFILE
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEngine;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
 
@@ -16,7 +19,8 @@ namespace Vexe.Editor.Drawers
 		private bool _populateFromTarget, _populateFromType;
 		private static string[] Empty = new string[1] { "--empty--" };
 		private const string kOwnerTypePrefix = "target";
-        private bool _showUpdateButton = true;
+        private bool _showUpdateButton = true, _changed;
+        private TextFilter _filter;
 
 		protected override void Initialize()
 		{
@@ -28,6 +32,7 @@ namespace Vexe.Editor.Drawers
 			}
 			else
 			{
+                _showUpdateButton = !attribute.HideUpdate;
 				Type populateFrom;
 				var split = fromMember.Split('.');
 				if (split.Length == 1)
@@ -37,7 +42,7 @@ namespace Vexe.Editor.Drawers
 				else
 				{
 					if (split[0].ToLower() == kOwnerTypePrefix) // populate from unityTarget
-					{ 
+					{
 						populateFrom = unityTarget.GetType();
 						_populateFromTarget = true;
 					}
@@ -58,25 +63,25 @@ namespace Vexe.Editor.Drawers
 				}
 
 				var all = populateFrom.GetAllMembers(typeof(object));
-				var member = all.FirstOrDefault(x => attribute.CaseSensitive ? x.Name == fromMember : x.Name.ToLower() == fromMember.ToLower());
-				if (member == null)
+				var popMember = all.FirstOrDefault(x => attribute.CaseSensitive ? x.Name == fromMember : x.Name.ToLower() == fromMember.ToLower());
+				if (popMember == null)
 					throw new vMemberNotFound(populateFrom, fromMember);
 
-				var field = member as FieldInfo;
+				var field = popMember as FieldInfo;
 				if (field != null)
-					_populateMember = (member as FieldInfo).DelegateForGet();
+					_populateMember = (popMember as FieldInfo).DelegateForGet();
 				else
 				{
-					var prop = member as PropertyInfo;
+					var prop = popMember as PropertyInfo;
 					if (prop != null)
-						_populateMember = (member as PropertyInfo).DelegateForGet();
+						_populateMember = (popMember as PropertyInfo).DelegateForGet();
 					else
 					{
-						var method = member as MethodInfo;
+						var method = popMember as MethodInfo;
 						if (method == null)
 							throw new Exception("{0} is not a field, nor a property nor a method!".FormatWith(fromMember));
 
-						_populateMethod = (member as MethodInfo).DelegateForCall();
+						_populateMethod = (popMember as MethodInfo).DelegateForCall();
 					}
 				}
 			}
@@ -88,7 +93,11 @@ namespace Vexe.Editor.Drawers
 				memberValue = string.Empty;
 
 			if (_values == null)
+            {
 				UpdateValues();
+                if (attribute.Filter)
+                    _filter = new TextFilter(_values, id, false, SetValue);
+            }
 
             _currentIndex = _values.IndexOf(memberValue);
             if (_currentIndex == -1 && !attribute.TextField)
@@ -98,29 +107,71 @@ namespace Vexe.Editor.Drawers
                     memberValue = _values[0];
             }
 
+            string newValue = null;
+            string currentValue = memberValue;
+
             using (gui.Horizontal())
             {
                 if (attribute.TextField)
                 {
-                    memberValue = gui.TextFieldDropDown(displayText, memberValue, _values);
+                    #if PROFILE
+                    Profiler.BeginSample("PopupDrawer TextFieldDrop");
+                    #endif
+
+                    newValue = gui.TextFieldDropDown(displayText, memberValue, _values);
+                    if (currentValue != newValue)
+                        _changed = true;
+
+                    #if PROFILE
+                    Profiler.EndSample();
+                    #endif
                 }
                 else
                 {
+                    #if PROFILE
+                    Profiler.BeginSample("PopupDrawer TextFieldDrop");
+                    #endif
+
                     int x = gui.Popup(displayText, _currentIndex.Value, _values);
                     {
-                        if (_currentIndex != x || (_values.InBounds(x) && memberValue != _values[x]))
+                        if (_currentIndex != x || (_values.InBounds(x) && currentValue != _values[x]))
                         {
-                            memberValue = _values[x];
+                            _changed = true;
                             _currentIndex = x;
-                            gui.RequestResetIfRabbit();
+                            newValue = _values[x];
+                            gui.RequestResetIfRabbit(); //@Todo what's up with this reset?
                         }
                     }
+
+                    #if PROFILE
+                    Profiler.EndSample();
+                    #endif
+                }
+
+                if (attribute.Filter)
+                    _filter.OnGUI(gui, 45f);
+
+                if (_changed)
+                {
+                    _changed = false;
+                    SetValue(newValue);
                 }
 
                 if (_showUpdateButton && gui.MiniButton("U", "Update popup values", MiniButtonStyle.Right))
 					UpdateValues();
 			}
 		}
+
+        private void SetValue(string value)
+        {
+            if (attribute.TakeLastPathItem && !string.IsNullOrEmpty(value))
+            {
+                int lastPathIdx = value.LastIndexOf('/') + 1;
+                if (lastPathIdx != -1)
+                    memberValue = value.Substring(lastPathIdx);
+            }
+            else memberValue = value;
+        }
 
 		public void UpdateValues()
 		{
