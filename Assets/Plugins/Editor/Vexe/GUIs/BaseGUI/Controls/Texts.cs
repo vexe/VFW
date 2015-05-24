@@ -14,6 +14,11 @@ namespace Vexe.Editor.GUIs
 			return Text(label, value, (Layout)null);
 		}
 
+		public string Text(string value, Layout option)
+        {
+            return Text(GUIContent.none, value, option);
+        }
+
 		public string Text(string label, string value, Layout option)
 		{
 			return Text(label, value, string.Empty, option);
