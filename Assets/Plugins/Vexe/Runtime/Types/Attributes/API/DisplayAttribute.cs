@@ -115,42 +115,47 @@ namespace Vexe.Runtime.Types
         Filter = 1 << 6,
     }
 
-	[Flags]
-	public enum Seq
-	{
-		/// <summary>
-		/// No customization applied whatsoever.
-		/// </summary>
-		None = 0,
+    [Flags]
+    public enum Seq
+    {
+        /// <summary>
+        /// No customization applied whatsoever.
+        /// </summary>
+        None = 0,
 
-		/// <summary>
-		/// Whether or not to show advanced controls (shuffle, randomize, shift, set new size etc)
-		/// </summary>
-		Advanced = 1,
+        /// <summary>
+        /// Whether or not to show advanced controls (shuffle, randomize, shift, set new size etc)
+        /// </summary>
+        Advanced = 1,
 
-		/// <summary>
-		/// Whether or not to show line numbers beside elements
-		/// </summary>
-		LineNumbers = 1 << 1,
+        /// <summary>
+        /// Whether or not to show line numbers beside elements
+        /// </summary>
+        LineNumbers = 1 << 1,
 
-		/// <summary>
-		/// Whether or not the sequence is readonly (non-editable in the inspector)
-		/// </summary>
-		Readonly = 1 << 2,
+        /// <summary>
+        /// Whether or not the sequence is readonly (non-editable in the inspector)
+        /// </summary>
+        Readonly = 1 << 2,
 
-		/// <summary>
-		/// Whether to show only one remove button that removes the last element or one foreach element
-		/// </summary>
-		PerItemRemove = 1 << 3,
+        /// <summary>
+        /// Whether to show only one remove button that removes the last element or one foreach element
+        /// </summary>
+        PerItemRemove = 1 << 3,
 
-		/// <summary>
-		/// Whether or not to draw elements in a GUI box
-		/// </summary>
-		GuiBox = 1 << 4,
+        /// <summary>
+        /// Whether or not to draw elements in a GUI box
+        /// </summary>
+        GuiBox = 1 << 4,
 
-		/// <summary>
-		/// Whether or not to allow adding duplicate items
-		/// </summary>
-		UniqueItems = 1 << 5,
-	}
+        /// <summary>
+        /// Whether or not to allow adding duplicate items
+        /// </summary>
+        UniqueItems = 1 << 5,
+
+        /// <summary>
+        /// Show a search box to filter elements? (uses element.ToString() when matching)
+        /// </summary>
+        Filter = 1 << 6,
+    }
 }

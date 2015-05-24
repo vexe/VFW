@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using Vexe.Editor.Types;
@@ -23,6 +24,7 @@ namespace Vexe.Editor.Drawers
 		private bool _shouldDrawAddingArea;
 		private int _newSize;
         private Attribute[] _perItemAttributes;
+        private TextFilter _filter;
 
 		private bool isAdvancedChecked
 		{
@@ -56,6 +58,9 @@ namespace Vexe.Editor.Drawers
                     _perItemAttributes = attributes.Where(x => !(x is PerItemAttribute)).ToArray();
                 else _perItemAttributes = attributes.Where(x => perItem.ExplicitAttributes.Contains(x.GetType().Name.Replace("Attribute", ""))).ToArray();
             }
+
+            if (_options.Filter)
+                _filter = new TextFilter(null, id, null);
 		}
 
 		public override void OnGUI()
@@ -69,6 +74,12 @@ namespace Vexe.Editor.Drawers
 			using (gui.Horizontal())
 			{
 				foldout = gui.Foldout(displayText, foldout, Layout.sExpandWidth());
+
+                if (_options.Filter)
+                {
+                    gui.Space(-10f);
+                    _filter.Field(gui, 70f);
+                }
 
 				gui.FlexibleSpace();
 
@@ -148,6 +159,13 @@ namespace Vexe.Editor.Drawers
 					{
 						var i = iLoop;
 						var elementValue = memberValue[i];
+
+                        if (_filter != null)
+                        {
+                            string elemStr = elementValue.ToString();
+                            if (!_filter.IsMatch(elemStr))
+                                continue;
+                        }
 
 						using (gui.Horizontal())
 						{
@@ -336,12 +354,13 @@ namespace Vexe.Editor.Drawers
 
 		private struct SequenceOptions
 		{
-			public bool Readonly;
-			public bool Advanced;
-			public bool LineNumbers;
-			public bool PerItemRemove;
-			public bool GuiBox;
-			public bool UniqueItems;
+			public readonly bool Readonly;
+			public readonly bool Advanced;
+			public readonly bool LineNumbers;
+			public readonly bool PerItemRemove;
+			public readonly bool GuiBox;
+			public readonly bool UniqueItems;
+            public readonly bool Filter;
 
 			public SequenceOptions(Seq options)
 			{
@@ -351,6 +370,7 @@ namespace Vexe.Editor.Drawers
 				PerItemRemove = options.HasFlag(Seq.PerItemRemove);
 				GuiBox        = options.HasFlag(Seq.GuiBox);
 				UniqueItems   = options.HasFlag(Seq.UniqueItems);
+                Filter        = options.HasFlag(Seq.Filter);
 			}
 		}
 	}
