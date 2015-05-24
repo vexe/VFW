@@ -225,7 +225,18 @@ namespace Vexe.Editor
         /// </summary>
         public Type BakeTypeInDrawer(Type type, Type drawerType)
         {
-            return drawerType.MakeGenericType(type);
+            try
+            {
+                if (type.IsSubclassOfRawGeneric(typeof(Nullable<>)))
+                    type = type.GetGenericArguments()[0];
+
+                return drawerType.MakeGenericType(type);
+            }
+            catch(ArgumentException e)
+            {
+                Debug.LogError("Failed to bake drawer ({0}) for type ({1}): {2} at {3}".FormatWith(drawerType.GetNiceName(), type.GetNiceName(), e.Message, e.StackTrace));
+                return typeof(RecursiveDrawer);
+            }
         }
 
         /// <summary>
