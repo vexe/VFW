@@ -31,7 +31,7 @@ namespace Vexe.Editor.GUIs
 
 		public bool Toggle(GUIContent content, bool value, Layout option)
 		{
-			return Toggle(content, value, Styles.Toggle, option);
+			return Toggle(content, value, GUIStyles.Toggle, option);
 		}
 
 		public abstract bool Toggle(GUIContent content, bool value, GUIStyle style, Layout option);
@@ -44,7 +44,7 @@ namespace Vexe.Editor.GUIs
 
 		public bool ToggleLeft(string label, bool value, Layout option)
 		{
-			return ToggleLeft(label, value, Styles.BoldLabel, option);
+			return ToggleLeft(label, value, GUIStyles.BoldLabel, option);
 		}
 
 		public bool ToggleLeft(string label, bool value, GUIStyle labelStyle, Layout option)

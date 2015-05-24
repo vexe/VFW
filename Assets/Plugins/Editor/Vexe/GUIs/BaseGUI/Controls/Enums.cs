@@ -7,7 +7,7 @@ namespace Vexe.Editor.GUIs
 	{
 		public Enum EnumPopup(Enum selected, Layout option)
 		{
-			return EnumPopup(selected, Styles.Popup, option);
+			return EnumPopup(selected, GUIStyles.Popup, option);
 		}
 
 		public Enum EnumPopup(Enum selected, GUIStyle style, Layout option)
@@ -17,7 +17,7 @@ namespace Vexe.Editor.GUIs
 
 		public Enum EnumPopup(GUIContent content, Enum selected, Layout option)
 		{
-			return EnumPopup(content, selected, Styles.Popup, option);
+			return EnumPopup(content, selected, GUIStyles.Popup, option);
 		}
 
 		public T EnumPopup<T>(string content, T selected)
@@ -32,7 +32,7 @@ namespace Vexe.Editor.GUIs
 
 		public Enum EnumPopup(string content, Enum selected, Layout option)
 		{
-			return EnumPopup(content, selected, Styles.Popup, option);
+			return EnumPopup(content, selected, GUIStyles.Popup, option);
 		}
 
 		public Enum EnumPopup(string content, Enum selected, GUIStyle style, Layout option)

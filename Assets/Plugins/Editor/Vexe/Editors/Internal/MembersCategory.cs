@@ -69,7 +69,7 @@ namespace Vexe.Editor.Internal
         {
             bool foldout = false;
             var boxed = (_display & CategoryDisplay.BoxedHeaders) == CategoryDisplay.BoxedHeaders;
-            using (gui.Horizontal(boxed ? Styles.ToolbarButton : GUIStyle.none))
+            using (gui.Horizontal(boxed ? GUIStyles.ToolbarButton : GUIStyle.none))
             {
                 gui.Space(10f);
                 foldout = gui.Foldout(Name, _prefs.Bools.ValueOrDefault(_id, true), Layout.sExpandWidth());

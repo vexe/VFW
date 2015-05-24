@@ -18,7 +18,7 @@ namespace Vexe.Editor.GUIs
 
 		public bool Foldout(string label, bool value)
 		{
-			return Foldout(label, value, Styles.Foldout);
+			return Foldout(label, value, GUIStyles.Foldout);
 		}
 
 		public bool Foldout(string label, bool value, GUIStyle style)
@@ -28,7 +28,7 @@ namespace Vexe.Editor.GUIs
 
 		public bool Foldout(string label, bool value, Layout option)
 		{
-			return Foldout(label, value, string.Empty, Styles.Foldout, option);
+			return Foldout(label, value, string.Empty, GUIStyles.Foldout, option);
 		}
 
 		public bool Foldout(string label, bool value, GUIStyle style, Layout option)

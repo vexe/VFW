@@ -108,7 +108,7 @@ namespace Vexe.Editor.Drawers
 		{
 			using (gui.Horizontal())
 			{
-				if (gui.Button(niceName, Styles.Mini))
+				if (gui.Button(niceName, GUIStyles.Mini))
 					invoke(rawTarget, argValues);
 
 				gui.Space(12f);

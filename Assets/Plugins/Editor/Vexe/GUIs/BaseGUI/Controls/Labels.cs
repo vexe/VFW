@@ -50,7 +50,7 @@ namespace Vexe.Editor.GUIs
 
 		public void BoldLabel(string text, Layout option)
 		{
-			Label(text, Styles.BoldLabel, option);
+			Label(text, GUIStyles.BoldLabel, option);
 		}
 
 		public void Label(string text)
@@ -60,7 +60,7 @@ namespace Vexe.Editor.GUIs
 
 		public void Label(string text, Layout option)
 		{
-			Label(text, Styles.Label, option);
+			Label(text, GUIStyles.Label, option);
 		}
 
 		public void Label(string text, GUIStyle style)

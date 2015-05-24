@@ -8,7 +8,7 @@ namespace Vexe.Editor.GUIs
 	{
 		public void Box(string text, Layout option)
 		{
-			Box(text, Styles.Box, option);
+			Box(text, GUIStyles.Box, option);
 		}
 
 		public void Box(string text, GUIStyle style)

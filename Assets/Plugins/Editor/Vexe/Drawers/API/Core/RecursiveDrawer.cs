@@ -138,10 +138,10 @@ namespace Vexe.Editor.Drawers
                 if (unityObj != null)
                 {
                     var icon = AssetPreview.GetMiniThumbnail(unityObj);
-                    gui.Label(new GUIContent(field, icon), Styles.ObjectField);
+                    gui.Label(new GUIContent(field, icon), GUIStyles.ObjectField);
                 }
                 else
-                    gui.Label(field, Styles.ObjectField);
+                    gui.Label(field, GUIStyles.ObjectField);
 
                 var totalRect = gui.LastRect;
                 var fieldRect = totalRect;

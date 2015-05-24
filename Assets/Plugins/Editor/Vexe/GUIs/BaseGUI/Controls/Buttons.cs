@@ -31,7 +31,7 @@ namespace Vexe.Editor.GUIs
 
 		public bool Button(string text, Layout option)
 		{
-			return Button(text, Styles.Button, option);
+			return Button(text, GUIStyles.Button, option);
 		}
 
 		public bool Button(string text, GUIStyle style, Layout option)

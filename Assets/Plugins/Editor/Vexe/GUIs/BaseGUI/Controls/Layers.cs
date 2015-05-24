@@ -21,7 +21,7 @@ namespace Vexe.Editor.GUIs
 
 		public int Layer(string label, int layer, Layout layout)
 		{
-			return Layer(label, layer, Styles.Popup, layout);
+			return Layer(label, layer, GUIStyles.Popup, layout);
 		}
 
 		public int Layer(string label, int layer, GUIStyle style, Layout layout)

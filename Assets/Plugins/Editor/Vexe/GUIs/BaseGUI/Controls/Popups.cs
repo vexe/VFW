@@ -23,7 +23,7 @@ namespace Vexe.Editor.GUIs
 
 		public int Popup(string text, int selectedIndex, string[] displayedOptions, Layout option)
 		{
-			return Popup(text, selectedIndex, displayedOptions, Styles.Popup, option);
+			return Popup(text, selectedIndex, displayedOptions, GUIStyles.Popup, option);
 		}
 
 		public abstract int Popup(string text, int selectedIndex, string[] displayedOptions, GUIStyle style, Layout option);
@@ -40,7 +40,7 @@ namespace Vexe.Editor.GUIs
 
 		public string Tag(string content, string tag, Layout layout)
 		{
-			return Tag(GetContent(content), tag, Styles.Popup, layout);
+			return Tag(GetContent(content), tag, GUIStyles.Popup, layout);
 		}
 
 		public abstract string Tag(GUIContent content, string tag, GUIStyle style, Layout layout);

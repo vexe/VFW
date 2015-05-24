@@ -31,7 +31,7 @@ namespace Vexe.Editor.GUIs
 
 			public ScrollViewBlock Begin(ref Vector2 pos, GUIStyle background, Layout option)
 			{
-				return Begin(ref pos, false, false, Styles.HorizontalScrollbar, Styles.VerticalScrollbar, background, option);
+				return Begin(ref pos, false, false, GUIStyles.HorizontalScrollbar, GUIStyles.VerticalScrollbar, background, option);
 			}
 
 			public ScrollViewBlock Begin(ref Vector2 pos, bool alwaysShowHorizontal, bool alwaysShowVertical, Layout option)
@@ -41,7 +41,7 @@ namespace Vexe.Editor.GUIs
 
 			public ScrollViewBlock Begin(ref Vector2 pos, GUIStyle horizontalScrollbar, GUIStyle verticalScrollbar, Layout option)
 			{
-				return Begin(ref pos, false, false, horizontalScrollbar, verticalScrollbar, Styles.ScrollView, option);
+				return Begin(ref pos, false, false, horizontalScrollbar, verticalScrollbar, GUIStyles.ScrollView, option);
 			}
 
 			public ScrollViewBlock Begin(ref Vector2 pos, bool alwaysShowHorizontal, bool alwaysShowVertical, GUIStyle horizontalScrollbar, GUIStyle verticalScrollbar, GUIStyle background, Layout option)

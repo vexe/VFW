@@ -29,7 +29,7 @@ namespace Vexe.Editor.Drawers
 			    gui.Label(label);
 
 			content.text = text;
-			float height = Styles.TextArea.CalcHeight(content, gui.Width);
+			float height = GUIStyles.TextArea.CalcHeight(content, gui.Width);
 			int numLines = (int)(height / 13f);
 			numLines = Mathf.Clamp(numLines, minLines, maxLines);
 			height = 20 + ((numLines - 1) * 13f);

@@ -4,7 +4,7 @@ using Vexe.Runtime.Extensions;
 
 namespace Vexe.Editor
 {
-    public static class Styles
+    public static class GUIStyles
     {
         public static readonly GUIStyle None                     = GUIStyle.none;
         public static readonly GUIStyle Button                   = GUI.skin.button;

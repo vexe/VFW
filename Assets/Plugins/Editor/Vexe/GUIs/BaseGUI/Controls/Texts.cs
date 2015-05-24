@@ -31,7 +31,7 @@ namespace Vexe.Editor.GUIs
 
 		public string Text(GUIContent content, string value, Layout option)
 		{
-			return Text(content, value, Styles.TextField, option);
+			return Text(content, value, GUIStyles.TextField, option);
 		}
 
 		public abstract string Text(GUIContent content, string value, GUIStyle style, Layout option);
@@ -52,7 +52,7 @@ namespace Vexe.Editor.GUIs
 
 		public string ScrollableTextArea(string value, ref Vector2 scrollPos, Layout option)
 		{
-			return ScrollableTextArea(value, ref scrollPos, Styles.TextArea, option);
+			return ScrollableTextArea(value, ref scrollPos, GUIStyles.TextArea, option);
 		}
 
 		public abstract string ScrollableTextArea(string value, ref Vector2 scrollPos, GUIStyle style, Layout option);

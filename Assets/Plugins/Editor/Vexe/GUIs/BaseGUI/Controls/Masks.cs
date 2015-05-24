@@ -85,7 +85,7 @@ namespace Vexe.Editor.GUIs
 
 		public int Mask(GUIContent content, int mask, string[] displayedOptions, Layout option)
 		{
-			return Mask(content, mask, displayedOptions, Styles.Popup, option);
+			return Mask(content, mask, displayedOptions, GUIStyles.Popup, option);
 		}
 
 		public int Mask(int mask, string[] displayedOptions, GUIStyle style, Layout option)
@@ -95,7 +95,7 @@ namespace Vexe.Editor.GUIs
 
 		public int Mask(string content, int mask, string[] displayedOptions, Layout option)
 		{
-			return Mask(content, mask, displayedOptions, Styles.Popup, option);
+			return Mask(content, mask, displayedOptions, GUIStyles.Popup, option);
 		}
 
 		public int Mask(string content, int mask, string[] displayedOptions, GUIStyle style, Layout option)

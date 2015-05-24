@@ -221,7 +221,7 @@ namespace Vexe.Editor.GUIs
 
             _nextControlIdx = 0;
             _nextBlockIdx   = 0;
-            BeginVertical(Styles.None);
+            BeginVertical(GUIStyles.None);
 
             return this;
         }
@@ -469,7 +469,7 @@ namespace Vexe.Editor.GUIs
 
         public override Bounds BoundsField(GUIContent content, Bounds value, Layout option)
         {
-            var bounds = new ControlData(content, Styles.None, option, ControlType.Bounds);
+            var bounds = new ControlData(content, GUIStyles.None, option, ControlType.Bounds);
 
             Rect position;
             if (CanDrawControl(out position, bounds))
@@ -482,7 +482,7 @@ namespace Vexe.Editor.GUIs
 
         public override Rect Rect(GUIContent content, Rect value, Layout option)
         {
-            var data = new ControlData(content, Styles.None, option, ControlType.RectField);
+            var data = new ControlData(content, GUIStyles.None, option, ControlType.RectField);
 
             Rect position;
             if (CanDrawControl(out position, data))
@@ -495,7 +495,7 @@ namespace Vexe.Editor.GUIs
 
 		public override AnimationCurve Curve (GUIContent content, AnimationCurve value, Layout option)
 		{
-			var data = new ControlData (content, Styles.None, option, ControlType.CurveField);
+			var data = new ControlData (content, GUIStyles.None, option, ControlType.CurveField);
 
 			Rect position;
 			if (CanDrawControl (out position, data))
@@ -510,7 +510,7 @@ namespace Vexe.Editor.GUIs
 
         public override Gradient GradientField(GUIContent content, Gradient value, Layout option)
         {
-            var data = new ControlData(content, Styles.None, option, ControlType.GradientField);
+            var data = new ControlData(content, GUIStyles.None, option, ControlType.GradientField);
 
             Rect position;
             if (CanDrawControl(out position, data))
@@ -537,9 +537,9 @@ namespace Vexe.Editor.GUIs
         public override void HelpBox(string message, MessageType type)
         {
             var content = GetContent(message);
-            var height  = Styles.HelpBox.CalcHeight(content, Width);
+            var height  = GUIStyles.HelpBox.CalcHeight(content, Width);
             var layout  = Layout.sHeight(height);
-            var data    = new ControlData(content, Styles.HelpBox, layout, ControlType.HelpBox);
+            var data    = new ControlData(content, GUIStyles.HelpBox, layout, ControlType.HelpBox);
 
             Rect position;
             if (CanDrawControl(out position, data))
@@ -571,7 +571,7 @@ namespace Vexe.Editor.GUIs
 
         public override Color Color(GUIContent content, Color value, Layout option)
         {
-            var data = new ControlData(content, Styles.ColorField, option, ControlType.ColorField);
+            var data = new ControlData(content, GUIStyles.ColorField, option, ControlType.ColorField);
 
             Rect position;
             if (CanDrawControl(out position, data))
@@ -597,7 +597,7 @@ namespace Vexe.Editor.GUIs
 
         public override float Float(GUIContent content, float value, Layout option)
         {
-            var data = new ControlData(content, Styles.NumberField, option, ControlType.Float);
+            var data = new ControlData(content, GUIStyles.NumberField, option, ControlType.Float);
 
             Rect position;
             if (CanDrawControl(out position, data))
@@ -623,7 +623,7 @@ namespace Vexe.Editor.GUIs
 
         public override int Int(GUIContent content, int value, Layout option)
         {
-            var data = new ControlData(content, Styles.NumberField, option, ControlType.IntField);
+            var data = new ControlData(content, GUIStyles.NumberField, option, ControlType.IntField);
 
             Rect position;
             if (CanDrawControl(out position, data))
@@ -660,7 +660,7 @@ namespace Vexe.Editor.GUIs
 
         public override UnityObject Object(GUIContent content, UnityObject value, Type type, bool allowSceneObjects, Layout option)
         {
-            var data = new ControlData(content, Styles.ObjectField, option, ControlType.ObjectField);
+            var data = new ControlData(content, GUIStyles.ObjectField, option, ControlType.ObjectField);
 
             Rect position;
             if (CanDrawControl(out position, data))
@@ -697,7 +697,7 @@ namespace Vexe.Editor.GUIs
 
         public override float FloatSlider(GUIContent content, float value, float leftValue, float rightValue, Layout option)
         {
-            var data = new ControlData(content, Styles.HorizontalSlider, option, ControlType.Slider);
+            var data = new ControlData(content, GUIStyles.HorizontalSlider, option, ControlType.Slider);
 
             Rect position;
             if (CanDrawControl(out position, data))
@@ -751,7 +751,7 @@ namespace Vexe.Editor.GUIs
 
         public override string ToolbarSearch(string value, Layout option)
         {
-            var data = new ControlData(GetContent(value), Styles.TextField, option, ControlType.TextField);
+            var data = new ControlData(GetContent(value), GUIStyles.TextField, option, ControlType.TextField);
 
             Rect position;
             if (CanDrawControl(out position, data))
@@ -817,7 +817,7 @@ namespace Vexe.Editor.GUIs
             if (!option.height.HasValue)
                 option.height = 50f;
 
-            var data = new ControlData(GetContent(value), Styles.TextArea, option, ControlType.TextArea);
+            var data = new ControlData(GetContent(value), GUIStyles.TextArea, option, ControlType.TextArea);
 
             Rect position;
             if (CanDrawControl(out position, data))
@@ -830,7 +830,7 @@ namespace Vexe.Editor.GUIs
 
         public override bool InspectorTitlebar(bool foldout, UnityObject target)
         {
-            var data = new ControlData(GUIContent.none, Styles.None, null, ControlType.Foldout);
+            var data = new ControlData(GUIContent.none, GUIStyles.None, null, ControlType.Foldout);
 
             Rect position;
             if (CanDrawControl(out position, data))
@@ -906,7 +906,7 @@ namespace Vexe.Editor.GUIs
 
         public override string TextFieldDropDown(GUIContent label, string value, string[] dropDownElements, Layout option)
         {
-            var data = new ControlData(label, Styles.TextFieldDropDown, option, ControlType.TextFieldDropDown);
+            var data = new ControlData(label, GUIStyles.TextFieldDropDown, option, ControlType.TextFieldDropDown);
 
             Rect position;
             if (CanDrawControl(out position, data))
@@ -921,7 +921,7 @@ namespace Vexe.Editor.GUIs
 
         public override double Double(GUIContent content, double value, Layout option)
         {
-            var data = new ControlData(content, Styles.NumberField, option, ControlType.Double);
+            var data = new ControlData(content, GUIStyles.NumberField, option, ControlType.Double);
 
             Rect position;
             if (CanDrawControl(out position, data))
@@ -931,7 +931,7 @@ namespace Vexe.Editor.GUIs
 
         public override long Long(GUIContent content, long value, Layout option)
         {
-            var data = new ControlData(content, Styles.NumberField, option, ControlType.Long);
+            var data = new ControlData(content, GUIStyles.NumberField, option, ControlType.Long);
 
             Rect position;
             if (CanDrawControl(out position, data))
