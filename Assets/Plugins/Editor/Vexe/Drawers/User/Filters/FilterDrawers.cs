@@ -3,55 +3,111 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using Vexe.Editor.GUIs;
 using Vexe.Editor.Helpers;
+using Vexe.Runtime.Helpers;
+using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
 
 namespace Vexe.Editor.Drawers
 {
-	public class FieldFilter
+	public class TextFilter
 	{
-		private readonly string[] values;
-		private readonly Action<string> setValue;
-		private string search;
+		private readonly string[] _values;
+		private readonly Action<string> _setValue;
+        private readonly int _id;
+		private string _pattern;
+        private bool _toggle;
 
-		public FieldFilter(string[] values, Action<string> setValue)
+		public TextFilter(string[] values, int id, Action<string> setValue)
+            : this(values, id, true, setValue)
+        {
+        }
+
+		public TextFilter(string[] values, int id, bool initialToggle, Action<string> setValue)
 		{
-			this.values   = values;
-			this.setValue = setValue;
+			this._values   = values;
+			this._setValue = setValue;
+            this._id = RuntimeHelper.CombineHashCodes(id, "Filter");
+
+            var prefs = BetterPrefs.GetEditorInstance();
+            _toggle = prefs.Bools.ValueOrDefault(this._id, initialToggle);
+            _pattern = prefs.Strings.ValueOrDefault(this._id, "");
 		}
 
+        public bool Field(BaseGUI gui, float width)
+        {
+            bool changed = false;
+            if (_toggle)
+            {
+                gui.BeginCheck();
+                var text = gui.Text(_pattern, Layout.sWidth(width));
+                if (gui.HasChanged())
+                {
+                    changed = true;
+                    _pattern = text;
+
+                    var prefs = BetterPrefs.GetEditorInstance();
+                    prefs.Strings[_id] = _pattern;
+                }
+            }
+            else gui.Text("", Layout.sWidth(5f));
+
+            var buttonStr = _toggle ? "<" : ">";
+            if (gui.Button(buttonStr, GUIStyles.None, Layout.sWidth(13f)))
+            {
+                _toggle = !_toggle;
+                var prefs = BetterPrefs.GetEditorInstance();
+                prefs.Bools[_id] = _toggle;
+                gui.RequestResetIfRabbit();
+            }
+            return changed;
+        }
+
+        public bool IsMatch(string input)
+        {
+            try
+            {
+                return Regex.IsMatch(input, _pattern);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
 		public void OnGUI(BaseGUI gui)
+        {
+            OnGUI(gui, 50f);
+        }
+
+        public void OnGUI(BaseGUI gui, float width)
 		{
-			var newSearch = gui.Text(GUIContent.none, search, Layout.sWidth(50f));
-			if (search != newSearch)
+            bool changed = Field(gui, width);
+			if (changed)
 			{
 				string match = null;
-				for (int i = 0; i < values.Length; i++)
-				{
-					var x = values[i];
-					if (Regex.IsMatch(x, newSearch))
-					{
-						match = x;
-						break;
-					}
+				for (int i = 0; i < _values.Length; i++)
+                {
+                    var x = _values[i];
+                    if (IsMatch(x))
+                    {
+                        match = x;
+                        break;
+                    }
 				}
-
-				search = newSearch;
 
 				if (match != null)
-				{
-					setValue(match);
-				}
+					_setValue(match);
 			}
 		}
 	}
 
 	public abstract class FilterDrawer<T, A> : CompositeDrawer<T, A> where A : CompositeAttribute
 	{
-		private FieldFilter filter;
+		private TextFilter filter;
 
 		protected override void Initialize()
 		{
-			filter = new FieldFilter(GetValues(), SetValue);
+			filter = new TextFilter(GetValues(), id, SetValue);
 		}
 
 		public override void OnRightGUI()
