@@ -9,16 +9,16 @@ namespace Vexe.Runtime.Types
 	public class InlineAttribute : CompositeAttribute
 	{
 		/// <summary>
-		/// Whether or not to hide the inlined Component/GameObject
-		/// Default: False
+		/// Whether or not to show a "Hide" or "Show" button to hide or show the inlined Component/GameObject
+		/// Defaults to: False
 		/// </summary>
-		public bool HideTarget { get; set; }
+		public bool HideButton;
 
 		/// <summary>
 		/// Inline inside a Gui box?
 		/// Default: True
 		/// </summary>
-		public bool GuiBox { get; set; }
+		public bool GuiBox;
 
 		public InlineAttribute() : this(-1)
 		{
