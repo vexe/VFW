@@ -906,7 +906,6 @@ namespace Vexe.Editor.GUIs
 
         public override string TextFieldDropDown(GUIContent label, string value, string[] dropDownElements, Layout option)
         {
-            var content = GetContent(value);
             var data = new ControlData(label, Styles.TextFieldDropDown, option, ControlType.TextFieldDropDown);
 
             Rect position;

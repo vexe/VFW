@@ -17,8 +17,6 @@ namespace Vexe.Editor
 		static readonly Dictionary<int, BaseDrawer> _cachedMemberDrawers;
 		static readonly Dictionary<int, MethodDrawer> _cachedMethodDrawers;
 
-        static readonly HashSet<Type> _definesElementDrawingAttributes;
-
         public static readonly TypeDrawerMapper Mapper;
 
 		public static readonly Func<Type, BaseDrawer> CachedGetObjectDrawer;
@@ -31,11 +29,6 @@ namespace Vexe.Editor
 			_cachedMemberDrawers    = new Dictionary<int, BaseDrawer>();
 			_cachedCompositeDrawers = new Dictionary<int, List<BaseDrawer>>();
 			_cachedMethodDrawers    = new Dictionary<int, MethodDrawer>();
-
-            _definesElementDrawingAttributes = new HashSet<Type>()
-            {
-                typeof(PerItemAttribute), typeof(PerKeyAttribute), typeof(PerValueAttribute)
-            };
 
             //TODO: check if this is still needed
             CachedGetObjectDrawer = new Func<Type, BaseDrawer>(Mapper.GetDrawer).Memoize();
