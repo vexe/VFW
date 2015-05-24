@@ -10,22 +10,25 @@ using Vexe.Runtime.Types;
 
 namespace Vexe.Editor.Visibility
 { 
-    public static class VFWVisibilityLogic
+    public static class VisibilityLogic
     {
         public static readonly VisibilityAttributes Attributes;
-        public static readonly Func<MemberInfo, bool> CachedIsVisibleMember;
-        public static readonly Func<Type, List<MemberInfo>> CachedGetVisibleMembers;
 
-        static VFWVisibilityLogic()
+        static readonly Func<Tuple<Type, ISerializationLogic>, List<MemberInfo>> _cachedGetVisibleMembers;
+
+        public static List<MemberInfo> CachedGetVisibleMembers(Type type, ISerializationLogic logic)
+        {
+            return _cachedGetVisibleMembers(Tuple.Create(type, logic));
+        }
+
+        static VisibilityLogic()
         {
             Attributes = VisibilityAttributes.Default;
 
-            CachedIsVisibleMember = new Func<MemberInfo, bool>(IsVisibleMember).Memoize();
-
-            CachedGetVisibleMembers = new Func<Type, List<MemberInfo>>(type =>
+            _cachedGetVisibleMembers = new Func<Tuple<Type, ISerializationLogic>, List<MemberInfo>>(tup =>
             {
-                return ReflectionHelper.CachedGetMembers(type)
-                                       .Where(IsVisibleMember)
+                return ReflectionHelper.CachedGetMembers(tup.Item1)
+                                       .Where(x => IsVisibleMember(x, tup.Item2))
                                        .OrderBy<MemberInfo, float>(GetMemberDisplayOrder)
                                        .ToList();
             }).Memoize();
@@ -46,12 +49,11 @@ namespace Vexe.Editor.Visibility
             }
         }
 
-        public static bool IsVisibleMember(MemberInfo member)
+        public static bool IsVisibleMember(MemberInfo member, ISerializationLogic logic)
         {
             if (member is MethodInfo)
                 return Attributes.Show.Any(member.IsDefined);
 
-            var logic = VFWSerializationLogic.Instance;
             var field = member as FieldInfo;
             if (field != null)
                 return !Attributes.Hide.Any(field.IsDefined)

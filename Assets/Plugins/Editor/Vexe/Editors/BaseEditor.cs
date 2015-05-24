@@ -225,9 +225,11 @@ namespace Vexe.Editor.Editors
             OnBeforeInitialized();
 
             // fetch visible members
-            _visibleMembers = VFWVisibilityLogic.CachedGetVisibleMembers(targetType).ToList();
+            var vfwObj = target as IVFWObject;
+            Assert.NotNull(vfwObj, "Target must implement IVFWObject!");
+            _visibleMembers = VisibilityLogic.CachedGetVisibleMembers(targetType, vfwObj.GetSerializationLogic());
 
-            var drawnByUnity =  _visibleMembers
+            var drawnByUnity = _visibleMembers
                 .Where(x => x.IsDefined<DrawByUnityAttribute>() || DrawnByUnityTypes.Any(x.GetDataType().IsA));
 
             _visibleMembers = _visibleMembers.Except(drawnByUnity).ToList();
@@ -296,7 +298,7 @@ namespace Vexe.Editor.Editors
                 resolver.Resolve(_visibleMembers, d).Foreach(last.Members.Add);
 
                 lookup.Clear();
-                parent.Members = parent.Members.OrderBy<MemberInfo, float>(VFWVisibilityLogic.GetMemberDisplayOrder).ToList();
+                parent.Members = parent.Members.OrderBy<MemberInfo, float>(VisibilityLogic.GetMemberDisplayOrder).ToList();
             }
 
             // filter out empty categories

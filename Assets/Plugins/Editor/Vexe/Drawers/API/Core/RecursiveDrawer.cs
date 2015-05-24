@@ -13,6 +13,8 @@ using Vexe.Editor.Visibility;
 using Vexe.Editor.Windows;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
+using Vexe.Runtime.Serialization;
+using Vexe.Runtime.Types;
 using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Editor.Drawers
@@ -253,11 +255,17 @@ namespace Vexe.Editor.Drawers
 
         public static bool DrawRecursive(ref object target, BaseGUI gui, int id, UnityObject unityTarget, params string[] memberNames)
         {
+            // target could be a Component (came from InlineDrawer for ex)
+            // in that case it doesn't implement IVFWObject, so we just use the default logic
+            // otherwise whatever custom logic is defined in the target
+            var vfwObj = unityTarget as IVFWObject;
+            var logic = vfwObj == null ? VFWSerializationLogic.Instance : vfwObj.GetSerializationLogic();
+
             List<MemberInfo> members;
             var targetType = target.GetType();
             if (memberNames.IsNullOrEmpty())
             {
-                members = VFWVisibilityLogic.CachedGetVisibleMembers(targetType);
+                members = VisibilityLogic.CachedGetVisibleMembers(targetType, logic);
             }
             else
             {
@@ -271,7 +279,7 @@ namespace Vexe.Editor.Drawers
                         LogFormat("RecursiveDrawer: Couldn't find member {0} in {1}", name, targetType.Name);
                         continue;
                     }
-                    if (VFWVisibilityLogic.IsVisibleMember(member))
+                    if (VisibilityLogic.IsVisibleMember(member, logic))
                         members.Add(member);
                 }
             }
