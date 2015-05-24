@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 namespace System
 {
@@ -46,6 +47,10 @@ namespace System
     {
         public vIndexOutOfRange(int outOfRangeIndex, int totalCount)
             : base("Index `" + outOfRangeIndex + "` should be greater or equal to zero and less than the total count of `" + totalCount + "`")
+        {
+        }
+
+        public vIndexOutOfRange(int outOfRangeIndex, IList list) : this(outOfRangeIndex, list.Count)
         {
         }
     }
