@@ -20,6 +20,11 @@ namespace Vexe.Editor.GUIs
 			return EnumPopup(content, selected, GUIStyles.Popup, option);
 		}
 
+		public T EnumPopup<T>(T selected)
+        {
+            return EnumPopup<T>(string.Empty, selected);
+        }
+
 		public T EnumPopup<T>(string content, T selected)
 		{
 			return (T)(object)EnumPopup(content, (Enum)(object)selected);
