@@ -339,9 +339,20 @@ namespace Vexe.Editor.Editors
                 c.RemoveEmptyNestedCategories();
             }
 
-            var displayKey = RuntimeHelper.CombineHashCodes(id, "display");
-            var displayValue = prefs.Ints.ValueOrDefault(displayKey, -1);
+            var getDisplayOptions = targetType.GetMethod("GetDisplayOptions");
+            if (getDisplayOptions == null)
+                throw new vMemberNotFound(targetType, "GetDisplayOptions");
+
             var vfwSettings = VFWSettings.GetInstance();
+
+            // does target override GetDisplayOptions? if so set that as the default value,
+            // otherwise whatever value is in our settings asset
+            var defaultDisplay = (getDisplayOptions.DeclaringType == typeof(BetterBehaviour) ||
+                                  getDisplayOptions.DeclaringType == typeof(BetterScriptableObject)) ?
+                                  vfwSettings.DefaultDisplay : (CategoryDisplay)getDisplayOptions.Invoke(target);
+
+            var displayKey = RuntimeHelper.CombineHashCodes(id, "display");
+            var displayValue = prefs.Ints.ValueOrDefault(displayKey, (int)defaultDisplay);
             _display = displayValue == -1 ? vfwSettings.DefaultDisplay : (CategoryDisplay)displayValue;
             prefs.Ints[displayKey] = (int)_display;
 
