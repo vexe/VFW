@@ -78,12 +78,15 @@ namespace Vexe.Editor.Drawers
             Log("Initializing: " + this);
 #endif
             var displayAttr = attributes.GetAttribute<DisplayAttribute>();
-            if (displayAttr != null && !string.IsNullOrEmpty(displayAttr.FormatMethod))
+            if (displayAttr != null)
             {
-                var method = targetType.GetMemberFromAll(displayAttr.FormatMethod, Flags.StaticInstanceAnyVisibility) as MethodInfo;
+                var hasCustomFormat = !string.IsNullOrEmpty(displayAttr.FormatMethod);
+                var formatMethod = hasCustomFormat ? displayAttr.FormatMethod : ("Format" + member.Name);
+                var method = targetType.GetMemberFromAll(formatMethod, Flags.StaticInstanceAnyVisibility) as MethodInfo;
                 if (method == null)
                 {
-                    Debug.Log("Couldn't find format method: " + displayAttr.FormatMethod);
+                    if (hasCustomFormat)
+                        Debug.Log("Couldn't find format method: " + displayAttr.FormatMethod);
                 }
                 else
                 {
