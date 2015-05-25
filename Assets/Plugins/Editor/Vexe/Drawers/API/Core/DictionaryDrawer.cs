@@ -350,6 +350,7 @@ namespace Vexe.Editor.Drawers
 
                 var eKey = RuntimeHelper.CombineHashCodes(id, (_kvpList.Count - 1), "entry");
                 foldouts[eKey] = true;
+                foldout = true;
             }
             catch (ArgumentException)
             {
