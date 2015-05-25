@@ -254,7 +254,8 @@ namespace Vexe.Editor.Editors
             // fetch visible members
             var vfwObj = target as IVFWObject;
             Assert.NotNull(vfwObj, "Target must implement IVFWObject!");
-            _visibleMembers = VisibilityLogic.CachedGetVisibleMembers(targetType, vfwObj.GetSerializationLogic());
+            var serialized = vfwObj.GetSerializedMembers();
+            _visibleMembers = VisibilityLogic.CachedGetVisibleMembers(targetType, serialized);
 
             var drawnByUnity = _visibleMembers
                 .Where(x => x.IsDefined<DrawByUnityAttribute>() || DrawnByUnityTypes.Any(x.GetDataType().IsA));

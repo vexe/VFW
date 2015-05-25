@@ -14,18 +14,18 @@ namespace Vexe.Editor.Visibility
     {
         public static readonly VisibilityAttributes Attributes;
 
-        static readonly Func<Tuple<Type, ISerializationLogic>, List<MemberInfo>> _cachedGetVisibleMembers;
+        static readonly Func<Tuple<Type, RuntimeMember[]>, List<MemberInfo>> _cachedGetVisibleMembers;
 
-        public static List<MemberInfo> CachedGetVisibleMembers(Type type, ISerializationLogic logic)
+        public static List<MemberInfo> CachedGetVisibleMembers(Type type, RuntimeMember[] serialized)
         {
-            return _cachedGetVisibleMembers(Tuple.Create(type, logic));
+            return _cachedGetVisibleMembers(Tuple.Create(type, serialized));
         }
 
         static VisibilityLogic()
         {
             Attributes = VisibilityAttributes.Default;
 
-            _cachedGetVisibleMembers = new Func<Tuple<Type, ISerializationLogic>, List<MemberInfo>>(tup =>
+            _cachedGetVisibleMembers = new Func<Tuple<Type, RuntimeMember[]>, List<MemberInfo>>(tup =>
             {
                 return ReflectionHelper.CachedGetMembers(tup.Item1)
                                        .Where(x => IsVisibleMember(x, tup.Item2))
@@ -49,15 +49,38 @@ namespace Vexe.Editor.Visibility
             }
         }
 
-        public static bool IsVisibleMember(MemberInfo member, ISerializationLogic logic)
+        /// <summary>
+        /// Determines whether or not 'member' should be visible in the inspector
+        /// The logic goes like this:
+        /// If member was a method it is visible only if it's annotated with [Show]
+        /// If member was a field/property it is visible if
+        /// 1- it's annotated with [Show]
+        /// 2- OR if it's serializable
+        /// To determine if a field/property is serializable:
+        /// 1- If the 'serialized' member array is null, we use the default VFWSerializationLogic
+        /// 2- otherwise we see if that field/property is contained within the serialized array
+        /// </summary>
+        public static bool IsVisibleMember(MemberInfo member, RuntimeMember[] serialized)
         {
             if (member is MethodInfo)
                 return Attributes.Show.Any(member.IsDefined);
 
+            bool useDefaultLogic = serialized == null;
+
             var field = member as FieldInfo;
             if (field != null)
-                return !Attributes.Hide.Any(field.IsDefined)
-                    && (logic.IsSerializableField(field) || Attributes.Show.Any(field.IsDefined));
+            { 
+                if (Attributes.Hide.Any(field.IsDefined))
+                    return false;
+
+                if (Attributes.Show.Any(field.IsDefined))
+                    return true;
+
+                if (useDefaultLogic)
+                    return VFWSerializationLogic.Instance.IsSerializableField(field);
+
+                return serialized.Contains(x => x.Name == field.Name);
+            }
 
             var property = member as PropertyInfo;
             if (property == null || Attributes.Hide.Any(property.IsDefined))
@@ -72,11 +95,13 @@ namespace Vexe.Editor.Visibility
             if (unityProp)
                 return true;
 
-            bool serializable = logic.IsSerializableProperty(property);
-            if (serializable)
+            if (Attributes.Show.Any(property.IsDefined))
                 return true;
 
-            return Attributes.Show.Any(property.IsDefined);
+            if (useDefaultLogic)
+                return VFWSerializationLogic.Instance.IsSerializableProperty(property);
+
+            return serialized.Contains(x => x.Name == property.Name);
         }
 
         static HashSet<string> IgnoredUnityProperties = new HashSet<string>()

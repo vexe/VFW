@@ -255,17 +255,21 @@ namespace Vexe.Editor.Drawers
 
         public static bool DrawRecursive(ref object target, BaseGUI gui, int id, UnityObject unityTarget, params string[] memberNames)
         {
+            // in order to determine the visibility of a member, we need to know if it's serializable or not
             // target could be a Component (came from InlineDrawer for ex)
-            // in that case it doesn't implement IVFWObject, so we just use the default logic
-            // otherwise whatever custom logic is defined in the target
+            // in that case it doesn't implement IVFWObject, so we just set the serialized array to null
+            // and then the visibility logic will use the default vfw serialization logic
+            // otherwise whatever serialized members that object specifies
+            RuntimeMember[] serialized = null;
             var vfwObj = unityTarget as IVFWObject;
-            var logic = vfwObj == null ? VFWSerializationLogic.Instance : vfwObj.GetSerializationLogic();
+            if (vfwObj != null)
+                serialized = vfwObj.GetSerializedMembers();
 
             List<MemberInfo> members;
             var targetType = target.GetType();
             if (memberNames.IsNullOrEmpty())
             {
-                members = VisibilityLogic.CachedGetVisibleMembers(targetType, logic);
+                members = VisibilityLogic.CachedGetVisibleMembers(targetType, serialized);
             }
             else
             {
@@ -279,7 +283,7 @@ namespace Vexe.Editor.Drawers
                         LogFormat("RecursiveDrawer: Couldn't find member {0} in {1}", name, targetType.Name);
                         continue;
                     }
-                    if (VisibilityLogic.IsVisibleMember(member, logic))
+                    if (VisibilityLogic.IsVisibleMember(member, serialized))
                         members.Add(member);
                 }
             }

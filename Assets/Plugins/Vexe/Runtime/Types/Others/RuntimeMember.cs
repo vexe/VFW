@@ -1,10 +1,11 @@
 ﻿#if UNITY_EDITOR || UNITY_STANDALONE
-//#define DYNAMIC_REFLECTION
+#define FAST_REFLECTION
 #endif
 
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
 
@@ -19,7 +20,7 @@ namespace Vexe.Runtime.Types
     /// </summary>
     public class RuntimeMember
     {
-#if DYNAMIC_REFLECTION
+#if FAST_REFLECTION
         private MemberSetter<object, object> _setter;
         private MemberGetter<object, object> _getter;
 #else
@@ -67,7 +68,7 @@ namespace Vexe.Runtime.Types
             {
                 try
                 {
-#if DYNAMIC_REFLECTION
+#if FAST_REFLECTION
                     _setter(ref Target, value);
 #else
                     _setter(Target, value);
@@ -105,7 +106,7 @@ namespace Vexe.Runtime.Types
 
             result = new RuntimeMember(field, field.FieldType, target);
 
-#if DYNAMIC_REFLECTION
+#if FAST_REFLECTION
             result._setter = field.DelegateForSet();
             result._getter = field.DelegateForGet();
 #else
@@ -133,19 +134,19 @@ namespace Vexe.Runtime.Types
 
             if (property.CanWrite)
             {
-#if DYNAMIC_REFLECTION
+#if FAST_REFLECTION
                 result._setter = property.DelegateForSet();
 #else
                 result._setter = (x, y) => property.SetValue(x, y, null);
 #endif
             }
-#if DYNAMIC_REFLECTION
+#if FAST_REFLECTION
             else result._setter = delegate(ref object obj, object value) { };
 #else
             else result._setter = (x, y) => { };
 #endif
 
-#if DYNAMIC_REFLECTION
+#if FAST_REFLECTION
             result._getter = property.DelegateForGet();
 #else
             result._getter = x => property.GetValue(x, null);
@@ -160,25 +161,69 @@ namespace Vexe.Runtime.Types
         {
             var result = new List<RuntimeMember>();
             foreach (var member in members)
-            {
-                var field = member as FieldInfo;
-                if (field != null)
-                {
-                    RuntimeMember wrappedField;
-                    if (RuntimeMember.TryWrapField(field, target, out wrappedField))
-                        result.Add(wrappedField);
-                }
-                else
-                {
-                    var property = member as PropertyInfo;
-                    if (property == null)
-                        continue;
+                result.AddIfNotNull(WrapMember(member, target));
+            return result;
+        }
 
-                    RuntimeMember wrappedProperty;
-                    if (RuntimeMember.TryWrapProperty(property, target, out wrappedProperty))
-                        result.Add(wrappedProperty);
-                }
+        /// <summary>
+        /// Tries to wrap the specified member.
+        /// Returns the wrapped result if it succeeds (valid field/property)
+        /// otherwise null
+        /// </summary>
+        public static RuntimeMember WrapMember(MemberInfo member, object target)
+        {
+            var field = member as FieldInfo;
+            if (field != null)
+            {
+                RuntimeMember wrappedField;
+                if (RuntimeMember.TryWrapField(field, target, out wrappedField))
+                    return wrappedField;
             }
+            else
+            {
+                var property = member as PropertyInfo;
+                if (property == null)
+                    return null;
+
+                RuntimeMember wrappedProperty;
+                if (RuntimeMember.TryWrapProperty(property, target, out wrappedProperty))
+                    return wrappedProperty;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Allocates a new array wrapping the specified members (not cached)
+        /// </summary>
+        public static RuntimeMember[] WrapMembers(Type type, params string[] memberNames)
+        {
+            //@Todo memoize, somehow...
+            var result = new RuntimeMember[memberNames.Length];
+            int added = 0;
+            for (int i = 0; i < memberNames.Length; i++)
+            {
+                var name = memberNames[i];
+                var member = type.GetMemberFromAll(name, Flags.StaticInstanceAnyVisibility);
+                if (member == null)
+                {
+                    Debug.Log("Couldn't find member: " + name + " inside: " + type.Name);
+                    continue;
+                }
+
+                var wrapped = WrapMember(member, null);
+                if (wrapped == null)
+                { 
+                    Debug.Log("Couldn't wrap member: " + name);
+                    continue;
+                }
+
+                result[added++] = wrapped;
+            }
+
+            if (added != memberNames.Length)
+                Array.Resize(ref result, added);
+
             return result;
         }
 
