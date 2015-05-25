@@ -1,13 +1,11 @@
 //#define dbg_level_1
 
-using System.Diagnostics;
 using UnityEngine;
 
 namespace Vexe.Editor.GUIs
 {
 	using ControlData = BaseGUI.ControlData;
 
-	[DebuggerDisplay("{DbgDisplay}")]
 	public class GUIControl
 	{
 		public float x, y;
@@ -68,9 +66,9 @@ namespace Vexe.Editor.GUIs
 			}
 		}
 
-		public string DbgDisplay
-		{
-			get { return data.type.ToString(); }
-		}
+        public override string ToString()
+        {
+            return data.type.ToString();
+        }
 	}
 }

@@ -11,9 +11,9 @@ namespace Vexe.Runtime.Extensions
         /// <summary>
         /// Invokes this method on the specified target with no arguments
         /// </summary>
-        public static void Invoke(this MethodInfo method, object target)
+        public static object Invoke(this MethodInfo method, object target)
         {
-            method.Invoke(target, null);
+            return method.Invoke(target, null);
         }
 
         /// <summary>

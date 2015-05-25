@@ -27,7 +27,7 @@ namespace Vexe.Runtime.Serialization
             var data = target.GetSerializationData();
             data.Clear();
 
-            var members = target.GetSerializableMembers();
+            var members = target.GetSerializedMembers();
             for (int i = 0; i < members.Length; i++)
             {
                 var member    = members[i];
@@ -61,7 +61,7 @@ namespace Vexe.Runtime.Serialization
         public void DeserializeTargetFromData(IVFWObject target)
         {
             var data = target.GetSerializationData();
-            var members = target.GetSerializableMembers();
+            var members = target.GetSerializedMembers();
             for(int i = 0; i < members.Length; i++)
             {
                 var member    = members[i];

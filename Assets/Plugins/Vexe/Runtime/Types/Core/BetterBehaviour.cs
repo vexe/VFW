@@ -148,7 +148,7 @@ namespace Vexe.Runtime.Types
             return VFWSerializationLogic.Instance;
         }
 
-        public virtual RuntimeMember[] GetSerializableMembers()
+        public virtual RuntimeMember[] GetSerializedMembers()
         {
             var logic = GetSerializationLogic();
             var members = logic.CachedGetSerializableMembers(GetType());

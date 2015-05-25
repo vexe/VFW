@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using UnityEngine;
 using Vexe.Editor.GUIs;
 using Vexe.Editor.Helpers;
-using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Extensions;
+using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Types;
 
 namespace Vexe.Editor.Drawers

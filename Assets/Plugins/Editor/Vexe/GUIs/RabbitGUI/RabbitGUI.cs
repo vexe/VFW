@@ -64,36 +64,31 @@ namespace Vexe.Editor.GUIs
         static MethodCaller<object, string> _scrollableTextArea;
         static MethodCaller<object, Gradient> _gradientField;
 
-#if dbg_level_1
-            private bool _pendingReset;
-            private bool pendingResetRequest
-            {
-                get { return _pendingReset; }
-                set
-                {
-                    if (value)
-                    {
-                        Debug.Log("Setting pending reset to true");
-                        LogCallStack();
-                    }
-                    _pendingReset = value;
-                }
-            }
-#else
-        private bool _pendingReset;
-        #endif
-
         #if dbg_level_1
         private int dbgMaxDepth;
         public static void LogCallStack()
         {
-            var stack = new System.Diagnostics.StackTrace();
-            foreach (var frame in stack.GetFrames())
-            {
-                Debug.Log("Call stack: " + frame.GetMethod().Name);
-            }
+            string stack = RuntimeHelper.GetCallStack();
+            Debug.Log("Call stack: " + stack);
         }
         #endif
+
+
+#if dbg_level_2
+        private bool m_pendingReset;
+        private bool _pendingReset
+        {
+            get { return m_pendingReset; }
+            set
+            {
+                if (value)
+                    Debug.Log("Setting Reset Request to True! Came from: " + RuntimeHelper.GetCallStack());
+                m_pendingReset = value;
+            }
+        }
+#else
+        private bool _pendingReset;
+#endif
 
         public RabbitGUI()
         {
@@ -259,7 +254,7 @@ namespace Vexe.Editor.GUIs
                 if (_pendingReset || _nextControlIdx != _controls.Count || _nextBlockIdx != _blocks.Count)
                 {
                     #if dbg_level_1
-                    if (pendingResetRequest)
+                    if (_pendingReset)
                         Debug.Log("Resetting - Theres a reset request pending");
                     else Debug.Log("Resetting -  The number of controls/blocks drawn doesn't match the total number of controls/blocks");
                     #endif
@@ -332,7 +327,7 @@ namespace Vexe.Editor.GUIs
                 }
 
                 #if dbg_level_1
-                    Debug.Log("Created new block of type {0}. Blocks count {1}. Is pending reset? {2}".FormatWith(typeof(T).Name, _blocks.Count, pendingResetRequest));
+                    Debug.Log("Created new block of type {0}. Blocks count {1}. Is pending reset? {2}".FormatWith(typeof(T).Name, _blocks.Count, _pendingReset));
                 #endif
             }
             else
@@ -362,16 +357,12 @@ namespace Vexe.Editor.GUIs
                     #if dbg_level_1
                         Debug.Log("Result block is null. Count {0}, Idx {1}, Request type {2}".FormatWith(_blocks.Count, _nextBlockIdx, typeof(T).Name));
                         for (int i = 0; i < _blocks.Count; i++)
-                        {
                             Debug.Log("Block {0} at {1} has {2} controls".FormatWith(_blocks[i].data.type.ToString(), i, _blocks[i].controls.Count));
-                        }
 
                         Debug.Log("Block Stack count " + _blockStack.Count);
                         var array = _blockStack.ToArray();
                         for (int i = 0; i < array.Length; i++)
-                        {
                             Debug.Log("Block {0} at {1} has {2} controls".FormatWith(array[i].data.type.ToString(), i, array[i].controls.Count));
-                        }
                     #endif
 
                     throw new NullReferenceException("result");

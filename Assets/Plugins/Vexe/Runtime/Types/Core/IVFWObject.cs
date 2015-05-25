@@ -7,7 +7,7 @@ namespace Vexe.Runtime.Types
     {
         Type GetSerializerType();
         ISerializationLogic GetSerializationLogic();
-        RuntimeMember[] GetSerializableMembers();
+        RuntimeMember[] GetSerializedMembers();
         SerializationData GetSerializationData();
         int GetPersistentId();
         CategoryDisplay GetDisplayOptions();

@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using Vexe.Editor.Types;
@@ -18,11 +17,11 @@ namespace Vexe.Editor.Drawers
 	public abstract class SequenceDrawer<TSequence, TElement> : ObjectDrawer<TSequence> where TSequence : IList<TElement>
 	{
 		private readonly Type _elementType;
-		private int _advancedKey;
 		private List<EditorMember> _elements;
 		private SequenceOptions _options;
 		private bool _shouldDrawAddingArea;
 		private int _newSize;
+		private int _advancedKey;
         private Attribute[] _perItemAttributes;
         private TextFilter _filter;
 
@@ -60,7 +59,7 @@ namespace Vexe.Editor.Drawers
             }
 
             if (_options.Filter)
-                _filter = new TextFilter(null, id, null);
+                _filter = new TextFilter(null, id, true, null);
 		}
 
 		public override void OnGUI()
@@ -81,7 +80,7 @@ namespace Vexe.Editor.Drawers
                     _filter.Field(gui, 70f);
                 }
 
-				gui.FlexibleSpace();
+                gui.FlexibleSpace();
 
 				if (showAdvanced)
 					isAdvancedChecked = gui.CheckButton(isAdvancedChecked, "advanced mode");
@@ -100,7 +99,8 @@ namespace Vexe.Editor.Drawers
 				}
 			}
 
-			if (!foldout) return;
+			if (!foldout)
+                return;
 
 			if (memberValue.IsEmpty())
 			{
@@ -160,7 +160,7 @@ namespace Vexe.Editor.Drawers
 						var i = iLoop;
 						var elementValue = memberValue[i];
 
-                        if (_filter != null)
+                        if (_filter != null && elementValue != null)
                         {
                             string elemStr = elementValue.ToString();
                             if (!_filter.IsMatch(elemStr))
