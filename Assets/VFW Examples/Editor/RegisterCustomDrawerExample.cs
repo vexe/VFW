@@ -3,6 +3,8 @@ using UnityEditor;
 using Vexe.Editor;
 using Vexe.Editor.Drawers;
 using Vexe.Editor.Types;
+using System;
+using Vexe.Runtime.Types;
 
 namespace VFWExamples
 {
@@ -18,7 +20,8 @@ namespace VFWExamples
         {
             MemberDrawersHandler.Mapper.Insert<CustomObject, CustomDrawer1>()
                                        .Insert<OverrideAttribute, CustomDrawer2>()
-                                       .Insert<Index2D, CustomDrawer3>();
+                                       .Insert<Index2D, CustomDrawer3>()
+                                       .Insert<ComplexDrawingExample.Lookup, LookupDrawer>();
         }
     }
 
@@ -74,6 +77,58 @@ namespace VFWExamples
                     gui.Member(j);
                 }
             }
+        }
+    }
+
+    public class LookupDrawer : ObjectDrawer<ComplexDrawingExample.Lookup>
+    //public class LookupDrawer : IDictionaryDrawer<string, int>
+    {
+        // since our lookup 'is a' Dictionary, we will use a dictionary drawer
+        IDictionaryDrawer<string, int> drawer;
+
+        protected override void Initialize()
+        {
+            base.Initialize();
+
+            drawer = new IDictionaryDrawer<string, int>();
+
+            // Here we play our secret card showing the power of injecting attributes!
+            drawer.Initialize(member,
+                new Attribute[]
+                {
+                    new DisplayAttribute(Dict.HorizontalPairs), // apply horizontal display on the dictionary pairs
+                    new PerKeyAttribute("Popup"), // popup per key
+                    new PopupAttribute("LookupDrawer.GetValues")
+                    { 
+                        TextField = true, // we want a nice text field
+                        TakeLastPathItem = true, // since we're using '/' in our values, we only care about the last item in the path
+                        HideUpdate = true, // we don't care about updating the popup values
+                        Filter = true, // since we have many values, it'd be nice if we can filter them quickly
+                    },
+                }, gui);
+
+            if (memberValue == null)
+                memberValue = new ComplexDrawingExample.Lookup();
+        }
+
+        public override void OnGUI()
+        {
+            // our Lookup overrides ToString to display how many elements it has
+            // let's use that as our display text!
+            member.DisplayText = memberValue.ToString();
+
+            drawer.OnGUI();
+        }
+
+        static string[] GetValues()
+        {
+            return new string[]
+            {
+                "Weapons/Berreta", "Weapons/Shotgun", "Weapons/Grenade Launcher", "Weapons/Barry's Gun!", 
+                "Key Item/Manhole Opener", "Key Item/Blue Gem", "Key Item/Jill Sandwich", "Key Item/ Golden Emblem",
+                "Health/Green Herb", "Health/First Aid Spray", "Health/First Aid Kit", "Health/Syringe", 
+                "Ammo/Handgun Ammo", "Ammo/Shotgun Shells", "Ammo/Grenade Rounds", "Ammo/Magnum Ammo", 
+            };
         }
     }
 }
