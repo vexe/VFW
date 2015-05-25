@@ -40,7 +40,32 @@ namespace Vexe.Editor.Editors
         /// RabbitGUI (a fast custom gui layout system) which is meant to be the standard choice
         /// and TurtleGUI (wraps EditorGUILayout) meant as a fallback type/ worst case scenario/ last choice type of deal
         /// </summary>
-        protected BaseGUI gui;
+        protected BaseGUI gui
+        {
+            get
+            {
+                if (_gui == null)
+                {
+                    if (!_guiCache.TryGetValue(id, out _gui))
+                    {
+                        #if DBG
+                        Debug.Log("New gui instance for: " + target.GetType().Name);
+                        #endif
+                        _gui = useUnityGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI();
+                        _guiCache[id] = _gui;
+                    }
+                }
+                return _gui;
+            }
+            set
+            {
+                if (_gui == value)
+                    return;
+
+                _gui = value;
+                _guiCache[id] = value;
+            }
+        }
 
         /// <summary>
         /// The runtime type of the target object we're inspecting (the type always 'is a' Component)
@@ -68,11 +93,12 @@ namespace Vexe.Editor.Editors
         private List<MemberInfo> _visibleMembers;
         private SerializedProperty _script;
         private EditorMember _serializationData, _debug, _serializerType;
-        private bool _useUnityGUI;
         private int _repaintCount, _spacing;
         private CategoryDisplay _display;
         private Action _onGUIFunction;
         private string[] _membersDrawnByUnityLayout;
+        private BaseGUI _gui;
+        static Dictionary<int, BaseGUI> _guiCache = new Dictionary<int, BaseGUI>();
         static int guiKey = "UnityGUI".GetHashCode();
 
         /// <summary>
@@ -83,6 +109,7 @@ namespace Vexe.Editor.Editors
             typeof(UnityEngine.Events.UnityEventBase)
         };
 
+        //private bool _useUnityGUI;
         private static bool useUnityGUI
         {
             get { return prefs.Bools.ValueOrDefault(guiKey); }
@@ -110,8 +137,8 @@ namespace Vexe.Editor.Editors
 
             id = RuntimeHelper.GetTargetID(target);
 
-            _useUnityGUI = useUnityGUI;
-            gui = _useUnityGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI();
+            //_useUnityGUI = useUnityGUI;
+            //gui = _useUnityGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI();
 
             Initialize();
 
@@ -136,11 +163,11 @@ namespace Vexe.Editor.Editors
         public sealed override void OnInspectorGUI()
         {
             // update gui instance if it ever changes
-            if (_useUnityGUI != useUnityGUI)
-            {
-                _useUnityGUI = useUnityGUI;
-                gui = _useUnityGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI();
-            }
+            //if (_useUnityGUI != useUnityGUI)
+            //{
+            //    _useUnityGUI = useUnityGUI;
+            //    gui = _useUnityGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI();
+            //}
 
             // creating the delegate once, reducing allocation
             if (_onGUIFunction == null)
