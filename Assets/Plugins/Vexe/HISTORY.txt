@@ -290,7 +290,7 @@ _______________
 - Renamed OnBetterGUI in BaseEditor to OnGUI
 
 _______________
--- VFW 1.3. --
+-- VFW 1.3.0 --
 
 Source Control:
 - VFW is now on github!
@@ -333,3 +333,128 @@ Renamed:
 Improvements/Modifications:
 - DictionaryDrawer now works with any IDictionary
 - Seperated visibility attributes/logic from serialization attributes/logic
+
+_______________
+-- VFW 1.3.1 --
+
+- Fixed: serialization of interfaces/System.Objects with Unity object implementers/wrappers fail.
+- Fixed: editor doesn't show a save prompt when exiting scene after modifying a BetterBehaviour.
+- Fixed: non-serializable members by Unity are not reset when calling "Reset"
+- DictionaryDrawer now only supports ValueTypes or strings as keys. It's much simpler and less buggy now. No more 'W' button. If the key was an enum, everytime you click the '+' button I would add a unique value so that you don't have to add, modify then add etc. Same for ints, everytime you press I add 0, 1, 2 etc. It's much easier to use that way. For anyone that uses reference types as keys, there's no reason you couldn't just use an int, as the reference value would just be hashed as GetHashCode which is just an int. Ints, Enums and strings are the most common use-case after all.
+- Renamed niceName to displayText in BaseDrawer
+- Renamed XAttributeDrawer to XDrawer (ex PopupAttributeDrawer to PopupDrawer)
+- Renamed OnInternalInitialization to InternalInitialize and removed OnSingle/MultipleInitialization in BaseDrawer
+- Due to the one-to-one nature of the new mapping system, we can't use a single attribute for multiple drawers. For that reason we now have fRand/iRand instead of just Rand, iMax/fMax, iMin/fMin, fClamp/iClamp, BetterV2/V3 etc.
+- Better invalid cast errors catching in Runtime/EditorMember
+- Removed FormatMemberAttribute,FormatPairAttribute, DisplayOrderAttribute, SeqAttribute etc and combined all of them in DisplayAttribute from which you could customize the display text of your member, the display of your sequence, and the formatting of your dictionary pairs. See DisplayExample.cs
+- Added UIntDrawer
+
+_______________
+-- VFW 1.3.2 --
+
+HOT:
+- New binary serializer: FastSerializer! (See the notes regarding it at the end)
+- PerItem, PerKey and PerValue now let you explicitly define what attributes you want to apply per
+  array element and dictionary key/value! (See CollectionElementExample.cs)
+- FastReflection.dll and cause we went open source now! (Runtime/Library/Extensions/FastReflection.cs)
+- You can now override the default serialization logic with your own! (See SerializationLogicExample.cs)
+- You can also explicitly specify what members to serialize ignoring any logic (See SerializeExplicitMembersExample.cs)
+- You can change the serializer backend using the popup when collapsing the script header (please read the notes regarding FastSerializer before you do so)
+- Improved drawing for arrays, lists, dictionaries and popups! (Read on for more details)
+
+Core types changes:
+- Both BetterBehaviour and BetterScriptableObject now implement IVFWObject letting your override
+  which members to serialize, serialization logic, serializer backend type and category display
+  options!
+
+Fixed:
+- BetterPrefs dictionaries are null in rare cases when getting the BetterPrefs editor instance
+- RabbitGUI throws when starting empty blocks (horizontal/vertical)
+- Annotating with [Display] without specifying a display order was messing up the order for other members
+- Errors mapping NullableDrawer to Nullable types
+- Error in RecursiveDrawing showing methods in nested objects
+- Errors in BaseDrawer when passing null as the attribute array
+- Drawers might still be using a leaked BaseGUI instance. Now gui instances are cached so they're not allocated each time an editor is created.
+- DelegateDrawer: Fixed errors when first initializing drawer
+- DelegateDrawer: Took more precautions when dealing with method handlers (got reports of null methods in very rare cases)
+
+Popups:
+- Update button is hidden when using predetermined string values
+- Added new flags: TextField, Filter, TakeLastPathItem and HideUpdate (See ComplexDrawingExample.cs to see some of these options in action)
+
+DisplayAttribute:
+- Added 'FormatMethod' to dynamically update the text display for members (useful if you want to include the element count of your collections etc) (For more info on that see DisplayExample.cs and ComplexDrawingExample.cs)
+- It now inherits ShowAttribute! no need to redundantly annotate with both.
+- 'Dict' New display options: HideHeader, ForceExpand, HorizontalPairs and Filter (See ComplexDrawingExample.cs to see HorizontalPairs and Filter in action)
+- 'Seq' New display option: Filter
+
+GUI/Editor:
+- [Comment] is now applicable on methods!
+- Added the ability to draw things by Unity's Layout. Useful for UnityEvents etc. (See DrawnByUnityLayoutExample.cs)
+- Added TextFieldDropDown control
+- Added more GUIStyles to the static Styles (now renamed to GUIStyles) such as TextFieldDropDown and TextFieldDropDownText
+- Added a OnRepaint callback for windows to call their Repaint function when RabbitGUI does repaint
+- Control overloads:
+--- public bool Member(EditorMember, BaseDrawer)
+--- public UnityObject Object(UnityObject, Layout)
+--- public Object(string, UnityObject, Layout)
+--- public EnumPopup<T>(T)
+--- public Text(string value, Layout) overload
+- New drawers: LongDrawer and DoubleDrawer (for long and double data types)
+- VisibleWhen now works for arbitrary System.Objects and is now more sophisticated (See VisibleWhenExample.cs)
+- InlineDrawer: Replaced 'HideTarget' flag with 'HideButton' to hide/show the target instead of hiding it forever (See InlineExample.cs)
+- EditorMember takes an Attribute[] parameter allowing you to inject attributes that your member might not be annotated with!
+- Added support for hungarian notation in inspector (e.g. m_fValue/_fValue/fValue -> Value)
+    (You can enable that from VFWSettings.asset which you could get to via Tools/Vexe/VFWSettings)
+
+Helpers/Extensions:
+- Added HasFlag Enum extension method
+- Added Activate/Deactivate Transform extension methods
+- Added GetCurrentSceneName to RuntimeHelper
+- Added GetCallStack(bool verbose) in RuntimeHelper
+
+Other:
+- Changed 'ClearDrawerCache' menu path to go under Tools/Vexe/Debug
+- Added a custom enumerator struct for KVPList (plays nice with FastSerializer)
+- Cleaned up editor warnings
+- Moved Editor Extensions/Helper under Editor/Library consistent with their runtime counterpart
+- Dictionary header will expand if it's not already when adding new pairs
+
+Known issues:
+- FastReflection: Incorrect method call generation when target is 'object' (weakly typed)
+
+
+Regarding FastSerializer:
+- DISCLAIMER: THIS IS STILL AN ALPHA BUILD.
+              I DO NOT RECOMMEND USING IT FOR PRODUCTION YET!
+              I'M NOT RESPONSIBLE FOR ANY DATA LOSS IF YOU DECIDED TO DO SO.
+
+- I recommend you stick with FullSerializer until FastSerializer reaches a stable usable state
+- It emits IL to generate the serialization codes. You could emit that code to memory, or to a DLL
+  and dynamically bind to it if you're targetting AOT platforms. But will you be limited to having only public fields/properties!
+- It is mainly intended to be used in my Fast.Save project as a fast binary serializer to save
+  GameObjects/Components etc but I wanted to see how well it will do in VFW.
+- It will be open source once it's in a state I'm happy with
+- It is included as a DLL because it uses unsafe code to write simple data types (you could still
+  view the code in ILSpy if you're curious).
+- It is designed with raw speed, minimal metadata usage and high customizability in mind!
+- Inspired by protobuf-net, NETSerializer and FullSerializer
+- By default, it serializes objects and strings 'by reference' and not 'by value'
+- Lets you inject your own serialization logic/predicates specifying when a type/field/property is serializable
+- Supports serializing instance/static fields and properties
+- Supports the following types:
+- byte, sbyte, byte[], bool, int, uint, short, ushort, long, ulong, float, double, char, string, DateTime,
+  enums, Guid, Arrays (1d/2d), Generics: List, Dictionary, Stack, Queue, HashSet, Nullable,
+  Metadata: Type, FieldInfo, PropertyInfo, MethodInfo, custom classes/structs
+- Does not require your types to have any special attributes (although you could do that with your own custom predicates)
+- Just like NETSerializer and Protobuf it must know about the types it's working with in advance
+- Serialization callbacks are supported via attributes (OnSerializing, OnSerialized, OnDeserializing and
+  OnDeserialized under System.Runtime.Serialization)
+- The backend in VFW will attempt to find all the runtime types in your project and generate the
+  serialization code necessary for them. So it will take a second or so when you first switch to
+  FastSerializer backend in the script popup.
+- No examples are supported yet on how to compile and bind to a DLL yet, this is to emphasise
+  the fact that I don't want users now to use it in production, cause I'm not sure it's ready yet.
+- To enable it, you can use the backend popup under the script header, or override GetSerializerType
+  and return typeof(ALPHA_FastSerializer); - If you ever decided to do so please let me know if you
+  come across any bugs. - Have fun!
