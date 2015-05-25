@@ -93,7 +93,10 @@ namespace Vexe.Editor.Drawers
                     if (method.ReturnType != typeof(string) && method.GetParameters().Length > 0)
                         Debug.Log("Format Method should return a string and take no parameters: " + method);
                     else
+                    { 
                         _dynamicFormatter = method.DelegateForCall<object, string>();
+                        displayText = _dynamicFormatter(rawTarget, null);
+                    }
                 }
             }
 
