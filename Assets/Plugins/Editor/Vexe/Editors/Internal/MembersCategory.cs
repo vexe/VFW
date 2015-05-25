@@ -72,7 +72,7 @@ namespace Vexe.Editor.Internal
             using (gui.Horizontal(boxed ? GUIStyles.ToolbarButton : GUIStyle.none))
             {
                 gui.Space(10f);
-                foldout = gui.Foldout(Name, _prefs.Bools.ValueOrDefault(_id, true), Layout.sExpandWidth());
+                foldout = gui.Foldout(Name, _prefs.Bools.ValueOrDefault(_id, true), Layout.Auto);
                 _prefs.Bools[_id] = foldout;
             }
 

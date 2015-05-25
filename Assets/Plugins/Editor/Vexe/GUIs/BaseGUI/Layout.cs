@@ -14,8 +14,14 @@ namespace Vexe.Editor
 		public float? maxHeight   { get; set; }
 		public float? maxWidth    { get; set; }
 
-		public static List<GUILayoutOption> sharedGLOptions;
+        /// <summary>
+        /// Return Auto layout (null) to tell the layout system to figure out the control dimensions itself
+        /// </summary>
+        public static readonly Layout Auto = null;
+
 		public static readonly Layout None;
+
+		public static List<GUILayoutOption> SharedGLOptions;
 
 		public static Layout sWidth(float w)
 		{
@@ -29,12 +35,14 @@ namespace Vexe.Editor
 
 		public static Layout sExpandWidth(bool exp = true)
 		{
-			return new Layout { expandWidth = exp };
+            Debug.LogWarning("ExpandWidth is not implemented, it won't do anything. Returning Auto layout");
+            return Auto;
 		}
 
 		public static Layout sExpandHeight(bool exp = true)
 		{
-			return new Layout { expandHeight = exp };
+            Debug.LogWarning("ExpandHeight is not implemented, it won't do anything. Returning Auto layout");
+            return Auto;
 		}
 
 		public Layout Width(float w)
@@ -51,19 +59,19 @@ namespace Vexe.Editor
 
 		public Layout ExpandWidth(bool exp = true)
 		{
-			expandWidth = exp;
-			return this;
+            Debug.LogWarning("ExpandWidth is not implemented, it won't do anything. Returning Auto layout");
+			return Auto;
 		}
 
 		public Layout ExpandHeight(bool exp = true)
 		{
-			expandHeight = exp;
-			return this;
+            Debug.LogWarning("ExpandHeight is not implemented, it won't do anything. Returning Auto layout");
+            return Auto;
 		}
 
 		static Layout()
 		{
-			sharedGLOptions = new List<GUILayoutOption>();
+			SharedGLOptions = new List<GUILayoutOption>();
 			None = new Layout();
 		}
 
@@ -79,22 +87,22 @@ namespace Vexe.Editor
 		{
 			if (option == null) return null;
 			if (option.width.HasValue)
-				Layout.sharedGLOptions.Add(GUILayout.Width(option.width.Value));
+				Layout.SharedGLOptions.Add(GUILayout.Width(option.width.Value));
 			if (option.height.HasValue)
-				Layout.sharedGLOptions.Add(GUILayout.Height(option.height.Value));
+				Layout.SharedGLOptions.Add(GUILayout.Height(option.height.Value));
 			if (option.minHeight.HasValue)
-				Layout.sharedGLOptions.Add(GUILayout.MinHeight(option.minHeight.Value));
+				Layout.SharedGLOptions.Add(GUILayout.MinHeight(option.minHeight.Value));
 			if (option.minWidth.HasValue)
-				Layout.sharedGLOptions.Add(GUILayout.MinWidth(option.minWidth.Value));
+				Layout.SharedGLOptions.Add(GUILayout.MinWidth(option.minWidth.Value));
 			if (option.maxHeight.HasValue)
-				Layout.sharedGLOptions.Add(GUILayout.MaxHeight(option.maxHeight.Value));
+				Layout.SharedGLOptions.Add(GUILayout.MaxHeight(option.maxHeight.Value));
 			if (option.maxWidth.HasValue)
-				Layout.sharedGLOptions.Add(GUILayout.MaxWidth(option.maxWidth.Value));
+				Layout.SharedGLOptions.Add(GUILayout.MaxWidth(option.maxWidth.Value));
 			if (option.expandHeight.HasValue)
-				Layout.sharedGLOptions.Add(GUILayout.ExpandHeight(option.expandHeight.Value));
+				Layout.SharedGLOptions.Add(GUILayout.ExpandHeight(option.expandHeight.Value));
 			if (option.expandWidth.HasValue)
-				Layout.sharedGLOptions.Add(GUILayout.ExpandWidth(option.expandWidth.Value));
-			return Layout.sharedGLOptions.ToArray(); // TODO: Garbage!
+				Layout.SharedGLOptions.Add(GUILayout.ExpandWidth(option.expandWidth.Value));
+			return Layout.SharedGLOptions.ToArray(); // TODO: Garbage!
 		}
 	}
 }

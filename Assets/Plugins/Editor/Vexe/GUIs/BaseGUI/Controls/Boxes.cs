@@ -25,7 +25,7 @@ namespace Vexe.Editor.GUIs
 
 		public void Splitter(float thickness)
 		{
-			Box(string.Empty, Layout.sExpandWidth(true).Height(thickness));
+			Box(string.Empty, Layout.sHeight(thickness));
 		}
 
 		public void Splitter()

@@ -109,7 +109,7 @@ namespace Vexe.Editor.Drawers
                     if (_options.ForceExpand)
                         gui.Label(displayText);
                     else
-                        foldout = gui.Foldout(displayText, foldout, Layout.sExpandWidth());
+                        foldout = gui.Foldout(displayText, foldout, Layout.Auto);
 
                     if (_options.Filter)
                     {
@@ -178,7 +178,7 @@ namespace Vexe.Editor.Drawers
                         {
                             if (pairStr == null)
                                 pairStr = FormatPair(dKey, dValue);
-                            foldouts[entryKey] = gui.Foldout(pairStr, foldouts[entryKey], Layout.sExpandWidth());
+                            foldouts[entryKey] = gui.Foldout(pairStr, foldouts[entryKey], Layout.Auto);
                         }
 
                         #if PROFILE

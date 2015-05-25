@@ -73,7 +73,7 @@ namespace Vexe.Editor.Drawers
 			// header
 			using (gui.Horizontal())
 			{
-				foldout = gui.Foldout(displayText, foldout, Layout.sExpandWidth());
+				foldout = gui.Foldout(displayText, foldout, Layout.Auto);
 
                 if (_options.Filter)
                 {

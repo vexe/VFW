@@ -66,7 +66,7 @@ namespace Vexe.Editor.Drawers
 
         public override void OnGUI()
         {
-            foldout = gui.Foldout(kHeaderStr, foldout, Layout.sExpandWidth());
+            foldout = gui.Foldout(kHeaderStr, foldout, Layout.Auto);
             if (!foldout) return;
 
             if (memberValue == null)
@@ -319,7 +319,7 @@ namespace Vexe.Editor.Drawers
 
         public override void OnGUI()
         {
-            foldout = gui.Foldout(kHeaderStr, foldout, Layout.sExpandWidth());
+            foldout = gui.Foldout(kHeaderStr, foldout, Layout.Auto);
             if (!foldout) return;
 
             if (memberValue == null)

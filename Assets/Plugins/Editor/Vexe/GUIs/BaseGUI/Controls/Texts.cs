@@ -11,7 +11,7 @@ namespace Vexe.Editor.GUIs
 
 		public string Text(string label, string value)
 		{
-			return Text(label, value, (Layout)null);
+			return Text(label, value, Layout.Auto);
 		}
 
 		public string Text(string value, Layout option)
@@ -26,7 +26,7 @@ namespace Vexe.Editor.GUIs
 
 		public string Text(string label, string value, string tooltip)
 		{
-			return Text(label, value, tooltip, null);
+			return Text(label, value, tooltip, Layout.Auto);
 		}
 
 		public string Text(string label, string value, string tooltip, Layout option)
