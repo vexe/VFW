@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -13,6 +14,33 @@ namespace Vexe.Runtime.Helpers
 {
     public static class RuntimeHelper
     {
+        public static string GetCallStack()
+        {
+            return GetCallStack(false);
+        }
+
+        public static string GetCallStack(bool verbose)
+        {
+            if (verbose)
+            {
+                return string.Join(" -> \r\n", new StackTrace()
+                             .GetFrames()
+                             .Select(x =>
+                             {
+                                 var method = x.GetMethod();
+                                 return string.Format("{0}.{1}",
+                                     method.DeclaringType.GetNiceName(),
+                                     x.GetMethod().GetNiceName());
+                             })
+                             .ToArray());
+            }
+
+            return string.Join(" -> ", new StackTrace()
+                         .GetFrames()
+                         .Select(x => x.GetMethod().Name)
+                         .ToArray());
+        }
+
         public static void Swap<T>(ref T value0, ref T value1)
         {
             T tmp = value0;

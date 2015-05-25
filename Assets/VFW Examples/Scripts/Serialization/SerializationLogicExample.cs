@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Vexe.Runtime.Extensions;
+using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Serialization;
 using Vexe.Runtime.Types;
 
@@ -32,11 +33,8 @@ namespace VFWExamples
             {
                 // Let's put a log so we get feedback when deserializing
                 // I chose to print the call stack for fun!
-                var stack = string.Join(" -> ", new StackTrace().GetFrames()
-                                                                .Select(x => x.GetMethod().Name)
-                                                                .ToArray());
+                string stack = RuntimeHelper.GetCallStack();
                 print("Property set call stack: " + stack);
-
                 _backingField = value;
             }
         }
