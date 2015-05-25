@@ -30,6 +30,7 @@ namespace Vexe.Editor.Drawers
 
         private bool _hasInit;
         private MethodCaller<object, string> _dynamicFormatter;
+        private static Attribute[] Empty = new Attribute[0];
 
         protected bool foldout
         {
@@ -56,6 +57,9 @@ namespace Vexe.Editor.Drawers
 
         public BaseDrawer Initialize(EditorMember member, Attribute[] attributes, BaseGUI gui)
         {
+            if (attributes == null)
+                attributes = Empty;
+
             this.member     = member;
             this.attributes = attributes;
             this.gui        = gui;
