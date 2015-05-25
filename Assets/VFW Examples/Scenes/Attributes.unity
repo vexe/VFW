@@ -98,7 +98,6 @@ GameObject:
   - 33: {fileID: 6841606}
   - 65: {fileID: 6841605}
   - 23: {fileID: 6841604}
-  - 114: {fileID: 6841603}
   m_Layer: 0
   m_Name: Cube
   m_TagString: EditorOnly
@@ -106,30 +105,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &6841603
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 6841602}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1e8f0a92cc4bc440a05173f34f340d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _serializationData:
-    serializedObjects: []
-    serializedStrings:
-      keys:
-      - string playerTag
-      - Vector3[] vectors
-      values:
-      - CQAAAAAAAAAAAAAAAA==
-      - eAAAAAAAAAAAAAAAAA==
-  _id: 7906
-  dbg: 0
-  playerTag: 
-  vectors: []
 --- !u!23 &6841604
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -220,9 +195,12 @@ MonoBehaviour:
       - string playerTag
       - string enemyTag
       values:
-      - YAAAAAAAAAA=
-      - CQAAAAAAAAAAAAAAAA==
-      - CQAAAAAAAAAADAAAAFAAbABhAHkAZQByAA==
+      - '"None"'
+      - '""'
+      - '"Player"'
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 7918
   dbg: 0
   jumpKey: 0
@@ -308,12 +286,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _serializationData:
-    serializedObjects: []
+    serializedObjects:
+    - {fileID: 6841602}
     serializedStrings:
       keys:
       - GameObject dragMe1
       values:
-      - UwAAAAAAAAAA
+      - 0
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 7930
   dbg: 0
   dragMe1: {fileID: 6841602}
@@ -348,14 +330,22 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
+      - GameObject[] gameObjs
       - int secret
       - DisplayOrderExample example
+      - string[] array
       values:
-      - BgAAAAAAAAA=
-      - agAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////wAAAAAAAAAAAAAAAAAAAAA=
+      - '[]'
+      - 0
+      - '{"three":0,"one":0,"four":0,"zero":0,"two":0,"five":{"seven":0.0,"six":null,"eight":{"r":0.0,"g":0.0,"b":0.0,"a":0.0},"nine":0.0,"ten":null}}'
+      - '[]'
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: -25674
   dbg: 0
   secret: 0
+  array: []
 --- !u!4 &284458400
 Transform:
   m_ObjectHideFlags: 0
@@ -427,6 +417,9 @@ MonoBehaviour:
     serializedStrings:
       keys: []
       values: []
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: -1
   dbg: 0
   rb: {fileID: 0}
@@ -504,9 +497,14 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
+      - string P2
       - string p1
       values:
-      - CQAAAAAAAAAAAAAAAA==
+      - '""'
+      - '""'
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 7954
   dbg: 0
   p1: 
@@ -533,7 +531,7 @@ GameObject:
   - 114: {fileID: 450988471}
   m_Layer: 0
   m_Name: OnChanged
-  m_TagString: Finish
+  m_TagString: Respawn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -553,14 +551,17 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
-      - string playerTag
       - Vector3[] vectors
+      - Dictionary<string, Vector3> dictionary
       values:
-      - CQAAAAEAAAAADAAAAEYAaQBuAGkAcwBoAA==
-      - eAAAAAAAAAAAAAAAAA==
-  _id: 7960
+      - '[]'
+      - '{}'
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  _id: -841684
   dbg: 0
-  playerTag: Finish
+  playerTag: 
   vectors: []
 --- !u!4 &450988472
 Transform:
@@ -569,8 +570,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 450988470}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.38, y: -1.34000003, z: 0}
-  m_LocalScale: {x: 1.12, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 16
@@ -615,6 +616,116 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &512946316
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 512946318}
+  - 114: {fileID: 512946317}
+  m_Layer: 0
+  m_Name: CustomDisplayOptions
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &512946317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 512946316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75368a9404816be49918e3349f1c6e94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _serializationData:
+    serializedObjects: []
+    serializedStrings:
+      keys:
+      - int we
+      - int are
+      - int split
+      values:
+      - 0
+      - 0
+      - 0
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  _id: -779826
+  dbg: 0
+  we: 0
+  are: 0
+  split: 0
+--- !u!4 &512946318
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 512946316}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.26006269, y: -1.18430376, z: 7.46875}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 26
+--- !u!1 &608316550
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 608316552}
+  - 114: {fileID: 608316551}
+  m_Layer: 0
+  m_Name: ComplexDrawing
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &608316551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 608316550}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccb0a97c0ffac0542855933348c464b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _serializationData:
+    serializedObjects: []
+    serializedStrings:
+      keys:
+      - Lookup[] ComplexArray
+      values:
+      - '[{"First Aid Spray":0,"Shotgun Shells":0},{"Barry''s Gun!":0,"Berreta":0,"Jill
+        Sandwich":0}]'
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  _id: -800880
+  dbg: 0
+--- !u!4 &608316552
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 608316550}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.26006269, y: -1.18430376, z: 7.46875}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 25
 --- !u!1 &624373765
 GameObject:
   m_ObjectHideFlags: 0
@@ -661,11 +772,79 @@ MonoBehaviour:
       - Permissions Permission
       - KeyCode actionKey
       values:
-      - bgAAAAAAAAA=
-      - YAAAAFwAAAA=
+      - '""'
+      - '"Backslash"'
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 7974
   dbg: 0
   actionKey: 92
+--- !u!1 &722374464
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 722374466}
+  - 114: {fileID: 722374465}
+  m_Layer: 0
+  m_Name: DrawnByUnity
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &722374465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 722374464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea1d62f41d49e85449f6404173528452, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _serializationData:
+    serializedObjects: []
+    serializedStrings:
+      keys:
+      - Index2D drawnByVfwLayout
+      - Index2D drawnByUnityLayout
+      - UnityEvent callback
+      values:
+      - '{"i":0,"j":0}'
+      - '{"i":0,"j":0}'
+      - '{"m_PersistentCalls":{"m_Calls":{"$content":[]}},"m_TypeName":"UnityEngine.Events.UnityEvent,
+        UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"}'
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  _id: -783542
+  dbg: 0
+  drawnByVfwLayout:
+    i: 0
+  drawnByUnityLayout:
+    i: 0
+  callback:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+--- !u!4 &722374466
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 722374464}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.26006269, y: -1.18430376, z: 7.46875}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 27
 --- !u!1 &728338951
 GameObject:
   m_ObjectHideFlags: 0
@@ -702,10 +881,13 @@ MonoBehaviour:
       - Vector2 vector2Field
       - Vector3 vector3Field
       values:
-      - WAAAAAAAAAAAAAAA
-      - WQAAAAAAAAAAAAAAAAAAAA==
-      - WAAAAIXrUUCkcIVA
-      - WQAAAD0KB0CPwvU9H4WrPw==
+      - '{"x":0.0,"y":0.0}'
+      - '{"x":0.0,"y":0.0,"z":0.0}'
+      - '{"x":3.27999997138977,"y":4.17000007629395}'
+      - '{"x":2.10999989509583,"y":0.119999997317791,"z":1.3400000333786}'
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 7978
   dbg: 0
   vector2Field: {x: 3.27999997, y: 4.17000008}
@@ -766,6 +948,9 @@ MonoBehaviour:
     serializedStrings:
       keys: []
       values: []
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 16306
   dbg: 0
 --- !u!1 &779312377
@@ -799,18 +984,27 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
-      - int number
-      - Color bigColor
-      - Color smallColor
+      - int value
+      - int member1
+      - int member2
+      - int member3
+      - bool Flag1
       values:
-      - BgAAAFX///8=
-      - WwAAAAAAAAAAAAAAAAAAAAAAAAA=
-      - WwAAAAAAAAAAAAAAAAAAAAAAAAA=
+      - 0
+      - 0
+      - 0
+      - 0
+      - false
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 7990
   dbg: 0
-  number: -171
-  bigColor: {r: 0, g: 0, b: 0, a: 0}
-  smallColor: {r: 0, g: 0, b: 0, a: 0}
+  value: 0
+  member1: 0
+  member2: 0
+  member3: 0
+  Flag1: 0
 --- !u!4 &779312379
 Transform:
   m_ObjectHideFlags: 0
@@ -868,19 +1062,22 @@ MonoBehaviour:
       - Color dbgColor
       - float dbgFloat
       values:
-      - OAAAAAAAAAA=
-      - OAAAAAAAAAA=
-      - OAAAAAAAAAA=
-      - CQAAAAAAAAAAAAAAAA==
-      - CQAAAAAAAAAAAAAAAA==
-      - CQAAAAAAAAAAAAAAAA==
-      - CQAAAAAAAAAAAAAAAA==
-      - CQAAAAAAAAAAAAAAAA==
-      - BgAAAAAAAAA=
-      - BgAAAAAAAAA=
-      - BgAAAAAAAAA=
-      - WwAAAAAAAAAAAAAAAAAAAAAAAAA=
-      - OAAAAAAAAAA=
+      - 0.0
+      - 0.0
+      - 0.0
+      - '""'
+      - '""'
+      - '""'
+      - '""'
+      - '""'
+      - 0
+      - 0
+      - 0
+      - '{"r":0.0,"g":0.0,"b":0.0,"a":0.0}'
+      - 0.0
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 7996
   dbg: 0
   nonExString1: 
@@ -948,15 +1145,22 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
+      - string Factor
+      - string[] EnemyTags
       - string strings
       - string playerTag
       - string[] items
       - SomeStruct someObj
       values:
-      - CQAAAAAAAAAADgAAAFMAdAByAGkAbgBnADEA
-      - CQAAAAAAAAAAFAAAAE0AYQBpAG4AQwBhAG0AZQByAGEA
-      - JgAAAAAAAAAAAAAAAA==
-      - fQAAAP////8=
+      - '""'
+      - '[]'
+      - '"String1"'
+      - '"MainCamera"'
+      - '[]'
+      - '{"factor":null}'
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 8010
   dbg: 0
   strings: String1
@@ -1008,11 +1212,14 @@ MonoBehaviour:
       - int RandomIntProperty
       - float randomFloat
       values:
-      - BgAAAAAAAAA=
-      - OAAAAOeiS0E=
+      - 20
+      - 12.5683193206787
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 8016
   dbg: 0
-  randomFloat: 12.7272711
+  randomFloat: 12.5683193
 --- !u!1 &1118903888
 GameObject:
   m_ObjectHideFlags: 0
@@ -1060,7 +1267,10 @@ MonoBehaviour:
       keys:
       - KeyCode jumpKey
       values:
-      - YAAAAAAAAAA=
+      - '"None"'
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: -1
   dbg: 0
   boxCollider: {fileID: 0}
@@ -1096,11 +1306,16 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
+      - string FullPath
       - string simplePath
       - string someAssetPath
       values:
-      - CQAAAAAAAAAAAAAAAA==
-      - CQAAAAAAAAAAAAAAAA==
+      - '""'
+      - '""'
+      - '""'
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 8026
   dbg: 0
   simplePath: 
@@ -1148,6 +1363,7 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
+      - string StringProperty
       - int IntProperty
       - float FloatProperty
       - bool BoolProperty
@@ -1163,20 +1379,24 @@ MonoBehaviour:
       - int[] intArray
       - bool[] boolArray
       values:
-      - BgAAAAAAAAA=
-      - OAAAAAAAAAA=
-      - GAAAAAA=
-      - WQAAAAAAAAAAAAAAAAAAAA==
-      - XwAAAAAAAAAAAAAAAA==
-      - JgAAAAAAAAAAAAAAAA==
-      - BgAAAAoAAAA=
-      - CQAAAAAAAAAAAAAAAA==
-      - BgAAAAoAAAA=
-      - OAAAAAAALEE=
-      - WAAAAAAAgD8AAABA
-      - YAAAACAAAAA=
-      - PwAAAAMAAAAAAAAAAAEAAAACAAAAAwAAAA==
-      - YQAAAAQAAAAAAAAAAAEBAAE=
+      - '""'
+      - 0
+      - 0.0
+      - false
+      - '{"x":0.0,"y":0.0,"z":0.0}'
+      - '[]'
+      - '[]'
+      - 10
+      - '""'
+      - 10
+      - 10.75
+      - '{"x":1.0,"y":2.0}'
+      - '"Space"'
+      - '[1,2,3]'
+      - '[true,true,false,true]'
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 8032
   dbg: 0
   defIntX: 10
@@ -1270,11 +1490,20 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
+      - List<GameObject> Gos
+      - List<string> Strings
+      - List<Vector3> BetterVectors
       - Transform[] transforms
       - string[] tags
       values:
-      - iAAAAAAAAAAAAAAAAA==
-      - JgAAAAIAAAAAAAAAAAAAAAAAHAAAAEcAYQBtAGUAQwBvAG4AdAByAG8AbABsAGUAcgABAAAAAAwAAABGAGkAbgBpAHMAaAA=
+      - '{"$content":[]}'
+      - '{"$content":[]}'
+      - '{"$content":[]}'
+      - '[]'
+      - '["GameController","Finish"]'
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 8044
   dbg: 0
   transforms: []
@@ -1369,6 +1598,9 @@ MonoBehaviour:
     serializedStrings:
       keys: []
       values: []
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 8056
   dbg: 0
 --- !u!4 &1475129519
@@ -1383,6 +1615,75 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
+--- !u!1 &1496115291
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1496115293}
+  - 114: {fileID: 1496115292}
+  m_Layer: 0
+  m_Name: PerElementDrawing
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1496115292
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1496115291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cc149338cddc904a9be71b746aeab06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _serializationData:
+    serializedObjects: []
+    serializedStrings:
+      keys:
+      - string[] array1
+      - string[] array2
+      - string[] array3
+      - List<KeyCode> list
+      - Dictionary<string, int> dictionary
+      values:
+      - '["",""]'
+      - '["","Finish"]'
+      - '["EditorOnly","Player"]'
+      - '{"$content":[]}'
+      - '{"Alex":0}'
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  _id: -793096
+  dbg: 0
+  array1:
+  - 
+  - 
+  array2:
+  - 
+  - Finish
+  array3:
+  - EditorOnly
+  - Player
+  list: 
+--- !u!4 &1496115293
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1496115291}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.26006269, y: -1.18430376, z: 7.46875}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 28
 --- !u!1 &1617788407
 GameObject:
   m_ObjectHideFlags: 0
@@ -1416,7 +1717,10 @@ MonoBehaviour:
       keys:
       - string scene
       values:
-      - CQAAAAAAAAAAAAAAAA==
+      - '""'
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 8062
   dbg: 0
   scene: 
@@ -1513,15 +1817,18 @@ MonoBehaviour:
       - float clampedFloat
       - string mustStartWithName
       values:
-      - OAAAAAAAAAA=
-      - BgAAAAAAAAA=
-      - BgAAAAAAAAA=
-      - CQAAAAAAAAAAAAAAAA==
-      - BgAAAGQAAAA=
-      - OAAAAAAAwD8=
-      - CQAAAAAAAAAAAAAAAA==
-      - OAAAAAAAwD8=
-      - CQAAAAAAAAAAAAAAAA==
+      - 0.0
+      - 0
+      - 3
+      - '""'
+      - 100
+      - 1.5
+      - '""'
+      - 1.5
+      - '""'
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 8080
   dbg: 0
   ip: 
@@ -1564,11 +1871,14 @@ MonoBehaviour:
       - int IntSlider
       - float floatSlider
       values:
-      - BgAAAAAAAAA=
-      - OAAAAOF6lEA=
+      - 3
+      - 2.73000001907349
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 8084
   dbg: 0
-  floatSlider: 4.63999987
+  floatSlider: 2.73000002
 --- !u!4 &1853462117
 Transform:
   m_ObjectHideFlags: 0
@@ -1612,9 +1922,14 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
+      - string SomeString
       - int SomeInt
       values:
-      - BgAAAAAAAAA=
+      - '""'
+      - 0
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 8090
   dbg: 0
 --- !u!4 &1856093237
@@ -1683,14 +1998,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _serializationData:
-    serializedObjects: []
+    serializedObjects:
+    - {fileID: 6841604}
+    - {fileID: 1877090479}
     serializedStrings:
       keys:
       - MeshRenderer meshrend
       - BoxCollider col
       values:
-      - cwAAAAAAAAAA
-      - dgAAAAAAAAAA
+      - 0
+      - 1
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 8100
   dbg: 0
   trans: {fileID: 0}
@@ -1712,12 +2032,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _serializationData:
-    serializedObjects: []
+    serializedObjects:
+    - {fileID: 1357484841}
     serializedStrings:
       keys:
       - GameObject target
       values:
-      - UwAAAAAAAAAA
+      - 0
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 8102
   dbg: 0
   target: {fileID: 1357484841}
@@ -1837,11 +2161,16 @@ MonoBehaviour:
     serializedObjects: []
     serializedStrings:
       keys:
+      - string[] Variables
       - string isDeadVar
       - string anotherVar
       values:
-      - CQAAAAAAAAAADAAAAEkAcwBEAGUAYQBkAA==
-      - CQAAAAAAAAAACgAAAFMAcABlAGUAZAA=
+      - '[]'
+      - '"IsDead"'
+      - '"Speed"'
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   _id: 8118
   dbg: 0
   isDeadVar: IsDead

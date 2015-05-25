@@ -18,7 +18,13 @@ namespace VFWExamples
 
         // although we haven't specified a FormatMethod, Display is smart enough to find this method
         // and use it to format the Lookups array cause it uses the naming convention: FormatX where X is the member name
-        string FormatComplexArray() { return "Complex Array (" + ComplexArray.Length + ")"; }
+        string FormatComplexArray()
+        {
+            if (ComplexArray == null)
+                ComplexArray = new Lookup[0];
+
+            return "Complex Array (" + ComplexArray.Length + ")";
+        }
 
         public class Lookup : Dictionary<string, int>
         {

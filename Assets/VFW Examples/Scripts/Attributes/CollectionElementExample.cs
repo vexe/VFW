@@ -32,6 +32,9 @@ namespace VFWExamples
 
         string FormatDictionary()
         {
+            if (dictionary == null)
+                dictionary = new Dictionary<string, int>();
+
             return "Lookup (Count: " + dictionary.Count + ")";
         }
 

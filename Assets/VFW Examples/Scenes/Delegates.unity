@@ -213,6 +213,7 @@ MonoBehaviour:
       - uAction[] actions0
       - List<uAction<string>> actions1
       - Dictionary<string, List<uAction>> dict
+      - uDelegate kickass
       values:
       - '{"handlers":{"$content":[]}}'
       - '{"handlers":{"$content":[]}}'
@@ -225,7 +226,11 @@ MonoBehaviour:
       - '[]'
       - '{"$content":[]}'
       - '{}'
-  _id: -1
+      - '{"arguments":{"$content":[]},"handlers":{"$content":[]}}'
+  _serializerType:
+    _name: Vexe.Runtime.Serialization.FullSerializerBackend, Assembly-CSharp-firstpass,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  _id: 14172
   dbg: 0
 --- !u!4 &693730688
 Transform:

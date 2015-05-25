@@ -4,8 +4,7 @@ using Vexe.Runtime.Types;
 
 namespace VFWExamples
 {
-	
-	public class NullablesExample : BetterBehaviour
+	public class NullablesExample : CachedBehaviour
 	{
 		[Whitespace(Top = 20f)]
 		public int? nullableIntField;
