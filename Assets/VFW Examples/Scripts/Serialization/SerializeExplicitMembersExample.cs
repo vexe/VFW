@@ -24,7 +24,8 @@ namespace VFWExamples
 
         public GameObject serialized3;
 
-        // [Serialize] here has no effect because this member is not specified in GetSerializableMembers
+        // [Serialize] here has no effect because this member
+        // is not specified in GetSerializableMembers
         [Show, Serialize] public float nonSerialized1;
 
         [Show] public double nonSerialized2;

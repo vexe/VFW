@@ -81,7 +81,6 @@ namespace VFWExamples
     }
 
     public class LookupDrawer : ObjectDrawer<ComplexDrawingExample.Lookup>
-    //public class LookupDrawer : IDictionaryDrawer<string, int>
     {
         // since our lookup 'is a' Dictionary, we will use a dictionary drawer
         IDictionaryDrawer<string, int> drawer;
