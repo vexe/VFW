@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEditor;
+using UnityEngine;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Types;
@@ -78,17 +80,21 @@ namespace Vexe.Editor.Types
         private EditorMember(MemberInfo memberInfo, Type memberType, string memberName,
             object rawTarget, UnityObject unityTarget, int targetId, Attribute[] attributes)
 		{
+            if (attributes == null)
+                attributes = Empty;
+            else ResolveUsing(ref attributes);
+
             Info         = memberInfo;
             Type         = memberType;
             RawTarget    = rawTarget;
             Name         = memberName;
             TypeNiceName = memberType.GetNiceName();
             UnityTarget  = unityTarget;
-            Attributes   = attributes ?? Empty;
+            Attributes   = attributes;
 
             string displayFormat = null;
 
-            var displayAttr = Attributes.GetAttribute<DisplayAttribute>();
+            var displayAttr = attributes.GetAttribute<DisplayAttribute>();
             if (displayAttr != null)
                 displayFormat = displayAttr.FormatLabel;
 
@@ -116,6 +122,62 @@ namespace Vexe.Editor.Types
 
             Id = RuntimeHelper.CombineHashCodes(targetId, TypeNiceName, DisplayText);
 		}
+
+        private void ResolveUsing(ref Attribute[] attributes)
+        {
+            var idx = attributes.IndexOf(x => x.GetType() == typeof(UsingAttribute));
+            if (idx == -1)
+                return;
+
+            var usingAttr = attributes[idx] as UsingAttribute;
+
+            FieldInfo field;
+            var path = usingAttr.Path;
+            var period = path.IndexOf('.');
+            if (period == -1) // find field in [AttributeContainer] classes
+            {
+                field = ReflectionHelper.GetAllTypes()
+                                        .Where(t => t.IsDefined<AttributeContainer>())
+                                        .SelectMany(t => t.GetFields(Flags.StaticAnyVisibility))
+                                        .FirstOrDefault(f => f.Name == path);
+                if (field == null)
+                {
+                    Debug.Log("Couldn't find field: " + path + " in any [AttributeContainer] marked class");
+                    return;
+                }
+            }
+            else
+            {
+                var typeName = path.Substring(0, period);
+                var container = ReflectionHelper.GetAllTypes().FirstOrDefault(x => x.Name == typeName);
+                if (container == null)
+                {
+                    Debug.Log("Couldn't find type: " + typeName);
+                    return;
+                }
+
+                var fieldName = path.Substring(period + 1);
+                field = container.GetField(fieldName, Flags.StaticAnyVisibility);
+                if (field == null)
+                {
+                    Debug.Log("Couldn't find static field: " + fieldName + " inside: " + typeName);
+                    return;
+                }
+            }
+
+            if (field.FieldType != typeof(Attribute[]))
+            {
+                Debug.Log("Field must be of type Attribute[] " + field.Name);
+                return;
+            }
+
+            var imported = field.GetValue(null) as Attribute[];
+
+            var tmp = attributes.ToList();
+            tmp.AddRange(imported);
+            tmp.RemoveAt(idx);
+            attributes = tmp.ToArray();
+        }
 
         public object Get()
         {
