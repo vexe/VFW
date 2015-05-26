@@ -43,7 +43,7 @@ namespace Vexe.Editor.Drawers
 
             _buttonStyle = attribute.Style;
 
-            float width = GUIStyles.Button.CalcSize(new GUIContent(attribute.DisplayText)).x;
+            float width = _buttonStyle.CalcSize(new GUIContent(attribute.DisplayText)).x;
             _buttonLayout = Layout.sWidth(width);
         }
 

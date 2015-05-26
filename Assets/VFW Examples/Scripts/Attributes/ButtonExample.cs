@@ -18,7 +18,8 @@ namespace VFWExamples
 
         public struct ButtonStruct
         {
-            [PerItem, Button("LogGO", "Log"), Button("ResetPos", "Reset")]
+            [PerItem, Button("LogGO", "Log"),
+                      Button("ResetPos", "Reset")]
             public GameObject[] gos;
 
             void ResetPos(GameObject go)
