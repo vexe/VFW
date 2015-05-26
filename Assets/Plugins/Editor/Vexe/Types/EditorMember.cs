@@ -77,6 +77,8 @@ namespace Vexe.Editor.Types
 		private SetVarOp<object> _setVar;
         private static Attribute[] Empty = new Attribute[0];
 
+        public readonly HashSet<Attribute> InitializedComposites = new HashSet<Attribute>();
+
         private EditorMember(MemberInfo memberInfo, Type memberType, string memberName,
             object rawTarget, UnityObject unityTarget, int targetId, Attribute[] attributes)
 		{

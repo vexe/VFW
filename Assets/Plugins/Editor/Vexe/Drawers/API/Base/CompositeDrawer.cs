@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using UnityEngine;
 using Vexe.Editor.Types;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
@@ -17,7 +19,19 @@ namespace Vexe.Editor.Drawers
 
 		protected sealed override void InternalInitialize()
 		{
-			attribute = attributes.GetAttribute<A>();
+            attribute = attributes.OfType<A>()
+                                  .OrderBy(x => x.id)
+                                  .FirstOrDefault(x => !member.InitializedComposites.Contains(x));
+
+            if (attribute == null)
+            { 
+                Debug.LogError("Requesting a composite attribute ({0}) from attributes that all have been initialized! This should not happen, please report it"
+                     .FormatWith(typeof(T).GetNiceName()));
+
+                attribute = attributes.GetAttribute<A>();
+            }
+
+            member.InitializedComposites.Add(attribute);
 		}
 
 		public sealed override void OnGUI()
