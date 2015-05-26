@@ -29,6 +29,11 @@ namespace Vexe.Editor.GUIs
 			return Button(text, tooltip, style, null);
 		}
 
+		public bool Button(string text, string tooltip, Layout layout)
+        {
+            return Button(text, tooltip, GUIStyles.Button, layout);
+        }
+
 		public bool Button(string text, Layout option)
 		{
 			return Button(text, GUIStyles.Button, option);
