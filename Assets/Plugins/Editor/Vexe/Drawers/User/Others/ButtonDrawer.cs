@@ -26,6 +26,19 @@ namespace Vexe.Editor.Drawers
                 return;
             }
 
+            var parameters = method.GetParameters();
+            if (parameters.Length > 1)
+            {
+                Debug.LogError("Button method {0} must take no more than one parameter!".FormatWith(attribute.Method));
+                return;
+            }
+
+            if (!parameters[0].ParameterType.IsA(memberType))
+            {
+                Debug.LogError("Button method ({0}) parameter must be of a '{1}' type".FormatWith(attribute.Method, memberType.GetNiceName()));
+                return;
+            }
+
             _callback = method.DelegateForCall();
 
             _buttonStyle = attribute.Style;

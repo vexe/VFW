@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using Vexe.Runtime.Types;
 
 namespace VFWExamples
