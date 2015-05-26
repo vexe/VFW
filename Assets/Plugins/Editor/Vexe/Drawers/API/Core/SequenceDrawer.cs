@@ -23,6 +23,7 @@ namespace Vexe.Editor.Drawers
 		private bool _shouldDrawAddingArea;
 		private int _newSize;
 		private int _advancedKey;
+        private int _lastUpdatedCount;
         private Attribute[] _perItemAttributes;
         private TextFilter _filter;
         private string _originalDisplay;
@@ -67,8 +68,6 @@ namespace Vexe.Editor.Drawers
 
 			if (memberValue == null)
 				memberValue = GetNew();
-
-            UpdateCountDisplay();
 		}
 
 		public override void OnGUI()
@@ -76,7 +75,12 @@ namespace Vexe.Editor.Drawers
 			if (memberValue == null)
             { 
 				memberValue = GetNew();
-                UpdateCountDisplay();
+            }
+
+            if (_lastUpdatedCount != memberValue.Count)
+            {
+                _lastUpdatedCount = memberValue.Count;
+                displayText = Regex.Replace(_originalDisplay, @"\$count", _lastUpdatedCount.ToString());
             }
 
 			bool showAdvanced = _options.Advanced && !_options.Readonly;
@@ -99,21 +103,12 @@ namespace Vexe.Editor.Drawers
 					using (gui.State(memberValue.Count > 0))
 					{
 						if (gui.ClearButton("elements"))
-                        {
                             Clear();
-                            UpdateCountDisplay();
-                        }
                         if (gui.RemoveButton("last element"))
-                        {
                             RemoveLast();
-                            UpdateCountDisplay();
-                        }
                     }
                     if (gui.AddButton("element", MiniButtonStyle.ModRight))
-                    {
                         AddValue();
-                        UpdateCountDisplay();
-                    }
 				}
 			}
 
@@ -141,10 +136,7 @@ namespace Vexe.Editor.Drawers
 							if (gui.MiniButton("c", "Commit", MiniButtonStyle.ModRight))
 							{
 								if (_newSize != memberValue.Count)
-                                { 
 									memberValue.AdjustSize(_newSize, RemoveAt, AddValue);
-                                    UpdateCountDisplay();
-                                }
 							}
 						}
 
@@ -247,10 +239,7 @@ namespace Vexe.Editor.Drawers
 							}
 
 							if (!_options.Readonly && _options.PerItemRemove && gui.RemoveButton("element", MiniButtonStyle.ModRight))
-							{
 								RemoveAt(i);
-                                UpdateCountDisplay();
-							}
 						}
 					}
 #if PROFILE
@@ -330,11 +319,6 @@ namespace Vexe.Editor.Drawers
 			e.InitializeIList(memberValue, index, rawTarget, unityTarget);
 			return e;
 		}
-
-        private void UpdateCountDisplay()
-        {
-            displayText = Regex.Replace(_originalDisplay, @"\$count", memberValue.Count.ToString());
-        }
 
 		// List ops
 		#region

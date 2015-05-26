@@ -26,6 +26,7 @@ namespace Vexe.Editor.Drawers
         private TextFilter _filter;
         private string _originalDisplay;
         private IDictionary<TK, TV> _temp;
+        private int _lastUpdatedCount;
 
         protected override void Initialize()
         {
@@ -72,19 +73,12 @@ namespace Vexe.Editor.Drawers
             if (memberValue == null)
                 memberValue = memberType.Instance<IDictionary<TK, TV>>();
 
-            UpdateCountDisplay(memberValue);
-
             _temp = memberType.Instance<IDictionary<TK, TV>>();
 
             #if DBG
             Log("Dictionary drawer Initialized (" + dictionaryName + ")");
             #endif
 
-        }
-
-        private void UpdateCountDisplay(IDictionary<TK, TV> value)
-        {
-            displayText = Regex.Replace(_originalDisplay, @"\$count", value.Count.ToString());
         }
 
         public override void OnGUI()
@@ -97,9 +91,12 @@ namespace Vexe.Editor.Drawers
             }
 
             if (memberValue == null)
-            { 
                 memberValue = memberType.Instance<IDictionary<TK, TV>>();
-                UpdateCountDisplay(memberValue);
+
+            if (_lastUpdatedCount != memberValue.Count)
+            { 
+                _lastUpdatedCount = memberValue.Count;
+                displayText = Regex.Replace(_originalDisplay, @"\$count", _lastUpdatedCount.ToString());
             }
 
             if (_kvpList == null)
@@ -140,23 +137,14 @@ namespace Vexe.Editor.Drawers
                         using (gui.State(_kvpList.Count > 0))
                         {
                             if (gui.ClearButton("dictionary"))
-                            { 
                                 _kvpList.Clear();
-                                UpdateCountDisplay(_kvpList);
-                            }
 
                             if (gui.RemoveButton("last dictionary pair"))
-                            { 
                                 _kvpList.RemoveFirst();
-                                UpdateCountDisplay(_kvpList);
-                            }
                         }
 
                         if (gui.AddButton("pair", MiniButtonStyle.ModRight))
-                        { 
                             AddNewPair();
-                            UpdateCountDisplay(_kvpList);
-                        }
                     }
                 }
 
