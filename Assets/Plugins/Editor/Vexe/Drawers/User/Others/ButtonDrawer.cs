@@ -8,7 +8,7 @@ namespace Vexe.Editor.Drawers
     {
         private MethodCaller<object, object> _callback;
         private Layout _buttonLayout;
-        private GUIStyle _buttonStyle;
+        private GUIStyle _buttonStyle = GUIStyles.Button;
         private static object[] _args = new object[1];
 
         protected override void Initialize()
