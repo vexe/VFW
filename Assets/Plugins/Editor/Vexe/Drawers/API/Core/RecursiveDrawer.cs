@@ -255,13 +255,8 @@ namespace Vexe.Editor.Drawers
 
         public static bool DrawRecursive(ref object target, BaseGUI gui, int id, UnityObject unityTarget, params string[] memberNames)
         {
-            // in order to determine the visibility of a member, we need to know if it's serializable or not
-            // target could be a Component (came from InlineDrawer for ex)
-            // in that case it doesn't implement IVFWObject, so we just set the serialized array to null
-            // and then the visibility logic will use the default vfw serialization logic
-            // otherwise whatever serialized members that object specifies
             RuntimeMember[] serialized = null;
-            var vfwObj = unityTarget as IVFWObject;
+            var vfwObj = target as IVFWObject;
             if (vfwObj != null)
                 serialized = vfwObj.GetSerializedMembers();
 

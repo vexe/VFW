@@ -15,15 +15,26 @@ namespace Vexe.Editor.Visibility
         public static readonly VisibilityAttributes Attributes;
 
         static readonly Func<Tuple<Type, RuntimeMember[]>, List<MemberInfo>> _cachedGetVisibleMembers;
+        static readonly Func<Type, List<MemberInfo>> _cachedGetDefaultVisibleMembers;
 
         public static List<MemberInfo> CachedGetVisibleMembers(Type type, RuntimeMember[] serialized)
         {
+            if (serialized == null)
+                return _cachedGetDefaultVisibleMembers(type);
             return _cachedGetVisibleMembers(Tuple.Create(type, serialized));
         }
 
         static VisibilityLogic()
         {
             Attributes = VisibilityAttributes.Default;
+
+            _cachedGetDefaultVisibleMembers = new Func<Type, List<MemberInfo>>(type =>
+            {
+                return ReflectionHelper.CachedGetMembers(type)
+                                       .Where(x => IsVisibleMember(x, null))
+                                       .OrderBy<MemberInfo, float>(GetMemberDisplayOrder)
+                                       .ToList();
+            }).Memoize();
 
             _cachedGetVisibleMembers = new Func<Tuple<Type, RuntimeMember[]>, List<MemberInfo>>(tup =>
             {
