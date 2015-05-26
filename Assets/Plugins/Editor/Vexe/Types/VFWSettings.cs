@@ -13,8 +13,8 @@ namespace Vexe.Editor.Types
         //const string kFullSerializer = "Full Serializer (JSON)";
 
         const string kDefaultMemberFormat = "$nicename";
-        const string kDefaultSequenceFormat = "$nicename ($nicetype)";
-        const string kDefaultDictionaryFormat = "$nicename ($nicetype)";
+        const string kDefaultSequenceFormat = "$nicename ($count)";
+        const string kDefaultDictionaryFormat = "$nicename ($count)";
 
         [Comment("Omit the type prefix in the member display. Eg m_fValue/_fValue/fValue will be displayed as Value")]
         public bool UseHungarianNotation;
@@ -31,7 +31,7 @@ namespace Vexe.Editor.Types
         [Serialize, Hide] string _sequenceFormat = kDefaultSequenceFormat;
         [Serialize, Hide] string _dictionaryFormat = kDefaultDictionaryFormat;
 
-        [Comment("The following are formatting options for sequences (array/list), dictionaries and general members. Available patterns are $nicename, $name, $type and $nicetype")]
+        [Comment("The following are formatting options for sequences (array/list), dictionaries and general members. Available patterns are $nicename, $name, $type and $nicetype. Note that they might not apply immediately on existing scripts till the next assembly reload")]
         [Show] public string MemberFormat
         {
             get { return GetFormat(ref _memberFormat, kDefaultMemberFormat); }
@@ -80,7 +80,7 @@ namespace Vexe.Editor.Types
         //        bso[i].SerializerType = SerializerPopup.StartsWith("Fast") ? typeof(ALPHA_FastSerializerBackend) : typeof(FullSerializerBackend);
         //}
 
-        [Show]
+        [Show, Comment("Resets all settings to their defaults")]
         public override void Reset()
         {
             _memberFormat = kDefaultMemberFormat;

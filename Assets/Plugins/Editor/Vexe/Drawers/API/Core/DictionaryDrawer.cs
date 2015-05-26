@@ -24,6 +24,8 @@ namespace Vexe.Editor.Drawers
         private string _formatPairPattern;
         private bool _invalidKeyType;
         private TextFilter _filter;
+        private string _originalDisplay;
+        private IDictionary<TK, TV> _temp;
 
         protected override void Initialize()
         {
@@ -62,13 +64,27 @@ namespace Vexe.Editor.Drawers
             if (_options.Readonly)
                 displayText += " (Readonly)";
 
+            _originalDisplay = displayText;
+
             if (_options.Filter)
                 _filter = new TextFilter(null, id, null);
+
+            if (memberValue == null)
+                memberValue = memberType.Instance<IDictionary<TK, TV>>();
+
+            UpdateCountDisplay(memberValue);
+
+            _temp = memberType.Instance<IDictionary<TK, TV>>();
 
             #if DBG
             Log("Dictionary drawer Initialized (" + dictionaryName + ")");
             #endif
 
+        }
+
+        private void UpdateCountDisplay(IDictionary<TK, TV> value)
+        {
+            displayText = Regex.Replace(_originalDisplay, @"\$count", value.Count.ToString());
         }
 
         public override void OnGUI()
@@ -81,7 +97,10 @@ namespace Vexe.Editor.Drawers
             }
 
             if (memberValue == null)
+            { 
                 memberValue = memberType.Instance<IDictionary<TK, TV>>();
+                UpdateCountDisplay(memberValue);
+            }
 
             if (_kvpList == null)
                 _kvpList = new KVPList<TK, TV>();
@@ -112,10 +131,7 @@ namespace Vexe.Editor.Drawers
                         foldout = gui.Foldout(displayText, foldout, Layout.Auto);
 
                     if (_options.Filter)
-                    {
-                        gui.Space(-10f);
                         _filter.Field(gui, 70f);
-                    }
 
                     if (!_options.Readonly)
                     {
@@ -124,14 +140,23 @@ namespace Vexe.Editor.Drawers
                         using (gui.State(_kvpList.Count > 0))
                         {
                             if (gui.ClearButton("dictionary"))
+                            { 
                                 _kvpList.Clear();
+                                UpdateCountDisplay(_kvpList);
+                            }
 
                             if (gui.RemoveButton("last dictionary pair"))
+                            { 
                                 _kvpList.RemoveFirst();
+                                UpdateCountDisplay(_kvpList);
+                            }
                         }
 
                         if (gui.AddButton("pair", MiniButtonStyle.ModRight))
+                        { 
                             AddNewPair();
+                            UpdateCountDisplay(_kvpList);
+                        }
                     }
                 }
 
@@ -226,13 +251,15 @@ namespace Vexe.Editor.Drawers
                         {
                             memberValue.Add(key, value);
                         }
-                        catch (ArgumentException)
+                        catch (ArgumentException) //@Todo: figure out a more forgiveful way to handle this
                         {
                             Log("Key already exists: " + key);
                         }
                     }
                 }
+                #if PROFILE
                 Profiler.EndSample();
+                #endif
             }
         }
 

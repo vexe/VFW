@@ -1,7 +1,6 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using Vexe.Runtime.Types;
-using System.Collections.Generic;
 
 namespace VFWExamples
 {
@@ -15,34 +14,19 @@ namespace VFWExamples
         // See how the drawer is implemented and mapped in RegisterCustomDrawerExample.cs
         [Display(Seq.LineNumbers | Seq.Filter), PerItem("Whitespace"), Whitespace(Left = 5f)]
         public Lookup[] ComplexArray;
+    }
 
-        // although we haven't specified a FormatMethod, Display is smart enough to find this method
-        // and use it to format the Lookups array cause it uses the naming convention: FormatX where X is the member name
-        string FormatComplexArray()
+    public class Lookup : Dictionary<string, int>
+    {
+        public new int this[string key]
         {
-            if (ComplexArray == null)
-                ComplexArray = new Lookup[0];
-
-            return "Complex Array (" + ComplexArray.Length + ")";
-        }
-
-        public class Lookup : Dictionary<string, int>
-        {
-            public new int this[string key]
+            set { base[key] = value; }
+            get
             {
-                set { base[key] = value; }
-                get
-                {
-                    int value;
-                    if (!TryGetValue(key, out value))
-                        return 0;
-                    return value;
-                }
-            }
-
-            public override string ToString()
-            {
-                return "Lookup (" + Count + ")";
+                int value;
+                if (!TryGetValue(key, out value))
+                    return 0;
+                return value;
             }
         }
     }

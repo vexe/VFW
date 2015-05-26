@@ -1,9 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
 using UnityEditor;
 using Vexe.Editor;
 using Vexe.Editor.Drawers;
 using Vexe.Editor.Types;
-using System;
 using Vexe.Runtime.Types;
 
 namespace VFWExamples
@@ -21,7 +20,7 @@ namespace VFWExamples
             MemberDrawersHandler.Mapper.Insert<CustomObject, CustomDrawer1>()
                                        .Insert<OverrideAttribute, CustomDrawer2>()
                                        .Insert<Index2D, CustomDrawer3>()
-                                       .Insert<ComplexDrawingExample.Lookup, LookupDrawer>();
+                                       .Insert<Lookup, LookupDrawer>();
         }
     }
 
@@ -80,7 +79,7 @@ namespace VFWExamples
         }
     }
 
-    public class LookupDrawer : ObjectDrawer<ComplexDrawingExample.Lookup>
+    public class LookupDrawer : ObjectDrawer<Lookup>
     {
         // since our lookup 'is a' Dictionary, we will use a dictionary drawer
         IDictionaryDrawer<string, int> drawer;
@@ -105,16 +104,12 @@ namespace VFWExamples
                         Filter = true, // since we have many values, it'd be nice if we can filter them quickly
                     },
                 }, gui);
-
-            if (memberValue == null)
-                memberValue = new ComplexDrawingExample.Lookup();
         }
 
         public override void OnGUI()
         {
-            // our Lookup overrides ToString to display how many elements it has
-            // let's use that as our display text!
-            member.DisplayText = memberValue.ToString();
+            if (memberValue == null)
+                memberValue = new Lookup();
 
             drawer.OnGUI();
         }

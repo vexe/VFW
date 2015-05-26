@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using Vexe.Editor.Types;
@@ -24,6 +25,7 @@ namespace Vexe.Editor.Drawers
 		private int _advancedKey;
         private Attribute[] _perItemAttributes;
         private TextFilter _filter;
+        private string _originalDisplay;
 
 		private bool isAdvancedChecked
 		{
@@ -42,12 +44,12 @@ namespace Vexe.Editor.Drawers
 		protected override void Initialize()
 		{
 			var displayAttr = attributes.GetAttribute<DisplayAttribute>();
-			_options        = new SequenceOptions(displayAttr != null ? displayAttr.SeqOpt : Seq.None);
+			_options = new SequenceOptions(displayAttr != null ? displayAttr.SeqOpt : Seq.None);
 
             if (_options.Readonly)
                 displayText += " (Readonly)";
 
-			_advancedKey          = RuntimeHelper.CombineHashCodes(id, "advanced");
+			_advancedKey = RuntimeHelper.CombineHashCodes(id, "advanced");
 			_shouldDrawAddingArea = !_options.Readonly && _elementType.IsA<UnityObject>();
 
             var perItem = attributes.GetAttribute<PerItemAttribute>();
@@ -60,12 +62,22 @@ namespace Vexe.Editor.Drawers
 
             if (_options.Filter)
                 _filter = new TextFilter(null, id, true, null);
+
+            _originalDisplay = displayText;
+
+			if (memberValue == null)
+				memberValue = GetNew();
+
+            UpdateCountDisplay();
 		}
 
 		public override void OnGUI()
 		{
 			if (memberValue == null)
+            { 
 				memberValue = GetNew();
+                UpdateCountDisplay();
+            }
 
 			bool showAdvanced = _options.Advanced && !_options.Readonly;
 
@@ -75,10 +87,7 @@ namespace Vexe.Editor.Drawers
 				foldout = gui.Foldout(displayText, foldout, Layout.Auto);
 
                 if (_options.Filter)
-                {
-                    gui.Space(-10f);
                     _filter.Field(gui, 70f);
-                }
 
                 gui.FlexibleSpace();
 
@@ -90,12 +99,21 @@ namespace Vexe.Editor.Drawers
 					using (gui.State(memberValue.Count > 0))
 					{
 						if (gui.ClearButton("elements"))
-							Clear();
-						if (gui.RemoveButton("last element"))
-							RemoveLast();
-					}
-					if (gui.AddButton("element", MiniButtonStyle.ModRight))
-						AddValue();
+                        {
+                            Clear();
+                            UpdateCountDisplay();
+                        }
+                        if (gui.RemoveButton("last element"))
+                        {
+                            RemoveLast();
+                            UpdateCountDisplay();
+                        }
+                    }
+                    if (gui.AddButton("element", MiniButtonStyle.ModRight))
+                    {
+                        AddValue();
+                        UpdateCountDisplay();
+                    }
 				}
 			}
 
@@ -123,7 +141,10 @@ namespace Vexe.Editor.Drawers
 							if (gui.MiniButton("c", "Commit", MiniButtonStyle.ModRight))
 							{
 								if (_newSize != memberValue.Count)
+                                { 
 									memberValue.AdjustSize(_newSize, RemoveAt, AddValue);
+                                    UpdateCountDisplay();
+                                }
 							}
 						}
 
@@ -228,6 +249,7 @@ namespace Vexe.Editor.Drawers
 							if (!_options.Readonly && _options.PerItemRemove && gui.RemoveButton("element", MiniButtonStyle.ModRight))
 							{
 								RemoveAt(i);
+                                UpdateCountDisplay();
 							}
 						}
 					}
@@ -309,6 +331,11 @@ namespace Vexe.Editor.Drawers
 			return e;
 		}
 
+        private void UpdateCountDisplay()
+        {
+            displayText = Regex.Replace(_originalDisplay, @"\$count", memberValue.Count.ToString());
+        }
+
 		// List ops
 		#region
 		protected abstract void Clear();
@@ -361,6 +388,7 @@ namespace Vexe.Editor.Drawers
 			public readonly bool GuiBox;
 			public readonly bool UniqueItems;
             public readonly bool Filter;
+            public readonly bool ShowType;
 
 			public SequenceOptions(Seq options)
 			{
@@ -371,6 +399,7 @@ namespace Vexe.Editor.Drawers
 				GuiBox        = options.HasFlag(Seq.GuiBox);
 				UniqueItems   = options.HasFlag(Seq.UniqueItems);
                 Filter        = options.HasFlag(Seq.Filter);
+                ShowType      = options.HasFlag(Seq.ShowType);
 			}
 		}
 	}
