@@ -42,7 +42,6 @@ namespace Vexe.Editor
 
 			drawers = new List<BaseDrawer>();
 
-
             var applied = GetAppliedAttributes(member.Type, attributes);
 			if (applied != null)
 			{

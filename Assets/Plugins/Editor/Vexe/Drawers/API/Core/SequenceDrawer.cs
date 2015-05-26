@@ -388,7 +388,6 @@ namespace Vexe.Editor.Drawers
 			public readonly bool GuiBox;
 			public readonly bool UniqueItems;
             public readonly bool Filter;
-            public readonly bool ShowType;
 
 			public SequenceOptions(Seq options)
 			{
@@ -399,7 +398,6 @@ namespace Vexe.Editor.Drawers
 				GuiBox        = options.HasFlag(Seq.GuiBox);
 				UniqueItems   = options.HasFlag(Seq.UniqueItems);
                 Filter        = options.HasFlag(Seq.Filter);
-                ShowType      = options.HasFlag(Seq.ShowType);
 			}
 		}
 	}

@@ -12,7 +12,7 @@ namespace Vexe.Runtime.Types
 	/// </summary>
 	public abstract class CompositeAttribute : Attribute
 	{
-		public int id { get; set; }
+		public int id;
 
 		public CompositeAttribute()
 		{
