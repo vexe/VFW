@@ -65,7 +65,7 @@ namespace Vexe.Editor.Drawers
         {
             try
             {
-                return Regex.IsMatch(input, _pattern);
+                return Regex.IsMatch(input, _pattern, RegexOptions.IgnoreCase);
             }
             catch
             {
