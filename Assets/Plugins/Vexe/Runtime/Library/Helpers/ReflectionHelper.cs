@@ -168,5 +168,13 @@ namespace Vexe.Runtime.Helpers
         {
             return GetAllUserTypesOf(wantedType).Concat(GetAllUnityEngineTypesOf(wantedType)).ToArray();
         }
+
+        /// <summary>
+        /// Returns all types in all assemblies in the current domain
+        /// </summary>
+        public static IEnumerable<Type> GetAllTypes()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes());
+        }
     }
 }
