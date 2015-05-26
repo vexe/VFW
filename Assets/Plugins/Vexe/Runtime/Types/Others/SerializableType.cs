@@ -18,7 +18,11 @@ namespace Vexe.Runtime.Types
             get
             {
                 if(_value == null)
+                { 
                     _value = Type.GetType(_name);
+                    if (_value == null)
+                        Debug.Log("Couldn't load type: " + _name);
+                }
                 return _value;
             }
             set

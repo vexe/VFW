@@ -40,7 +40,14 @@ namespace Vexe.Runtime.Types
                     }
                     _serializerType = new SerializableType(type);
                 }
-                return _serializerType.Value;
+
+                var result = _serializerType.Value;
+                if (result == null)
+                { 
+                    result = GetSerializerType();
+                    _serializerType = new SerializableType(result);
+                }
+                return result;
             }
             set
             {
