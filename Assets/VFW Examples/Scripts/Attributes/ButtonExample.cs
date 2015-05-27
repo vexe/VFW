@@ -10,11 +10,19 @@ namespace VFWExamples
          Button(1, "Log3", "3", "miniButtonRight")]
         public int value;
 
+        [PerItem, Button("Add")]
+        public Component[] array;
+
         public ButtonStruct test;
 
         void Log1(int x) { Log("1: " + x); }
         void Log2(int x) { Log("2: " + x); }
         void Log3(int x) { Log("3: " + x); }
+
+        void Add(Component element, int index)
+        {
+            array[index] = GetComponent<Transform>();
+        }
 
         public struct ButtonStruct
         {

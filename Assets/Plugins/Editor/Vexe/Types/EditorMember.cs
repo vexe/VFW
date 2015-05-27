@@ -68,8 +68,8 @@ namespace Vexe.Editor.Types
         private MemberSetter<object, object> _memberSetter;
         private MemberGetter<object, object> _memberGetter;
 
-		private IList _list;
-		private int _index;
+		public IList ListValue;
+		public int ListIndex = -1;
 
 		private static BetterUndo _undo = new BetterUndo();
 		private double _undoTimer, _undoLastTime;
@@ -318,8 +318,8 @@ namespace Vexe.Editor.Types
 
 		public void InitializeIList<T>(IList<T> list, int index, object rawTarget, UnityObject unityTarget)
 		{
-			_list = list as IList;
-			_index = index;
+			ListValue = list as IList;
+			ListIndex = index;
 			RawTarget = rawTarget;
 			UnityTarget = unityTarget;
 		}
@@ -335,12 +335,12 @@ namespace Vexe.Editor.Types
 
 		private object GetListElement()
 		{
-			return _list[_index];
+			return ListValue[ListIndex];
 		}
 
 		private void SetListElement(object value)
 		{
-			_list[_index] = value;
+			ListValue[ListIndex] = value;
 		}
 
         private object GetWrappedMemberValue()

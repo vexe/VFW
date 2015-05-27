@@ -9,6 +9,11 @@ namespace Vexe.Runtime.Types
         public readonly string DisplayText;
         public readonly string Style;
 
+        public ButtonAttribute(string method)
+            : this (method, method)
+        {
+        }
+
         public ButtonAttribute(string method, string displayText)
             : this(-1, method, displayText)
         {
