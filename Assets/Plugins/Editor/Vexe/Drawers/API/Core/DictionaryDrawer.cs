@@ -26,7 +26,7 @@ namespace Vexe.Editor.Drawers
         private TextFilter _filter;
         private string _originalDisplay;
         private IDictionary<TK, TV> _temp;
-        private int _lastUpdatedCount;
+        private int _lastUpdatedCount = -1;
 
         protected override void Initialize()
         {

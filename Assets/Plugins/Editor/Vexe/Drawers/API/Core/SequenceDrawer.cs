@@ -23,7 +23,7 @@ namespace Vexe.Editor.Drawers
 		private bool _shouldDrawAddingArea;
 		private int _newSize;
 		private int _advancedKey;
-        private int _lastUpdatedCount;
+        private int _lastUpdatedCount = -1;
         private Attribute[] _perItemAttributes;
         private TextFilter _filter;
         private string _originalDisplay;
