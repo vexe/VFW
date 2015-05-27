@@ -30,7 +30,7 @@ namespace Vexe.Editor.Drawers
             }
 
             var parameters = method.GetParameters();
-            if (member.ListIndex == -1) // is this not a member of a sequence?
+            if (member.ElementIndex == -1) // is this not a member of a sequence?
             { 
                 if (parameters.Length != 1)
                 {
@@ -85,7 +85,7 @@ namespace Vexe.Editor.Drawers
                 else
                 {
                     _2param[0] = memberValue;
-                    _2param[1] = member.ListIndex;
+                    _2param[1] = member.ElementIndex;
                     _callback(rawTarget, _2param);
                 }
             }
