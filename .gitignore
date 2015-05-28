@@ -6,7 +6,7 @@ Assets/Plugins/Editor/UnityVS*
 *Temp*
 Obj/
 UnityGenerated/
-Library/
+/Library/
 Assets/AssetStoreTools*
 
 ExportedObj/
