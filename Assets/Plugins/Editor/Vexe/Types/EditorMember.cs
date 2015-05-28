@@ -335,6 +335,8 @@ namespace Vexe.Editor.Types
 
 		private object GetListElement()
 		{
+            if (ElementIndex < 0 || ElementIndex >= Elements.Count)
+                return null;
 			return Elements[ElementIndex];
 		}
 

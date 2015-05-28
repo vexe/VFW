@@ -21,7 +21,6 @@ namespace Vexe.Editor.Drawers
 
     public class InlineDrawer : CompositeDrawer<UnityObject, InlineAttribute>
     {
-        private bool hideTarget;
         private List<bool> expandValues;
 
         public bool GuiBox;
