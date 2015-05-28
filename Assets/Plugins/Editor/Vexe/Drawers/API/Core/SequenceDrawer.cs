@@ -28,6 +28,8 @@ namespace Vexe.Editor.Drawers
         private TextFilter _filter;
         private string _originalDisplay;
 
+        public bool UpdateCount = true;
+
 		private bool isAdvancedChecked
 		{
 			get { return prefs.Bools.ValueOrDefault(_advancedKey); }
@@ -77,7 +79,7 @@ namespace Vexe.Editor.Drawers
 				memberValue = GetNew();
             }
 
-            if (_lastUpdatedCount != memberValue.Count)
+            if (UpdateCount && _lastUpdatedCount != memberValue.Count)
             {
                 _lastUpdatedCount = memberValue.Count;
                 displayText = Regex.Replace(_originalDisplay, @"\$count", _lastUpdatedCount.ToString());

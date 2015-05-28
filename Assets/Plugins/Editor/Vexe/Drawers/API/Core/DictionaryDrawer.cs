@@ -28,6 +28,8 @@ namespace Vexe.Editor.Drawers
         private IDictionary<TK, TV> _temp;
         private int _lastUpdatedCount = -1;
 
+        public bool UpdateCount = true;
+
         protected override void Initialize()
         {
             _invalidKeyType = !typeof(TK).IsValueType && typeof(TK) != typeof(string);
@@ -68,7 +70,7 @@ namespace Vexe.Editor.Drawers
             _originalDisplay = displayText;
 
             if (_options.Filter)
-                _filter = new TextFilter(null, id, null);
+                _filter = new TextFilter(null, id, true, null);
 
             if (memberValue == null)
                 memberValue = memberType.Instance<IDictionary<TK, TV>>();
@@ -93,7 +95,7 @@ namespace Vexe.Editor.Drawers
             if (memberValue == null)
                 memberValue = memberType.Instance<IDictionary<TK, TV>>();
 
-            if (_lastUpdatedCount != memberValue.Count)
+            if (UpdateCount && _lastUpdatedCount != memberValue.Count)
             { 
                 _lastUpdatedCount = memberValue.Count;
                 displayText = Regex.Replace(_originalDisplay, @"\$count", _lastUpdatedCount.ToString());
