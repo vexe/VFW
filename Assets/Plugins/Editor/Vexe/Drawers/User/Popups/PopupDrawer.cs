@@ -1,11 +1,11 @@
-﻿#define PROFILE
+﻿//#define PROFILE
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using UnityEngine;
 using Vexe.Runtime.Extensions;
+using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Types;
 
 namespace Vexe.Editor.Drawers
@@ -49,9 +49,8 @@ namespace Vexe.Editor.Drawers
 					else // populate from type (member should be static)
 					{
 						var typeName = split[0];
-						populateFrom = AppDomain.CurrentDomain.GetAssemblies()
-											.SelectMany(x => x.GetTypes())
-											.FirstOrDefault(x => x.Name == typeName);
+						populateFrom = ReflectionHelper.GetAllTypes()
+											           .FirstOrDefault(x => x.Name == typeName);
 
 						if (populateFrom == null)
 							throw new InvalidOperationException("Couldn't find type " + typeName);
@@ -99,14 +98,6 @@ namespace Vexe.Editor.Drawers
                     _filter = new TextFilter(_values, id, false, SetValue);
             }
 
-            _currentIndex = _values.IndexOf(memberValue);
-            if (_currentIndex == -1 && !attribute.TextField)
-            {
-                _currentIndex = 0;
-                if (_values.Length > 0)
-                    memberValue = _values[0];
-            }
-
             string newValue = null;
             string currentValue = memberValue;
 
@@ -132,15 +123,28 @@ namespace Vexe.Editor.Drawers
                     Profiler.BeginSample("PopupDrawer TextFieldDrop");
                     #endif
 
-                    int x = gui.Popup(displayText, _currentIndex.Value, _values);
+                    if (!_currentIndex.HasValue)
                     {
-                        if (_currentIndex != x || (_values.InBounds(x) && currentValue != _values[x]))
-                        {
-                            _changed = true;
-                            _currentIndex = x;
-                            newValue = _values[x];
-                            gui.RequestResetIfRabbit(); //@Todo what's up with this reset?
-                        }
+                        if (attribute.TakeLastPathItem)
+                            _currentIndex = _values.IndexOf(x => GetActualValue(x) == currentValue);
+                        else
+                            _currentIndex = _values.IndexOf(currentValue);
+                    }
+
+                    if (_currentIndex == -1)
+                    {
+                        _currentIndex = 0;
+                        if (_values.Length > 0)
+                            memberValue = _values[0];
+                    }
+
+                    gui.BeginCheck();
+                    int selection = gui.Popup(displayText, _currentIndex.Value, _values);
+                    if (gui.HasChanged() && _values.Length > 0)
+                    {
+                        _currentIndex = selection;
+                        _changed = true;
+                        newValue = _values[selection];
                     }
 
                     #if PROFILE
@@ -162,15 +166,24 @@ namespace Vexe.Editor.Drawers
 			}
 		}
 
-        private void SetValue(string value)
+        private string GetActualValue(string value)
         {
+            string result = value;
             if (attribute.TakeLastPathItem && !string.IsNullOrEmpty(value))
             {
                 int lastPathIdx = value.LastIndexOf('/') + 1;
                 if (lastPathIdx != -1)
-                    memberValue = value.Substring(lastPathIdx);
+                    result = value.Substring(lastPathIdx);
             }
-            else memberValue = value;
+            return result;
+        }
+
+        private void SetValue(string value)
+        {
+            if (!attribute.TextField && attribute.TakeLastPathItem && attribute.Filter)
+                _currentIndex = _values.IndexOf(value);
+
+            memberValue = GetActualValue(value);
         }
 
 		public void UpdateValues()
