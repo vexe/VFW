@@ -121,10 +121,10 @@ namespace Vexe.Runtime.Types
         }
         #endregion
 
-        //public virtual void Reset()
-        //{
-        //    RuntimeHelper.ResetTarget(this);
-        //}
+        public virtual void Reset()
+        {
+            RuntimeHelper.ResetTarget(this);
+        }
 
 #if UNITY_EDITOR
         private bool _delayDeserialize;

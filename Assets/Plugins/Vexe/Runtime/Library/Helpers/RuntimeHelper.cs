@@ -102,36 +102,36 @@ namespace Vexe.Runtime.Helpers
 
         public static void ResetTarget(object target)
         {
-            Func<Type, bool> IsTypeSerializedByUnity = type =>
-            {
-                // Might be forgetting something here...
-                return (type.IsPrimitive || type.IsEnum || type == typeof(string)
-                    || type.IsA<UnityObject>()
-                    || VFWSerializationLogic.UnityStructs.ContainsValue(type)
-                    || type == typeof(AnimationCurve)
-                    || type == typeof(Gradient));
-            };
+            //Func<Type, bool> IsTypeSerializedByUnity = type =>
+            //{
+            //    // Might be forgetting something here...
+            //    return (type.IsPrimitive || type.IsEnum || type == typeof(string)
+            //        || type.IsA<UnityObject>()
+            //        || VFWSerializationLogic.UnityStructs.ContainsValue(type)
+            //        || type == typeof(AnimationCurve)
+            //        || type == typeof(Gradient));
+            //};
 
-            Func<FieldInfo, bool> IsFieldSerializedByUnity = field =>
-            {
-                var type = field.FieldType;
-                if (!IsTypeSerializedByUnity(type))
-                    return false;
+            //Func<FieldInfo, bool> IsFieldSerializedByUnity = field =>
+            //{
+            //    var type = field.FieldType;
+            //    if (!IsTypeSerializedByUnity(type))
+            //        return false;
 
-                if (!field.IsPublic && !field.IsDefined<SerializeField>())
-                    return false;
+            //    if (!field.IsPublic && !field.IsDefined<SerializeField>())
+            //        return false;
 
-                if (type.IsArray)
-                    return type.GetArrayRank() == 1 && IsTypeSerializedByUnity(type.GetElementType());
+            //    if (type.IsArray)
+            //        return type.GetArrayRank() == 1 && IsTypeSerializedByUnity(type.GetElementType());
 
-                if (type.IsGenericType)
-                    return type.GetGenericTypeDefinition() == typeof(List<>) && IsTypeSerializedByUnity(type.GetGenericArguments()[0]);
+            //    if (type.IsGenericType)
+            //        return type.GetGenericTypeDefinition() == typeof(List<>) && IsTypeSerializedByUnity(type.GetGenericArguments()[0]);
 
-                if (type.IsAbstract)
-                    return false;
+            //    if (type.IsAbstract)
+            //        return false;
 
-                return type.IsDefined<SerializableAttribute>();
-            };
+            //    return type.IsDefined<SerializableAttribute>();
+            //};
 
             var members = RuntimeMember.CachedWrapMembers(target.GetType());
             for (int i = 0; i < members.Count; i++)
@@ -144,9 +144,9 @@ namespace Vexe.Runtime.Helpers
                     // if a field is not serializable by Unity, then Unity won't be able to set it to whatever we initialized it with,
                     // so we will reset it to its default value and unfortunately ignore the field initialization because it's very
                     // hard to obtain that value
-                    var field = member.Info as FieldInfo;
-                    if (field != null && !IsFieldSerializedByUnity(field) || member.Info is PropertyInfo)
-                        member.Value = member.Type.GetDefaultValue();
+                    //var field = member.Info as FieldInfo;
+                    //if (field != null && !IsFieldSerializedByUnity(field) || member.Info is PropertyInfo)
+                    //    member.Value = member.Type.GetDefaultValue();
                 }
 				else
 				{ 

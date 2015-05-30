@@ -4,6 +4,14 @@ using Vexe.Runtime.Types;
 
 namespace VFWExamples
 {
+    /// <summary>
+    /// An example showing how to use 'Defualt' to give properties default values.
+    /// This is done when 'Reset' is called which Vfw implements to take into consideration 'DefaultAttribute'
+    /// Please note that if you have a field initializer (MyType myField = SomeValue;) Unity will not initialize that field
+    /// when Reset is called if 'MyType' wasn't serializable by Unity.
+    /// It's hard to detect initialized values so Vfw will also ignore your initialized fields unfortunately.
+    /// The best way is to implement Reset and put your initializing/resetting values in it.
+    /// </summary>
 	public class DefaultValueExample : BetterBehaviour
 	{
 		public int defIntX = 10;
