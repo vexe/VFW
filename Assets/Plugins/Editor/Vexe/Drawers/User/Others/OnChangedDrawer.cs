@@ -8,9 +8,10 @@ namespace Vexe.Editor.Drawers
 {
 	public class OnChangedDrawer : CompositeDrawer<object, OnChangedAttribute>
 	{
-		private MethodCaller<object, object> onChanged;
-		private MemberSetter<object, object> setter;
-		private object previous;
+		private MethodCaller<object, object> _onChanged;
+		private MemberSetter<object, object> _setter;
+		private object _previousValue;
+        private int _previousCollectionCount;
 
 		protected override void Initialize()
 		{
@@ -22,14 +23,14 @@ namespace Vexe.Editor.Drawers
 				try
 				{
 					var field = targetType.GetField(set, Flags.InstanceAnyVisibility);
-					setter = field.DelegateForSet();
+					_setter = field.DelegateForSet();
 				}
 				catch
 				{
 					try
 					{
 						var property = targetType.GetProperty(set, Flags.InstanceAnyVisibility);
-						setter = property.DelegateForSet();
+						_setter = property.DelegateForSet();
 					}
 					catch
 					{
@@ -43,7 +44,7 @@ namespace Vexe.Editor.Drawers
 				try
 				{
 					var methods = targetType.GetAllMembers(typeof(object)).OfType<MethodInfo>();
-					onChanged = (from method in methods
+					_onChanged = (from method in methods
 								 where method.Name == call
 								 where method.ReturnType == typeof(void)
 								 let args = method.GetParameters()
@@ -57,17 +58,30 @@ namespace Vexe.Editor.Drawers
 				}
 			}
 
-			previous = memberValue;
+			_previousValue = memberValue;
+
+            if (member.CollectionCount != -1)
+                _previousCollectionCount = member.CollectionCount;
 		}
 
 		public override void OnLowerGUI()
 		{
 			var current = memberValue;
-			if (!current.GenericEquals(previous))
+
+            bool changed;
+            if (member.CollectionCount != -1 && member.CollectionCount != _previousCollectionCount)
+            {
+                _previousCollectionCount = member.CollectionCount;
+                changed = true;
+            }
+            else
+                changed = !current.GenericEquals(_previousValue);
+
+            if (changed)
 			{
-				previous = current;
-				onChanged.SafeInvoke(rawTarget, current);
-				setter.SafeInvoke(ref member.RawTarget, current);
+				_previousValue = current;
+				_onChanged.SafeInvoke(rawTarget, current);
+				_setter.SafeInvoke(ref member.RawTarget, current);
 			}
 		}
 	}
