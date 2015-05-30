@@ -88,8 +88,8 @@ namespace Vexe.Runtime.Helpers
                 if (!data.serializedStrings.TryGetValue(memberKey, out prevState))
                     return true;
 
-                if (value.IsObjectNull())
-                    return prevState != "null";
+                if (value.IsObjectNull() && prevState == "null")
+                    return true;
 
                 string curState = serializer.Serialize(member.Type, value, data.serializedObjects);
 
