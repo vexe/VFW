@@ -70,14 +70,16 @@ namespace Vexe.Editor.Drawers
 
 			if (memberValue == null)
 				memberValue = GetNew();
+
+            member.CollectionCount = memberValue.Count;
 		}
 
 		public override void OnGUI()
 		{
 			if (memberValue == null)
-            { 
 				memberValue = GetNew();
-            }
+
+            member.CollectionCount = memberValue.Count;
 
             if (UpdateCount && _lastUpdatedCount != memberValue.Count)
             {

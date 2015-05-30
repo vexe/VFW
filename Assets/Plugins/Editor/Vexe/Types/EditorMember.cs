@@ -19,6 +19,15 @@ namespace Vexe.Editor.Types
         public UnityObject UnityTarget;
         public string DisplayText;
 
+        // These are set when the member is an element of a collection (list, array, dictionary)
+        // So you can use these to query whether or not an element is a collection element (Elemnts != null or ElementIndex != -1)
+		public IList Elements;
+		public int ElementIndex = -1;
+
+        // Set when the member is a collection (list, array, dictionary)
+        // Use this to query whether an element is a collection (CollectionCoun != -1)
+        public int CollectionCount = -1;
+
 		public readonly int Id;
         public readonly string Name;
         public readonly string TypeNiceName;
@@ -67,9 +76,6 @@ namespace Vexe.Editor.Types
 
         private MemberSetter<object, object> _memberSetter;
         private MemberGetter<object, object> _memberGetter;
-
-		public IList Elements;
-		public int ElementIndex = -1;
 
 		private static BetterUndo _undo = new BetterUndo();
 		private double _undoTimer, _undoLastTime;

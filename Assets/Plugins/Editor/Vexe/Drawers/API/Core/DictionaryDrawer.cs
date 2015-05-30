@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
+using Vexe.Editor.Extensions;
 using Vexe.Editor.Types;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
@@ -25,7 +26,6 @@ namespace Vexe.Editor.Drawers
         private bool _invalidKeyType;
         private TextFilter _filter;
         private string _originalDisplay;
-        private IDictionary<TK, TV> _temp;
         private int _lastUpdatedCount = -1;
 
         public bool UpdateCount = true;
@@ -75,7 +75,7 @@ namespace Vexe.Editor.Drawers
             if (memberValue == null)
                 memberValue = memberType.Instance<IDictionary<TK, TV>>();
 
-            _temp = memberType.Instance<IDictionary<TK, TV>>();
+            member.CollectionCount = memberValue.Count;
 
             #if DBG
             Log("Dictionary drawer Initialized (" + dictionaryName + ")");
@@ -94,6 +94,8 @@ namespace Vexe.Editor.Drawers
 
             if (memberValue == null)
                 memberValue = memberType.Instance<IDictionary<TK, TV>>();
+
+            member.CollectionCount = memberValue.Count;
 
             if (UpdateCount && _lastUpdatedCount != memberValue.Count)
             { 
