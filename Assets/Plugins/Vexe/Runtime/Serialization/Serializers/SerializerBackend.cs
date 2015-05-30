@@ -34,9 +34,6 @@ namespace Vexe.Runtime.Serialization
                 member.Target = target;
                 var value     = member.Value;
 
-                if (value.IsObjectNull())
-                    continue;
-
                 try
                 {
                     string memberKey = GetMemberKey(member);
