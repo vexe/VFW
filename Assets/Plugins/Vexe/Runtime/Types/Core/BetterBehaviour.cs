@@ -86,10 +86,10 @@ namespace Vexe.Runtime.Types
             DeserializeObject();
         }
 
-        public virtual void Reset()
-        {
-            RuntimeHelper.ResetTarget(this);
-        }
+        //public virtual void Reset()
+        //{
+        //    RuntimeHelper.ResetTarget(this);
+        //}
 
         // Logging
         #region
