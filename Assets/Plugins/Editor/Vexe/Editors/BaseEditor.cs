@@ -462,8 +462,8 @@ namespace Vexe.Editor.Editors
 #if DBG
                 Log("Target changed: " + target);
 #endif
-                EditorUtility.SetDirty(target);
-                //SerializationManager.MarkModified(target);
+                if (target != null)
+                    EditorUtility.SetDirty(target);
             }
         }
 
