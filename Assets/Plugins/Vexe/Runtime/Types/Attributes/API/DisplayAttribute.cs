@@ -112,6 +112,17 @@ namespace Vexe.Runtime.Types
         /// Show a search box to filter elements? (uses element.ToString() when matching)
         /// </summary>
         Filter = 1 << 6,
+
+        /// <summary>
+        /// Should new pairs be added to the end of the dictionary as opposed to inserting them at the beginning?
+        /// (same applies to removing them as well)
+        /// </summary>
+        AddToLast = 1 << 7,
+
+        /// <summary>
+        /// Show a temporary adding area for keys? (enter key and hit return to add a new pair with that key value)
+        /// </summary>
+        TempKey = 1 << 8,
     }
 
     [Flags]
