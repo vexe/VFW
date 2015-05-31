@@ -27,16 +27,8 @@ namespace VFWExamples
         // apply Popup on each key, iClamp and Comment on each value and Display on dictionary
         [PerKey("Popup"), Popup("GetNames", TextField = true),
         PerValue("iClamp", "Comment"), iClamp(0, 10), Comment("0 -> 10"),
-        Display(Dict.ForceExpand, FormatMethod = "FormatDictionary")]
+        Display(Dict.ForceExpand)]
         public Dictionary<string, int> dictionary;
-
-        string FormatDictionary()
-        {
-            if (dictionary == null)
-                dictionary = new Dictionary<string, int>();
-
-            return "Lookup (Count: " + dictionary.Count + ")";
-        }
 
         string[] GetNames()
         {

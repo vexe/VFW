@@ -103,7 +103,7 @@ namespace Vexe.Editor.Types
             string displayFormat = null;
 
             var displayAttr = attributes.GetAttribute<DisplayAttribute>();
-            if (displayAttr != null)
+            if (displayAttr != null && MemberDrawersHandler.IsApplicableAttribute(memberType, displayAttr, attributes))
                 displayFormat = displayAttr.FormatLabel;
 
             var settings = VFWSettings.GetInstance();

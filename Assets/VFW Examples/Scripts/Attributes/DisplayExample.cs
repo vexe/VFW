@@ -27,21 +27,12 @@ namespace VFWExamples
 
         public DisplayOrderExample example = new DisplayOrderExample();
 
-        [Display(FormatMethod = "FormatArray")]
-        public string[] array;
+        [PerItem, Display(FormatMethod = "FormatArrayElement")]
+        public Component[] array;
 
-        // gets called from editor
-        string FormatArray()
+        string FormatArrayElement(Component value)
         {
-            return "Array of string (" + array.Length + ")";
-        }
-
-        [Display(FormatMethod = "FormatDictionary")]
-        public Dictionary<string, float> dictionary;
-
-        string FormatDictionary()
-        {
-            return "Lookup (Count: " + dictionary.Count + ")";
+            return value == null ? "Null" : value.GetType().GetNiceName();
         }
     }
 

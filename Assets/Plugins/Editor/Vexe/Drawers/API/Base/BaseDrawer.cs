@@ -31,6 +31,7 @@ namespace Vexe.Editor.Drawers
         private bool _hasInit;
         private MethodCaller<object, string> _dynamicFormatter;
         private static Attribute[] Empty = new Attribute[0];
+        private static object[] _formatArgs = new object[1];
 
         protected bool foldout
         {
@@ -65,7 +66,10 @@ namespace Vexe.Editor.Drawers
             this.gui        = gui;
 
             if (_dynamicFormatter != null)
-                displayText = _dynamicFormatter(rawTarget, null);
+            { 
+                _formatArgs[0] = member.Value;
+                displayText = _dynamicFormatter(rawTarget, _formatArgs);
+            }
 
             if (_hasInit)
             {
@@ -78,7 +82,7 @@ namespace Vexe.Editor.Drawers
             Log("Initializing: " + this);
 #endif
             var displayAttr = attributes.GetAttribute<DisplayAttribute>();
-            if (displayAttr != null)
+            if (displayAttr != null && MemberDrawersHandler.IsApplicableAttribute(memberType, displayAttr, attributes))
             {
                 var hasCustomFormat = !string.IsNullOrEmpty(displayAttr.FormatMethod);
                 var formatMethod = hasCustomFormat ? displayAttr.FormatMethod : ("Format" + member.Name);
@@ -95,7 +99,8 @@ namespace Vexe.Editor.Drawers
                     else
                     { 
                         _dynamicFormatter = method.DelegateForCall<object, string>();
-                        displayText = _dynamicFormatter(rawTarget, null);
+                        _formatArgs[0] = member.Value;
+                        displayText = _dynamicFormatter(rawTarget, _formatArgs);
                     }
                 }
             }

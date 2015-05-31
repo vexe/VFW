@@ -99,6 +99,14 @@ namespace Vexe.Editor
 			return drawer;
 		}
 
+        public static bool IsApplicableAttribute(Type memberType, Attribute attribute, Attribute[] attributes)
+        {
+            var applied = GetAppliedAttributes(memberType, attributes);
+            if (applied == null)
+                return false;
+            return applied.ContainsValue(attribute);
+        }
+
         private static Attribute[] GetAppliedAttributes(Type memberType, Attribute[] attributes)
         {
             if (!memberType.IsCollection())
