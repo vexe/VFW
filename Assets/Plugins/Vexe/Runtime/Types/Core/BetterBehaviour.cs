@@ -65,16 +65,21 @@ namespace Vexe.Runtime.Types
             get { return _serializer ?? (_serializer = SerializerType.ActivatorInstance<SerializerBackend>()); }
         }
 
-        public void OnBeforeSerialize()
+        public virtual void OnBeforeSerialize()
         {
-            if (RuntimeHelper.IsModified(this, Serializer, GetSerializationData()))
+            bool serialize;
+            if (SemiAutomaticSerialization())
+                serialize = _dirty++ < 2;
+            else serialize = RuntimeHelper.IsModified(this, Serializer, GetSerializationData());
+
+            if (serialize)
             {
                 dLog("Serializing: " + GetType().Name);
                 SerializeObject();
             }
         }
 
-        public void OnAfterDeserialize()
+        public virtual void OnAfterDeserialize()
         {
 #if UNITY_EDITOR
             if (_delayDeserialize)
@@ -180,16 +185,30 @@ namespace Vexe.Runtime.Types
         }
 
         [ContextMenu("Load behaviour state")]
-        public void DeserializeObject()
+        public virtual void DeserializeObject()
         {
             Serializer.DeserializeTargetFromData(this);
         }
 
         [ContextMenu("Save behaviour state")]
-        public void SerializeObject()
+        public virtual void SerializeObject()
         {
             Serializer.SerializeTargetIntoData(this);
         }
         #endregion
+
+
+        [SerializeField, HideInInspector] int _dirty = 0;
+
+        public void MarkChanged()
+        {
+            dLog("Marked: " + name);
+            _dirty = 0;
+        }
+
+        public virtual bool SemiAutomaticSerialization()
+        {
+            return false;
+        }
     }
 }

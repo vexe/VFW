@@ -181,9 +181,34 @@ namespace Vexe.Editor.Types
 
             var imported = field.GetValue(null) as Attribute[];
 
+            // check if 'DisplayAttribute' merging is needed
+            // happens only if the both the imported and current attributes have a DisplayAttribute
+            var display1 = attributes.GetAttribute<DisplayAttribute>();
+            if (display1 != null)
+            {
+                var display2 = imported.GetAttribute<DisplayAttribute>();
+                if (display2 != null)
+                {
+                    // combine seq/dict options
+                    display2.DictOpt |= display1.DictOpt;
+                    display2.SeqOpt |= display1.SeqOpt;
+
+                    // display1 overrides display2 if any formatting/order values are specified
+                    if (display1.DisplayOrder.HasValue)
+                        display2.Order = display1.Order;
+                    if (!string.IsNullOrEmpty(display1.FormatMethod))
+                        display2.FormatMethod = display1.FormatMethod;
+                    if (!string.IsNullOrEmpty(display1.FormatKVPair))
+                        display2.FormatKVPair = display1.FormatKVPair;
+                }
+            }
+
             var tmp = attributes.ToList();
             tmp.AddRange(imported);
             tmp.RemoveAt(idx);
+            if (display1 != null)
+                tmp.Remove(display1);
+
             attributes = tmp.ToArray();
         }
 
@@ -197,6 +222,10 @@ namespace Vexe.Editor.Types
 			bool sameValue = value.GenericEquals(Get());
 			if (sameValue)
 				return;
+
+            var vfw = UnityTarget as IVFWObject;
+            if (vfw != null)
+                vfw.MarkChanged();
 
 			HandleUndoAndSet(value);
 

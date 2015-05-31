@@ -13,5 +13,7 @@ namespace Vexe.Runtime.Types
         CategoryDisplay GetDisplayOptions();
         void SerializeObject();
         void DeserializeObject();
+        void MarkChanged();
+        bool SemiAutomaticSerialization();
     }
 }
