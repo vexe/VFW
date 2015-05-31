@@ -13,8 +13,17 @@ namespace Vexe.Editor.Drawers
 		private readonly string[] _values;
 		private readonly Action<string> _setValue;
         private readonly int _id;
-		private string _pattern;
+		private string _pattern, _previous;
         private bool _toggle;
+        private bool _cachedResult;
+
+        static Func<string, Regex> _getRegex;
+        static Regex GetRegex(string pattern)
+        {
+            if (_getRegex == null)
+                _getRegex = new Func<string, Regex>(x => new Regex(x, RegexOptions.IgnoreCase)).Memoize();
+            return _getRegex(pattern);
+        }
 
 		public TextFilter(string[] values, int id, Action<string> setValue)
             : this(values, id, true, setValue)
@@ -63,14 +72,41 @@ namespace Vexe.Editor.Drawers
 
         public bool IsMatch(string input)
         {
+            return IsMatch(input, _pattern);
+        }
+
+        public bool IsMatch(string input, string pattern)
+        {
             try
             {
-                return Regex.IsMatch(input, _pattern, RegexOptions.IgnoreCase);
+                if (_previous == pattern)
+                    return _cachedResult;
+
+                _previous = pattern;
+
+                var regex = GetRegex(pattern);
+                _cachedResult = regex.IsMatch(input);
+                return _cachedResult;
             }
             catch
             {
                 return false;
             }
+        }
+
+        public string Process(string pattern)
+        {
+            string match = null;
+            for (int i = 0; i < _values.Length; i++)
+            {
+                var x = _values[i];
+                if (IsMatch(x, pattern))
+                {
+                    match = x;
+                    break;
+                }
+            }
+            return match ?? pattern;
         }
 
 		public void OnGUI(BaseGUI gui)
@@ -83,22 +119,12 @@ namespace Vexe.Editor.Drawers
             bool changed = Field(gui, width);
 			if (changed)
 			{
-				string match = null;
-				for (int i = 0; i < _values.Length; i++)
-                {
-                    var x = _values[i];
-                    if (IsMatch(x))
-                    {
-                        match = x;
-                        break;
-                    }
-				}
-
-				if (match != null)
+				string match = Process(_pattern);
+				if (match != _pattern)
 					_setValue(match);
 			}
 		}
-	}
+    }
 
 	public abstract class FilterDrawer<T, A> : CompositeDrawer<T, A> where A : CompositeAttribute
 	{
