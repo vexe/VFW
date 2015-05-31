@@ -71,7 +71,7 @@ namespace Vexe.Editor.Drawers
                     @getValues: getValues,
                     @getCurrent: () => { var x = memberValue; return x == null ? null : x.GetType(); },
                     @setTarget: newType => { if (newType == null) memberValue = memberType.GetDefaultValueEmptyIfString(); else create(newType); },
-                    @getValueName: type => type.Name,
+                    @getValueName: type => type.GetNiceName(),
                     @title: title
                 );
 
@@ -80,7 +80,7 @@ namespace Vexe.Editor.Drawers
                     @getValues: getValues,
                     @getCurrent: member.As<UnityObject>,
                     @setTarget: member.Set,
-                    @getValueName: obj => obj.name + " (" + obj.GetType().Name + ")",
+                    @getValueName: obj => obj.name + " (" + obj.GetType().GetNiceName() + ")",
                     @title: title
                 );
 
@@ -102,10 +102,14 @@ namespace Vexe.Editor.Drawers
             }
             else _tabs = new Tab[1];
 
-            _tabs[idx] = _newTypeTab(() => ReflectionHelper.GetAllUserTypesOf(memberType)
-                                .Disinclude(memberType.IsAbstract ? memberType : null)
+            var systemTypes = ReflectionHelper.GetAllUserTypesOf(memberType)
                                 .Where(t => !t.IsA<UnityObject>() && !t.IsAbstract)
-                                .ToArray(), TryCreateInstance, "System Type");
+                                .ToArray();
+
+            if (memberType.IsGenericType && !systemTypes.Contains(memberType))
+                ArrayUtility.Add(ref systemTypes, memberType);
+
+            _tabs[idx] = _newTypeTab(() => systemTypes, TryCreateInstance, "System Type");
         }
 
         public override void OnGUI()
@@ -311,7 +315,7 @@ namespace Vexe.Editor.Drawers
 
         private void TryCreateInstanceInGO(Type newType)
         {
-            TryCreateInstance(() => new GameObject("(new) " + newType.Name).AddComponent(newType));
+            TryCreateInstance(() => new GameObject("(new) " + newType.GetNiceName()).AddComponent(newType));
         }
 
         private void TryCreateInstance(Type newType)
