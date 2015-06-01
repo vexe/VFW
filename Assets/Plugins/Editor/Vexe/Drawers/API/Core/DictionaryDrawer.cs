@@ -448,7 +448,7 @@ namespace Vexe.Editor.Drawers
 
         private void AddNewPair()
         {
-            var key = _tempKey;
+            var key = _options.TempKey ? _tempKey : GetNewKey(_kvpList);
             try
             {
                 var value = default(TV);
