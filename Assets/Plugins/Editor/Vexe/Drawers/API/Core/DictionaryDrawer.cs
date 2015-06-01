@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using Vexe.Editor.Extensions;
+using Vexe.Editor.Helpers;
 using Vexe.Editor.Types;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
@@ -28,6 +29,7 @@ namespace Vexe.Editor.Drawers
         private TextFilter _filter;
         private string _originalDisplay;
         private int _lastUpdatedCount = -1;
+        private bool _dirty;
 
         private TK _tempKey;
 
@@ -164,7 +166,10 @@ namespace Vexe.Editor.Drawers
                         using (gui.State(_kvpList.Count > 0))
                         {
                             if (gui.ClearButton("dictionary"))
+                            { 
                                 _kvpList.Clear();
+                                _dirty = true;
+                            }
 
                             if (gui.RemoveButton("last added dictionary pair"))
                             {
@@ -172,6 +177,8 @@ namespace Vexe.Editor.Drawers
                                     _kvpList.RemoveLast();
                                 else
                                     _kvpList.RemoveFirst();
+
+                                _dirty = true;
                             }
                         }
 
@@ -247,11 +254,14 @@ namespace Vexe.Editor.Drawers
                         Profiler.BeginSample("DictionaryDrawer SinglePair");
                         #endif
                         if (_options.HorizontalPairs)
+                        {
+                            using (gui.ColorBlock(pairColor))
                             using (gui.Horizontal())
                             {
                                 DrawKey(i, entryKey + 1);
                                 DrawValue(i, entryKey + 2);
                             }
+                        }
                         else
                             using (gui.Indent())
                             {
@@ -290,6 +300,13 @@ namespace Vexe.Editor.Drawers
                 #if PROFILE
                 Profiler.EndSample();
                 #endif
+
+                if (_dirty)
+                {
+                    var vfw = unityTarget as IVFWObject;
+                    if (vfw != null)
+                        vfw.MarkChanged();
+                }
             }
         }
 
@@ -449,6 +466,8 @@ namespace Vexe.Editor.Drawers
 
                 if (_options.TempKey)
                     _tempKey = GetNewKey(_kvpList);
+
+                _dirty = true;
             }
             catch (ArgumentException)
             {

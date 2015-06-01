@@ -463,12 +463,7 @@ namespace Vexe.Editor.Editors
                 Log("Target changed: " + target);
 #endif
                 if (target != null)
-                { 
                     EditorUtility.SetDirty(target);
-                    var vfw = target as IVFWObject;
-                    if (vfw != null)
-                        vfw.MarkChanged();
-                }
             }
         }
 
