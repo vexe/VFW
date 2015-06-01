@@ -2,33 +2,33 @@
 
 namespace Vexe.Editor.GUIs
 {
-	public abstract partial class BaseGUI
-	{
-		public int Layer(int layer)
-		{
-			return Layer(string.Empty, layer);
-		}
+    public abstract partial class BaseGUI
+    {
+        public int LayerField(int layer)
+        {
+            return LayerField(string.Empty, layer);
+        }
 
-		public int Layer(string label, int layer)
-		{
-			return Layer(label, layer, null);
-		}
+        public int LayerField(string label, int layer)
+        {
+            return LayerField(label, layer, null);
+        }
 
-		public LayerMask Layer(string content, LayerMask layer)
-		{
-			return Layer(content, (int)layer);
-		}
+        public LayerMask LayerField(string content, LayerMask layer)
+        {
+            return LayerField(content, (int)layer);
+        }
 
-		public int Layer(string label, int layer, Layout layout)
-		{
-			return Layer(label, layer, GUIStyles.Popup, layout);
-		}
+        public int LayerField(string label, int layer, Layout layout)
+        {
+            return LayerField(label, layer, GUIStyles.Popup, layout);
+        }
 
-		public int Layer(string label, int layer, GUIStyle style, Layout layout)
-		{
-			return Layer(GetContent(label), layer, style, layout);
-		}
+        public int LayerField(string label, int layer, GUIStyle style, Layout layout)
+        {
+            return LayerField(GetContent(label), layer, style, layout);
+        }
 
-		public abstract int Layer(GUIContent label, int layer, GUIStyle style, Layout layout);
-	}
+        public abstract int LayerField(GUIContent label, int layer, GUIStyle style, Layout layout);
+    }
 }

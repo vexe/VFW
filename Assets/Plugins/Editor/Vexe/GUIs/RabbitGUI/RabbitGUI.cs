@@ -627,7 +627,7 @@ namespace Vexe.Editor.GUIs
             }
         }
 
-        public override int Mask(GUIContent content, int mask, string[] displayedOptions, GUIStyle style, Layout option)
+        public override int MaskField(GUIContent content, int mask, string[] displayedOptions, GUIStyle style, Layout option)
         {
             var data = new ControlData(content, style, option, ControlType.MaskField);
 
@@ -836,7 +836,7 @@ namespace Vexe.Editor.GUIs
             return tag;
         }
 
-        public override int Layer(GUIContent content, int layer, GUIStyle style, Layout layout)
+        public override int LayerField(GUIContent content, int layer, GUIStyle style, Layout layout)
         {
             var data = new ControlData(content, style, layout, ControlType.Popup);
 

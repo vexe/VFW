@@ -75,7 +75,7 @@ namespace Vexe.Editor.GUIs
             GUILayout.Label(content, style, option);
         }
 
-        public override int Mask(GUIContent content, int mask, string[] displayedOptions, GUIStyle style, Layout option)
+        public override int MaskField(GUIContent content, int mask, string[] displayedOptions, GUIStyle style, Layout option)
         {
             return EditorGUILayout.MaskField(content, mask, displayedOptions, style, option);
         }
@@ -206,7 +206,7 @@ namespace Vexe.Editor.GUIs
             return EditorGUILayout.TagField(content, tag, style, layout);
         }
 
-        public override int Layer(GUIContent label, int layer, GUIStyle style, Layout layout)
+        public override int LayerField(GUIContent label, int layer, GUIStyle style, Layout layout)
         {
             return EditorGUILayout.LayerField(label, layer, style, layout);
         }

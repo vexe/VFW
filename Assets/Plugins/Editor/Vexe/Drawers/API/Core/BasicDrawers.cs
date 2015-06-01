@@ -167,7 +167,7 @@ namespace Vexe.Editor.Drawers
     {
         protected override LayerMask DoField(string text, LayerMask value)
         {
-            return gui.Layer(text, value);
+            return gui.LayerMaskField(text, value);
         }
     }
 

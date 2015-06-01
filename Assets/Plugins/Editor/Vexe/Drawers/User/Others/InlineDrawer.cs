@@ -194,7 +194,7 @@ namespace Vexe.Editor.Drawers
                     {
                         go.tag = gui.Tag("Tag", go.tag);
                         gui.Space(5f);
-                        go.layer = gui.Layer("Layer", go.layer);
+                        go.layer = gui.LayerField("Layer", go.layer);
                     }
 
                     var comps = go.GetAllComponents();
