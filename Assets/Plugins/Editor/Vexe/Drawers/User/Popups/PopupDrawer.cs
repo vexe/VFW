@@ -135,7 +135,7 @@ namespace Vexe.Editor.Drawers
                     {
                         _currentIndex = 0;
                         if (_values.Length > 0)
-                            memberValue = _values[0];
+                            SetValue(_values[0]);
                     }
 
                     gui.BeginCheck();
