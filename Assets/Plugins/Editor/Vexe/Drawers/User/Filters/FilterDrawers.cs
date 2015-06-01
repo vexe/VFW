@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using Vexe.Editor.GUIs;
 using Vexe.Editor.Helpers;
@@ -13,9 +14,9 @@ namespace Vexe.Editor.Drawers
 		private readonly string[] _values;
 		private readonly Action<string> _setValue;
         private readonly int _id;
-		private string _pattern, _previous;
+		private string _pattern, _previousPattern, _previousMatch;
         private bool _toggle;
-        private bool _cachedResult;
+        static BetterPrefs _prefs;
 
         static Func<string, Regex> _getRegex;
         static Regex GetRegex(string pattern)
@@ -32,13 +33,15 @@ namespace Vexe.Editor.Drawers
 
 		public TextFilter(string[] values, int id, bool initialToggle, Action<string> setValue)
 		{
-			this._values   = values;
-			this._setValue = setValue;
-            this._id = RuntimeHelper.CombineHashCodes(id, "Filter");
+			_values = values;
+			_setValue = setValue;
+            _id = RuntimeHelper.CombineHashCodes(id, "Filter");
 
-            var prefs = BetterPrefs.GetEditorInstance();
-            _toggle = prefs.Bools.ValueOrDefault(this._id, initialToggle);
-            _pattern = prefs.Strings.ValueOrDefault(this._id, "");
+            if (_prefs == null)
+                _prefs = BetterPrefs.GetEditorInstance();
+
+            _toggle = _prefs.Bools.ValueOrDefault(this._id, initialToggle);
+            _pattern = _prefs.Strings.ValueOrDefault(this._id, "");
 		}
 
         public bool Field(BaseGUI gui, float width)
@@ -52,9 +55,7 @@ namespace Vexe.Editor.Drawers
                 {
                     changed = true;
                     _pattern = text;
-
-                    var prefs = BetterPrefs.GetEditorInstance();
-                    prefs.Strings[_id] = _pattern;
+                    _prefs.Strings[_id] = _pattern;
                 }
             }
             else gui.Text("", Layout.sWidth(5f));
@@ -63,8 +64,7 @@ namespace Vexe.Editor.Drawers
             if (gui.Button(buttonStr, GUIStyles.None, Layout.sWidth(13f)))
             {
                 _toggle = !_toggle;
-                var prefs = BetterPrefs.GetEditorInstance();
-                prefs.Bools[_id] = _toggle;
+                _prefs.Bools[_id] = _toggle;
                 gui.RequestResetIfRabbit();
             }
             return changed;
@@ -79,14 +79,9 @@ namespace Vexe.Editor.Drawers
         {
             try
             {
-                if (_previous == pattern)
-                    return _cachedResult;
-
-                _previous = pattern;
-
                 var regex = GetRegex(pattern);
-                _cachedResult = regex.IsMatch(input);
-                return _cachedResult;
+                var result = regex.IsMatch(input);
+                return result;
             }
             catch
             {
@@ -96,6 +91,11 @@ namespace Vexe.Editor.Drawers
 
         public string Process(string pattern)
         {
+            if (_previousPattern == pattern)
+                return _previousMatch;
+
+            _previousPattern = pattern;
+
             string match = null;
             for (int i = 0; i < _values.Length; i++)
             {
@@ -103,6 +103,7 @@ namespace Vexe.Editor.Drawers
                 if (IsMatch(x, pattern))
                 {
                     match = x;
+                    _previousMatch = x;
                     break;
                 }
             }
