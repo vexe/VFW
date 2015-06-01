@@ -255,7 +255,6 @@ namespace Vexe.Editor.Drawers
                         #endif
                         if (_options.HorizontalPairs)
                         {
-                            using (gui.ColorBlock(pairColor))
                             using (gui.Horizontal())
                             {
                                 DrawKey(i, entryKey + 1);
