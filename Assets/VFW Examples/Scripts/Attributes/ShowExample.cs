@@ -7,8 +7,7 @@ namespace VFWExamples
 	/// A small demo for exposing methods in the inspector
 	/// Notes: The arguments you set to the method in the editor won't survive assembly reloads
 	/// </summary>
-	
-	public class ShowMethodExample : BetterBehaviour
+	public class ShowExample : BaseBehaviour
 	{
 		[Show]
 		public void Method0()

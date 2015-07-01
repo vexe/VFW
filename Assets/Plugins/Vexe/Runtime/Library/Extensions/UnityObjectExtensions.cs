@@ -3,7 +3,7 @@ using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Runtime.Extensions
 {
-    public static class UEObjectExtensions
+    public static class UnityObjectExtensions
     {
         public static T Instantiate<T>(this T source, Vector3 pos, Quaternion rot) where T : UnityObject 
         {

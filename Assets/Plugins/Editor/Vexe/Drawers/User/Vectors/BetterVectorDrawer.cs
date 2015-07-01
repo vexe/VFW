@@ -2,6 +2,7 @@
 using UnityEngine;
 using Vexe.Editor.Types;
 using Vexe.Runtime.Extensions;
+using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Types;
 using Random = UnityEngine.Random;
 
@@ -76,10 +77,22 @@ namespace Vexe.Editor.Drawers
 
 	public class BetterV2Drawer : BetterVectorDrawer<Vector2, BetterV2Attribute>
 	{
-		protected override void Copy()         { Clipboard.GetInstance().V2Value = memberValue; }
-		protected override Vector2 Paste()     { return Clipboard.GetInstance().V2Value; }
+        protected override void Copy()
+        {
+            int key = RuntimeHelper.CombineHashCodes(id, "Clip");
+            BetterPrefs.GetEditorInstance().Vector3s[key] = memberValue;
+        }
+
+        protected override Vector2 Paste()
+        {
+            int key = RuntimeHelper.CombineHashCodes(id, "Clip");
+            return BetterPrefs.GetEditorInstance().Vector3s[key, memberValue];
+        }
+
 		protected override Vector2 Randomize() { return new Vector2(rand(), rand()); }
+
 		protected override Vector2 Normalize() { return Vector2.one; }
+
 		protected override Vector2 Reset()     { return Vector2.zero; }
 
 		protected override Func<string, Vector2, Vector2> GetField()
@@ -95,10 +108,22 @@ namespace Vexe.Editor.Drawers
 
 	public class BetterV3Drawer : BetterVectorDrawer<Vector3, BetterV3Attribute>
 	{
-		protected override void Copy()         { Clipboard.GetInstance().V3Value = memberValue; }
-		protected override Vector3 Paste()     { return Clipboard.GetInstance().V3Value; }
+        protected override void Copy()
+        {
+            int key = RuntimeHelper.CombineHashCodes(id, "Clip");
+            BetterPrefs.GetEditorInstance().Vector3s[key] = memberValue;
+        }
+
+        protected override Vector3 Paste()
+        {
+            int key = RuntimeHelper.CombineHashCodes(id, "Clip");
+            return BetterPrefs.GetEditorInstance().Vector3s[key, memberValue];
+        }
+
 		protected override Vector3 Randomize() { return new Vector3(rand(), rand(), rand()); }
+
 		protected override Vector3 Normalize() { return Vector3.one; }
+
 		protected override Vector3 Reset()     { return Vector3.zero; }
 
 		protected override Func<string, Vector3, Vector3> GetField()
