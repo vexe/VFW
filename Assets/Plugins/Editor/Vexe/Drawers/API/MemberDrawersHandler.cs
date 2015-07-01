@@ -158,11 +158,21 @@ namespace Vexe.Editor
                 return null;
             }
 
-            if (perKey != null && perKey.ExplicitAttributes != null)
-                attributes = attributes.Where(x => !perKey.ExplicitAttributes.Contains(x.GetType().Name.Replace("Attribute", ""))).ToArray();
+            if (perKey != null)
+            {
+                if (perKey.ExplicitAttributes != null)
+                    attributes = attributes.Where(x => !perKey.ExplicitAttributes.Contains(x.GetType().Name.Replace("Attribute", ""))).ToArray();
+                else
+                    attributes = new Attribute[] { perKey };
+            }
 
-            if (perValue != null && perValue.ExplicitAttributes != null)
-                attributes = attributes.Where(x => !perValue.ExplicitAttributes.Contains(x.GetType().Name.Replace("Attribute", ""))).ToArray();
+            if (perValue != null)
+            {
+                if (perValue.ExplicitAttributes != null)
+                    attributes = attributes.Where(x => !perValue.ExplicitAttributes.Contains(x.GetType().Name.Replace("Attribute", ""))).ToArray();
+                else 
+                    attributes = new Attribute[] { perValue };
+            }
 
             return attributes;
         }
