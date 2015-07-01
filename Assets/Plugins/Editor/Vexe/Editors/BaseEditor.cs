@@ -142,6 +142,10 @@ namespace Vexe.Editor.Editors
 
             Initialize();
 
+            var rabbit = gui as RabbitGUI;
+            if (rabbit != null && _membersDrawnByUnityLayout.Length > 0)
+                rabbit.OnFinishedLayoutReserve = DoUnityLayout;
+
             gui.OnEnable();
         }
 
@@ -172,10 +176,6 @@ namespace Vexe.Editor.Editors
             // creating the delegate once, reducing allocation
             if (_onGUIFunction == null)
                 _onGUIFunction = OnGUI;
-
-            var rabbit = gui as RabbitGUI;
-            if (rabbit != null && rabbit.OnFinishedLayoutReserve == null && _membersDrawnByUnityLayout.Length > 0)
-                rabbit.OnFinishedLayoutReserve = DoUnityLayout;
 
             // I found 25 to be a good padding value such that there's not a whole lot of empty space wasted
             // and the vertical inspector scrollbar doesn't obstruct our controls
