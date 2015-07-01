@@ -265,6 +265,18 @@ namespace Vexe.Editor.Drawers
 								RemoveAt(i);
                                 _dirty = true;
                             }
+
+                          
+                            ///Only valid for Classes implementing ICloneable
+                            if (typeof(ICloneable).IsAssignableFrom(_elementType) && elementValue != null) {
+                                if (!_options.Readonly && _options.PerItemDuplicate && gui.AddButton("element", MiniButtonStyle.ModRight))
+                                {
+                                    ICloneable _elementToClone = (ICloneable)elementValue;
+                                    TElement cloned = (TElement)_elementToClone.Clone();
+                                    AddValue(cloned);
+                                    _dirty = true;
+                                }
+                            }
 						}
 					}
 #if PROFILE
@@ -396,19 +408,21 @@ namespace Vexe.Editor.Drawers
 			public readonly bool Advanced;
 			public readonly bool LineNumbers;
 			public readonly bool PerItemRemove;
+            public readonly bool PerItemDuplicate;
 			public readonly bool GuiBox;
 			public readonly bool UniqueItems;
             public readonly bool Filter;
 
 			public SequenceOptions(Seq options)
 			{
-				Readonly      = options.HasFlag(Seq.Readonly);
-				Advanced      = options.HasFlag(Seq.Advanced);
-				LineNumbers   = options.HasFlag(Seq.LineNumbers);
-				PerItemRemove = options.HasFlag(Seq.PerItemRemove);
-				GuiBox        = options.HasFlag(Seq.GuiBox);
-				UniqueItems   = options.HasFlag(Seq.UniqueItems);
-                Filter        = options.HasFlag(Seq.Filter);
+				Readonly          = options.HasFlag(Seq.Readonly);
+				Advanced          = options.HasFlag(Seq.Advanced);
+				LineNumbers       = options.HasFlag(Seq.LineNumbers);
+				PerItemRemove     = options.HasFlag(Seq.PerItemRemove);
+                PerItemDuplicate  = options.HasFlag(Seq.PerItemDuplicate);
+				GuiBox            = options.HasFlag(Seq.GuiBox);
+				UniqueItems       = options.HasFlag(Seq.UniqueItems);
+                Filter            = options.HasFlag(Seq.Filter);
 			}
 		}
 	}
