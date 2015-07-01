@@ -49,6 +49,9 @@ namespace Vexe.Editor.Drawers
 
 			niceName = method.GetNiceName();
 
+            if (niceName.IsPrefix("dbg") || niceName.IsPrefix("Dbg"))
+                niceName = niceName.Remove(0, 3);
+
 			invoke	     = method.DelegateForCall();
 			var argInfos = method.GetParameters();
 			int len      = argInfos.Length;
