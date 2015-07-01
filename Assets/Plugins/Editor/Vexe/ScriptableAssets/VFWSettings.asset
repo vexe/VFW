@@ -24,7 +24,7 @@ MonoBehaviour:
       - bool DisplayReadonlyIfTrue
       values:
       - true
-      - '"BoxedMembersArea"'
+      - '"BoxedMembersArea,Headers,BoxedHeaders"'
       - 10
       - '"$nicename"'
       - '"$nicename ($count)"'
@@ -36,6 +36,6 @@ MonoBehaviour:
   _id: 412
   dbg: 0
   UseHungarianNotation: 1
-  DefaultDisplay: 4
+  DefaultDisplay: 28
   DefaultSpacing: 10
   DisplayReadonlyIfTrue: 1

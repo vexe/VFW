@@ -51,7 +51,7 @@ namespace Vexe.Editor.Editors
                         #if DBG
                         Debug.Log("New gui instance for: " + target.GetType().Name);
                         #endif
-                        _gui = useUnityGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI();
+                        _gui = new RabbitGUI();
                         _guiCache[id] = _gui;
                     }
                 }
@@ -98,8 +98,8 @@ namespace Vexe.Editor.Editors
         private Action _onGUIFunction;
         private string[] _membersDrawnByUnityLayout;
         private BaseGUI _gui;
+
         static Dictionary<int, BaseGUI> _guiCache = new Dictionary<int, BaseGUI>();
-        static int guiKey = "UnityGUI".GetHashCode();
 
         /// <summary>
         /// Members of these types will be drawn by Unity's Layout system
@@ -108,13 +108,6 @@ namespace Vexe.Editor.Editors
         {
             typeof(UnityEngine.Events.UnityEventBase)
         };
-
-        //private bool _useUnityGUI;
-        private static bool useUnityGUI
-        {
-            get { return prefs.Bools.ValueOrDefault(guiKey); }
-            set { prefs.Bools[guiKey] = value; }
-        }
 
         protected bool foldout
         {
@@ -136,9 +129,6 @@ namespace Vexe.Editor.Editors
             targetType = target.GetType();
 
             id = RuntimeHelper.GetTargetID(target);
-
-            //_useUnityGUI = useUnityGUI;
-            //gui = _useUnityGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI();
 
             Initialize();
 
@@ -166,13 +156,6 @@ namespace Vexe.Editor.Editors
 
         public sealed override void OnInspectorGUI()
         {
-            // update gui instance if it ever changes
-            //if (_useUnityGUI != useUnityGUI)
-            //{
-            //    _useUnityGUI = useUnityGUI;
-            //    gui = _useUnityGUI ? (BaseGUI)new TurtleGUI() : new RabbitGUI();
-            //}
-
             // creating the delegate once, reducing allocation
             if (_onGUIFunction == null)
                 _onGUIFunction = OnGUI;
@@ -307,7 +290,7 @@ namespace Vexe.Editor.Editors
 
                     if (current == null)
                     {
-                        current = new MembersCategory(path, d.DisplayOrder, id);
+                        current = new MembersCategory(path, d.Order, id);
                         if (i == 0)
                             _categories.Add(current);
                         if (parent != null)
@@ -398,15 +381,6 @@ namespace Vexe.Editor.Editors
                     using (gui.Indent(GUI.skin.textField))
                     {
                         gui.Space(3f);
-                        if (targetType.IsDefined<HasRequirementsAttribute>())
-                        {
-                            using (gui.Horizontal())
-                            {
-                                gui.Space(3f);
-                                if (gui.MiniButton("Resolve Requirements", (Layout)null))
-                                    Requirements.Resolve(target, gameObject);
-                            }
-                        }
 
                         gui.Member(_debug);
 
@@ -429,7 +403,8 @@ namespace Vexe.Editor.Editors
                             gui.RequestResetIfRabbit();
                         }
 
-                        gui.Member(_serializationData, true);
+                        if (_serializationData != null)
+                            gui.Member(_serializationData, true);
                     }
                 }
             }
@@ -477,21 +452,6 @@ namespace Vexe.Editor.Editors
             }
 
             return false;
-        }
-
-        public static class MenuItems
-        {
-            [MenuItem("Tools/Vexe/GUI/UseUnityGUI")]
-            public static void UseUnityGUI()
-            {
-                BetterPrefs.GetEditorInstance().Bools[guiKey] = true;
-            }
-
-            [MenuItem("Tools/Vexe/GUI/UseRabbitGUI")]
-            public static void UseRabbitGUI()
-            {
-                BetterPrefs.GetEditorInstance().Bools[guiKey] = false;
-            }
         }
     }
 }
