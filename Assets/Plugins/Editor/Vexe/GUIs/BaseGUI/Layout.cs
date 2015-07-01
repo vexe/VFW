@@ -5,14 +5,19 @@ namespace Vexe.Editor
 {
 	public class Layout
 	{
-		public float? height      { get; set; }
-		public float? width       { get; set; }
-		public bool? expandHeight { get; set; }
-		public bool? expandWidth  { get; set; }
-		public float? minHeight   { get; set; }
-		public float? minWidth    { get; set; }
-		public float? maxHeight   { get; set; }
-		public float? maxWidth    { get; set; }
+		public float? height;
+		public float? width;
+		public bool? expandHeight;
+		public bool? expandWidth;
+		public float? minHeight;
+		public float? minWidth;
+		public float? maxHeight;
+		public float? maxWidth;
+
+        /// <summary>
+        /// Match control width to better fit its content
+        /// </summary>
+        public bool fit;
 
         /// <summary>
         /// Return Auto layout (null) to tell the layout system to figure out the control dimensions itself
@@ -22,6 +27,11 @@ namespace Vexe.Editor
 		public static readonly Layout None;
 
 		public static List<GUILayoutOption> SharedGLOptions;
+
+        public static Layout sFit()
+        {
+            return new Layout().Fit();
+        }
 
 		public static Layout sWidth(float w)
 		{
@@ -44,6 +54,12 @@ namespace Vexe.Editor
             Debug.LogWarning("ExpandHeight is not implemented, it won't do anything. Returning Auto layout");
             return Auto;
 		}
+
+        public Layout Fit()
+        {
+            fit = true;
+            return this;
+        }
 
 		public Layout Width(float w)
 		{

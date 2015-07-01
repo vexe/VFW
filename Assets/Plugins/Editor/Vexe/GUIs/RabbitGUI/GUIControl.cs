@@ -57,6 +57,11 @@ namespace Vexe.Editor.GUIs
 					width = UnityEditor.EditorGUIUtility.labelWidth - 5f;
 				else if (option.width.HasValue)
 					width = option.width.Value;
+                else if (option.fit)
+                {
+                    var size = data.style.CalcSize(data.content);
+                    width = size.x;
+                }
 				height = option.height.HasValue ? option.height.Value : BaseGUI.GetHeight(data.type);
 			}
 			else
