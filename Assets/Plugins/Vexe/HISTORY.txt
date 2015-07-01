@@ -458,3 +458,55 @@ Regarding FastSerializer:
 - To enable it, you can use the backend popup under the script header, or override GetSerializerType
   and return typeof(ALPHA_FastSerializer); - If you ever decided to do so please let me know if you
   come across any bugs. - Have fun!
+
+_______________
+-- VFW 1.3.3 --
+
+Fixes:
+- simple method parameters (ints, floats, bools, enums and strings) exposed via [Show] were not being persisted between editor sessions
+- using unexplicit PerValue/Key on a dictionary, attributes get applied on the dictionary itself as well
+- Popup drawer doesn't correctly set initial value when using paths
+- #33 error when using Unity's layout for drawing UnityEvents when exiting playmode
+- #34 GameObject is now included in the list of targets for the delegate
+- #30 bug when getting UnityEngine types that inherits a certain type
+- #32 added proper LayerMask drawer
+
+Core behaviours: simplified/cleaned up serialization code, and split into Base/Better Behaviour/ScriptableObject
+- Vfw was initially about custom drawing, then I added custom serialization on top. From that time it has always been that those two things are combined into BetterBehaviour. Now, we have BaseBehaviour/ScriptableObject = Vfw editor power, and BetterBehaviour/ScriptableObject = Vfw editor + serialization power. So if you ever need Vfw editor stuff but not any custom serialization (uses Unity's serialization) use BaseBehaviour
+- Removed FastSerializer backend. Those binary serializers I wrote will come into the picture later, not in Vfw.
+- Removed the flexibility I've added in 1.3.2 regarding overriding the serialization logic in a behaviour and/or explicitly defining what members to serialize by name. This was adding complexity that we don't have to deal with. I added those features as a response to a user request, but even after that it wasn't certain if those features would fix his problem or not.
+
+Cleanup/Refactoring/Changes:
+- PopupDrawer: population method is now only fetched from runtime assemblies
+- BetterAnimator is no more, the stuff that was in it are now extension methods for Animator
+- Moved 'Message', 'CachedBehaviour' and 'Requirements' out of the core into a 'VFW Misc' folder
+  (Trying to keep the fw as clean, minimal and focused as possible)
+- GizHelper uses IDisposable blocks instead of lambdas
+- Changed the default display options to "BoxedMembersArea | Headers | BoxedHeaders"
+- Removed useUnityGUI from BaseEditor - always using RabbitGUI now.
+- Renamed UEObjectExtensions to UnityObjectExtensions
+- Renamed ShowMethodExample.cs to ShowExample.cs
+- Removed Clipboard.cs and .asset (and replaced its usage in Vector drawer with BetterPrefs)
+- Removed ScriptableAssets folder from the Runtime folder
+- Moved the category files from the Runtime folder to Attributes/API
+
+Additions:
+- Added a SerializableDictionary (not a wrapper) extracted from System.Collections.Generic (LINK)
+- Added a 'fit' option in Layout (matches width with content)
+- Added HideButtons options for sequence/dictionary and ManualAlloc to dictionary drawing
+- Added ToTitleCase string extension method (MY_INT_VALUE => MyIntValue)
+- Added Assert.False
+- Added ColorToHex to RuntimeHelper
+
+Improvements:
+- Credited Fasterflect for Flags.cs
+- KVPList implements IDictionary
+- Nice editor display for snake_case members
+- ButtonDrawer: button callback can now take either 0, 1 (member value) or 2 (collection value + index) parameters
+- MethodDrawer: removed the dbg/Dbg prefix from method names that start with it
+- GetNiceName MemberInfo extension now takes into consideration snake-cased members
+- [Show] takes a category string thus can now serve the purpose of [Category("...")]
+    This saves some typing, instead of:
+    [Show, Category("MyCategory")] int my_value;
+    we can say:
+    [Show("MyCategory")] int my_value;
