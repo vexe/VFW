@@ -191,6 +191,6 @@ expose it in the inspector, and not modify it from code - my personal favorite a
   Also see MethodInfoConverter.cs under Vexe/Runtime/Serialization/Serializers/FullSerializer
   After you write the converter, make sure to add it in FullSerializerBackend.cs upon initializing it
 1. <a name="faq-view-state">**How to view the serialize state of a BetterBehaviour?**</a>
-  - Just collapse the script header foldout, from there you'll see the runtime serialization data
+  - Just expand the script header foldout, from there you'll see the runtime serialization data
 1. <a name="faq-how-to-serialize">**How do you serialize a BetterBehaviour to file?**</a>
   - *Short answer:* there's no direct support to do this, so don't do it. *Long answer:* Like we mentioned before, serialization of Unity objects is done by storing the object in a serializable list (by Unity) and serializing the index of the storage location. That doesn't play well with saving things to Stream (File for ex) because then the receiving end must have the same list available for deserialization to work, which isn't very practical. This is why the serialization system is mainly meant and designed for persisting data between assembly reloads. That said, you could still try to write the serialization data of a behaviour to file, it will work nicely with non-UnityObject members such as dictionary, list etc but not with UnityObject references.

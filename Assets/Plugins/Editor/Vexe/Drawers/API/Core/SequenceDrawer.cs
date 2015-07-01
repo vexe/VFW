@@ -102,21 +102,21 @@ namespace Vexe.Editor.Drawers
 				if (showAdvanced)
 					isAdvancedChecked = gui.CheckButton(isAdvancedChecked, "advanced mode");
 
-				if (!_options.Readonly && !_options.HideButtons)
+				if (!_options.Readonly)
 				{
 					using (gui.State(memberValue.Count > 0))
 					{
 						if (gui.ClearButton("elements"))
-                        {
+                        { 
                             Clear();
                         }
                         if (gui.RemoveButton("last element"))
-                        {
+                        { 
                             RemoveLast();
                         }
                     }
                     if (gui.AddButton("element", MiniButtonStyle.ModRight))
-                    {
+                    { 
                         AddValue();
                     }
 				}
@@ -176,7 +176,7 @@ namespace Vexe.Editor.Drawers
 				using (gui.Indent(_options.GuiBox ? GUI.skin.box : GUIStyle.none))
 				{
 #if PROFILE
-					Profiler.BeginSample("Sequence Elements: " + displayText);
+					Profiler.BeginSample("Sequence Elements");
 #endif
 					for (int iLoop = 0; iLoop < memberValue.Count; iLoop++)
 					{
@@ -202,13 +202,7 @@ namespace Vexe.Editor.Drawers
 								using (gui.Vertical())
 								{
 									var element = GetElement(i);
-#if PROFILE
-                                    Profiler.BeginSample("Element: " + i);
-#endif
 									gui.Member(element, @ignoreComposition: _perItemAttributes == null);
-#if PROFILE
-                                    Profiler.EndSample();
-#endif
 								}
 							}
 
@@ -246,19 +240,31 @@ namespace Vexe.Editor.Drawers
 								if (showAdvanced)
 								{
 									if (gui.MoveDownButton())
-                                    {
+                                    { 
 										MoveElementDown(i);
                                     }
 									if (gui.MoveUpButton())
-                                    {
+                                    { 
 										MoveElementUp(i);
                                     }
 								}
 							}
 
 							if (!_options.Readonly && _options.PerItemRemove && gui.RemoveButton("element", MiniButtonStyle.ModRight))
-                            {
+                            { 
 								RemoveAt(i);
+                            }
+
+
+                            ///Only valid for Classes implementing ICloneable
+                            if (typeof(ICloneable).IsAssignableFrom(_elementType) && elementValue != null)
+                            {
+                                if (!_options.Readonly && _options.PerItemDuplicate && gui.AddButton("element", MiniButtonStyle.ModRight))
+                                {
+                                    ICloneable _elementToClone = (ICloneable)elementValue;
+                                    TElement cloned = (TElement)_elementToClone.Clone();
+                                    AddValue(cloned);
+                                }
                             }
 						}
 					}
@@ -383,21 +389,21 @@ namespace Vexe.Editor.Drawers
 			public readonly bool Advanced;
 			public readonly bool LineNumbers;
 			public readonly bool PerItemRemove;
+            public readonly bool PerItemDuplicate;
 			public readonly bool GuiBox;
 			public readonly bool UniqueItems;
             public readonly bool Filter;
-            public readonly bool HideButtons;
 
 			public SequenceOptions(Seq options)
 			{
-				Readonly      = options.HasFlag(Seq.Readonly);
-				Advanced      = options.HasFlag(Seq.Advanced);
-				LineNumbers   = options.HasFlag(Seq.LineNumbers);
-				PerItemRemove = options.HasFlag(Seq.PerItemRemove);
-				GuiBox        = options.HasFlag(Seq.GuiBox);
-				UniqueItems   = options.HasFlag(Seq.UniqueItems);
-                Filter        = options.HasFlag(Seq.Filter);
-                HideButtons   = options.HasFlag(Seq.HideButtons);
+				Readonly          = options.HasFlag(Seq.Readonly);
+				Advanced          = options.HasFlag(Seq.Advanced);
+				LineNumbers       = options.HasFlag(Seq.LineNumbers);
+				PerItemRemove     = options.HasFlag(Seq.PerItemRemove);
+                PerItemDuplicate  = options.HasFlag(Seq.PerItemDuplicate);
+				GuiBox            = options.HasFlag(Seq.GuiBox);
+				UniqueItems       = options.HasFlag(Seq.UniqueItems);
+                Filter            = options.HasFlag(Seq.Filter);
 			}
 		}
 	}

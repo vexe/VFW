@@ -106,36 +106,35 @@ namespace Vexe.Runtime.Types
         /// <summary>
         /// Display pairs in a single horizontal block?
         /// </summary>
-        HorizontalPairs = 1 << 5,
+        HorizontalPairs = 1 << 3,
 
         /// <summary>
         /// Show a search box to filter elements? (uses element.ToString() when matching)
         /// </summary>
-        Filter = 1 << 6,
+        Filter = 1 << 4,
 
         /// <summary>
         /// Should new pairs be added to the end of the dictionary as opposed to inserting them at the beginning?
         /// (same applies to removing them as well)
         /// </summary>
-        AddToLast = 1 << 7,
+        AddToLast = 1 << 5,
 
         /// <summary>
         /// Show a temporary adding area for keys? (enter key and hit return to add a new pair with that key value)
         /// </summary>
-        TempKey = 1 << 8,
+        TempKey = 1 << 6,
 
         /// <summary>
-        /// Should leave the dictionary value null if it was? (by default we allocate a new one if null)
-        /// This is useful if you have say, an array of dictionaries and you're populating the
-        /// values from code, and you don't want the drawer to mess with the values
+        /// Hides the header buttons (clear, add, remove)
         /// </summary>
-        ManualAlloc = 1 << 9,
+        HideButtons = 1 << 7,
 
         /// <summary>
-        /// Hide the add/remove/clear buttons?
-        /// Useful if you're only populating the dictionary from code, but you still want to edit the values in the inspector
+        /// Show a 'New' button to manually allocate memory for the dictionary
+        /// (Useful if say you have an array of dictionaries and you don't want the elements
+        /// to be automatically allocated)
         /// </summary>
-        HideButtons = 1 << 10,
+        ManualAlloc = 1 << 8,
     }
 
     [Flags]
@@ -182,9 +181,13 @@ namespace Vexe.Runtime.Types
         Filter = 1 << 6,
 
         /// <summary>
-        /// Hide the add/remove/clear buttons?
-        /// Useful if you're only populating the sequence from code, but you still want to edit the values in the inspector
+        /// Hides the header buttons (clear, add, remove)
         /// </summary>
         HideButtons = 1 << 7,
+
+        /// <summary>
+        /// Whether to show a duplicate button that will add clone element at the end of the list.
+        /// </summary>
+        PerItemDuplicate = 1 << 8,
     }
 }
