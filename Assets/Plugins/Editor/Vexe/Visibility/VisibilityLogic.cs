@@ -14,14 +14,11 @@ namespace Vexe.Editor.Visibility
     {
         public static readonly VisibilityAttributes Attributes;
 
-        static readonly Func<Tuple<Type, RuntimeMember[]>, List<MemberInfo>> _cachedGetVisibleMembers;
         static readonly Func<Type, List<MemberInfo>> _cachedGetDefaultVisibleMembers;
 
-        public static List<MemberInfo> CachedGetVisibleMembers(Type type, RuntimeMember[] serialized)
+        public static List<MemberInfo> CachedGetVisibleMembers(Type type)
         {
-            if (serialized == null)
-                return _cachedGetDefaultVisibleMembers(type);
-            return _cachedGetVisibleMembers(Tuple.Create(type, serialized));
+            return _cachedGetDefaultVisibleMembers(type);
         }
 
         static VisibilityLogic()
@@ -31,15 +28,7 @@ namespace Vexe.Editor.Visibility
             _cachedGetDefaultVisibleMembers = new Func<Type, List<MemberInfo>>(type =>
             {
                 return ReflectionHelper.CachedGetMembers(type)
-                                       .Where(x => IsVisibleMember(x, null))
-                                       .OrderBy<MemberInfo, float>(GetMemberDisplayOrder)
-                                       .ToList();
-            }).Memoize();
-
-            _cachedGetVisibleMembers = new Func<Tuple<Type, RuntimeMember[]>, List<MemberInfo>>(tup =>
-            {
-                return ReflectionHelper.CachedGetMembers(tup.Item1)
-                                       .Where(x => IsVisibleMember(x, tup.Item2))
+                                       .Where(IsVisibleMember)
                                        .OrderBy<MemberInfo, float>(GetMemberDisplayOrder)
                                        .ToList();
             }).Memoize();
@@ -71,12 +60,10 @@ namespace Vexe.Editor.Visibility
         /// 1- If the 'serialized' member array is null, we use the default VFWSerializationLogic
         /// 2- otherwise we see if that field/property is contained within the serialized array
         /// </summary>
-        public static bool IsVisibleMember(MemberInfo member, RuntimeMember[] serialized)
+        public static bool IsVisibleMember(MemberInfo member)
         {
             if (member is MethodInfo)
                 return Attributes.Show.Any(member.IsDefined);
-
-            bool useDefaultLogic = serialized == null;
 
             var field = member as FieldInfo;
             if (field != null)
@@ -87,10 +74,10 @@ namespace Vexe.Editor.Visibility
                 if (Attributes.Show.Any(field.IsDefined))
                     return true;
 
-                if (useDefaultLogic)
-                    return VFWSerializationLogic.Instance.IsSerializableField(field);
+                if (field.IsDefined<SerializeField>())
+                    return true;
 
-                return serialized.Contains(x => x.Name == field.Name);
+                return VFWSerializationLogic.Instance.IsSerializableField(field);
             }
 
             var property = member as PropertyInfo;
@@ -109,10 +96,7 @@ namespace Vexe.Editor.Visibility
             if (Attributes.Show.Any(property.IsDefined))
                 return true;
 
-            if (useDefaultLogic)
-                return VFWSerializationLogic.Instance.IsSerializableProperty(property);
-
-            return serialized.Contains(x => x.Name == property.Name);
+            return VFWSerializationLogic.Instance.IsSerializableProperty(property);
         }
 
         static HashSet<string> IgnoredUnityProperties = new HashSet<string>()

@@ -259,16 +259,11 @@ namespace Vexe.Editor.Drawers
 
         public static bool DrawRecursive(ref object target, BaseGUI gui, int id, UnityObject unityTarget, params string[] memberNames)
         {
-            RuntimeMember[] serialized = null;
-            var vfwObj = target as IVFWObject;
-            if (vfwObj != null)
-                serialized = vfwObj.GetSerializedMembers();
-
             List<MemberInfo> members;
             var targetType = target.GetType();
             if (memberNames.IsNullOrEmpty())
             {
-                members = VisibilityLogic.CachedGetVisibleMembers(targetType, serialized);
+                members = VisibilityLogic.CachedGetVisibleMembers(targetType);
             }
             else
             {
@@ -282,7 +277,7 @@ namespace Vexe.Editor.Drawers
                         LogFormat("RecursiveDrawer: Couldn't find member {0} in {1}", name, targetType.Name);
                         continue;
                     }
-                    if (VisibilityLogic.IsVisibleMember(member, serialized))
+                    if (VisibilityLogic.IsVisibleMember(member))
                         members.Add(member);
                 }
             }
