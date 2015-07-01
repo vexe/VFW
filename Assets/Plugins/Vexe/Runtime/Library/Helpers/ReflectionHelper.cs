@@ -134,7 +134,7 @@ namespace Vexe.Runtime.Helpers
         /// </summary>
         public static Type[] GetAllUnityEngineTypesOf(Type type)
         {
-            return GetAllUnityEngineTypes().Where(type.IsA).ToArray();
+            return GetAllUnityEngineTypes().Where(type.IsAssignableFrom).ToArray();
         }
 
         /// <summary>
