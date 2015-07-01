@@ -30,6 +30,7 @@ namespace Vexe.Editor.Types
 
 		public readonly int Id;
         public readonly string Name;
+        public readonly string NiceName;
         public readonly string TypeNiceName;
         public readonly Type Type;
         public readonly MemberInfo Info;
@@ -42,12 +43,18 @@ namespace Vexe.Editor.Types
             { @"\$name"    , x => x.Name },
             { @"\$nicename", x =>
                 {
-                    var settings = VFWSettings.GetInstance();
-                    var name = x.Name;
-                    if (!settings.UseHungarianNotation)
-                        return name.Replace("m_", "").Replace("_", "").SplitPascalCase();;
+                    string name = x.Name;
+                    string result = null;
 
-                    string result = name.Replace("m_", "").Replace("_", "");
+                    if (name.IsPrefix("m_"))
+                        result = name.Replace("m_", "");
+                    else result = name;
+
+                    result = result.ToTitleCase();
+
+                    var settings = VFWSettings.GetInstance();
+                    if (!settings.UseHungarianNotation)
+                        return result.SplitPascalCase();;
 
                     if (name.Length > 1 && char.IsLower(result[0]) && char.IsUpper(result[1]))
                     {
@@ -95,8 +102,9 @@ namespace Vexe.Editor.Types
             Info         = memberInfo;
             Type         = memberType;
             RawTarget    = rawTarget;
-            Name         = memberName;
             TypeNiceName = memberType.GetNiceName();
+            Name         = memberName;
+            NiceName     = Formatters[@"\$nicename"].Invoke(this);
             UnityTarget  = unityTarget;
             Attributes   = attributes;
 
@@ -181,26 +189,12 @@ namespace Vexe.Editor.Types
 
             var imported = field.GetValue(null) as Attribute[];
 
-            // check if 'DisplayAttribute' merging is needed
-            // happens only if the both the imported and current attributes have a DisplayAttribute
             var display1 = attributes.GetAttribute<DisplayAttribute>();
             if (display1 != null)
             {
                 var display2 = imported.GetAttribute<DisplayAttribute>();
                 if (display2 != null)
-                {
-                    // combine seq/dict options
-                    display2.DictOpt |= display1.DictOpt;
-                    display2.SeqOpt |= display1.SeqOpt;
-
-                    // display1 overrides display2 if any formatting/order values are specified
-                    if (display1.DisplayOrder.HasValue)
-                        display2.Order = display1.Order;
-                    if (!string.IsNullOrEmpty(display1.FormatMethod))
-                        display2.FormatMethod = display1.FormatMethod;
-                    if (!string.IsNullOrEmpty(display1.FormatKVPair))
-                        display2.FormatKVPair = display1.FormatKVPair;
-                }
+                    CombineDisplays(src: display1, dest: display2);
             }
 
             var tmp = attributes.ToList();
@@ -210,6 +204,32 @@ namespace Vexe.Editor.Types
                 tmp.Remove(display1);
 
             attributes = tmp.ToArray();
+        }
+
+        public static void CombineDisplays(DisplayAttribute src, DisplayAttribute dest)
+        {
+            // combine seq/dict options
+            dest.DictOpt |= src.DictOpt;
+            dest.SeqOpt |= src.SeqOpt;
+
+            // display1 overrides display2 if any formatting/order values are specified
+            if (src.DisplayOrder.HasValue)
+                dest.Order = src.Order;
+            if (!string.IsNullOrEmpty(src.FormatMethod))
+                dest.FormatMethod = src.FormatMethod;
+            if (!string.IsNullOrEmpty(src.FormatKVPair))
+                dest.FormatKVPair = src.FormatKVPair;
+        }
+
+        public static DisplayAttribute CombineDisplays(DisplayAttribute[] attributes)
+        {
+            var result = new DisplayAttribute();
+            for (int i = 0; i < attributes.Length; i++)
+            {
+                var display = attributes[i];
+                CombineDisplays(src: display, dest: result);
+            }
+            return result;
         }
 
         public object Get()
@@ -222,10 +242,6 @@ namespace Vexe.Editor.Types
 			bool sameValue = value.GenericEquals(Get());
 			if (sameValue)
 				return;
-
-            var vfw = UnityTarget as IVFWObject;
-            if (vfw != null)
-                vfw.MarkChanged();
 
 			HandleUndoAndSet(value);
 
