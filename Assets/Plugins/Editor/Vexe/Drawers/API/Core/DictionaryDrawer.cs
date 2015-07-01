@@ -394,8 +394,13 @@ namespace Vexe.Editor.Drawers
         {
             if (from.IsObjectNull())
                 return "null";
+
             var obj = from as UnityObject;
-            return (obj != null) ? (obj.name + " (" + obj.GetType().Name + ")") : from.ToString();
+            if (obj != null)
+                return obj.name + " (" + obj.GetType().Name + ")";
+
+            var toStr = from.ToString();
+            return toStr == null ? "null" : toStr;
         }
 
         TK GetNewKey(IDictionary<TK, TV> from)

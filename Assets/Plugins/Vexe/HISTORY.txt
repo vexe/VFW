@@ -470,6 +470,7 @@ Fixes:
 - #34 GameObject is now included in the list of targets for the delegate
 - #30 bug when getting UnityEngine types that inherits a certain type
 - #32 added proper LayerMask drawer
+- #28 dictionary value string throws when ToString returns null
 
 Core behaviours: simplified/cleaned up serialization code, and split into Base/Better Behaviour/ScriptableObject
 - Vfw was initially about custom drawing, then I added custom serialization on top. From that time it has always been that those two things are combined into BetterBehaviour. Now, we have BaseBehaviour/ScriptableObject = Vfw editor power, and BetterBehaviour/ScriptableObject = Vfw editor + serialization power. So if you ever need Vfw editor stuff but not any custom serialization (uses Unity's serialization) use BaseBehaviour
