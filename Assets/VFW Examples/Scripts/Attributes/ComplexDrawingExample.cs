@@ -4,7 +4,7 @@ using Vexe.Runtime.Types;
 
 namespace VFWExamples
 {
-    public class ComplexDrawingExample : BetterBehaviour
+    public class ComplexDrawingExample : BaseBehaviour
     {
         // let's say we have an array of Lookup (custom dictionary of sorts) objects
         // we want to apply Display on the array to give it a custom format
@@ -13,10 +13,10 @@ namespace VFWExamples
         // the custom drawer will be applied on Lookup and will draw it just the way we like!
         // See how the drawer is implemented and mapped in RegisterCustomDrawerExample.cs
         [Display(Seq.LineNumbers | Seq.Filter), PerItem("Whitespace"), Whitespace(Left = 5f)]
-        public Lookup[] ComplexArray;
+        public ItemsLookup[] ComplexArray;
     }
 
-    public class Lookup : Dictionary<string, int>
+    public class ItemsLookup : SerializableDictionary<string, int>
     {
         public new int this[string key]
         {
@@ -28,6 +28,17 @@ namespace VFWExamples
                     return 0;
                 return value;
             }
+        }
+
+        static string[] GetValues()
+        {
+            return new string[]
+            {
+                "Weapons/Berreta", "Weapons/Shotgun", "Weapons/Grenade Launcher", "Weapons/Barry's Gun!", 
+                "Key Item/Manhole Opener", "Key Item/Blue Gem", "Key Item/Jill Sandwich", "Key Item/ Golden Emblem",
+                "Health/Green Herb", "Health/First Aid Spray", "Health/First Aid Kit", "Health/Syringe", 
+                "Ammo/Handgun Ammo", "Ammo/Shotgun Shells", "Ammo/Grenade Rounds", "Ammo/Magnum Ammo", 
+            };
         }
     }
 }

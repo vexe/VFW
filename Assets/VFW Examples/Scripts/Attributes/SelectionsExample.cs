@@ -3,16 +3,10 @@ using Vexe.Runtime.Types;
 
 namespace VFWExamples
 {
-	
-	public class SelectionsExample : BetterBehaviour
+	public class SelectionsExample : BaseBehaviour
 	{
-		[SelectObj]
-		public BoxCollider boxCollider;
-
-		[SelectObj]
-		public GameObject GO { get; set; }
-
-		[SelectEnum]
-		public KeyCode jumpKey;
+		[SelectObj] public BoxCollider boxCollider;
+		[SelectObj] public GameObject GO;
+		[SelectEnum] public KeyCode jumpKey;
 	}
 }

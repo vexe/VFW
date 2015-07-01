@@ -4,7 +4,6 @@ using Vexe.Runtime.Types;
 
 namespace VFWExamples
 {
-	
 	public class EnumsExample : BetterBehaviour
 	{
 		// you can use the 'id' number to determine which drawer to draw first, the filter or the selection button
@@ -14,7 +13,7 @@ namespace VFWExamples
 		public KeyCode actionKey;
 
 		[EnumMask]
-		public Permissions Permission { get; set; }
+		public Permissions permission;
 
 		// Remark: For bit-wise operations on the enum to give you the results you'd expect,
 		// the enums have to have values of power of 2. Here's why http://stackoverflow.com/questions/9811114/why-do-enum-permissions-often-have-0-1-2-4-values

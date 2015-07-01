@@ -3,11 +3,10 @@ using Vexe.Runtime.Types;
 
 namespace VFWExamples
 {
-	
-	public class AssignableExample : BetterBehaviour
+	public class AssignableExample : BaseBehaviour
 	{
-		[Assignable] public string SomeString         { get; set; }
-		[Assignable] public int SomeInt               { get; set; }
-		[Assignable] public GameObject SomeGameObject { get; set; }
+		[Assignable] public string SomeString;
+		[Assignable] public int SomeInt;
+		[Assignable] public GameObject SomeGameObject;
 	}
 }

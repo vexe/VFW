@@ -1,8 +1,9 @@
 ﻿using Vexe.Runtime.Types;
+
 namespace VFWExamples
 {
 	
-	public class ConstraintsExample : BetterBehaviour
+	public class ConstraintsExample : BaseBehaviour
 	{
 		[Comment("Example value: 1.0.0.127"), IP]
 		public string ip;

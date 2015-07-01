@@ -7,6 +7,6 @@ namespace VFWExamples
 		public float randomFloat;
 
 		[Comment("This is a random property between 10 and 100"), iRand(10, 100)]
-		public int RandomIntProperty { get; set; }
+		public int randomInt;
 	}
 }

@@ -4,13 +4,13 @@ using Vexe.Runtime.Types;
 
 namespace VFWExamples
 {
-	public class AnimVarExample : BetterBehaviour
+	public class AnimVarExample : BaseBehaviour
 	{
 		[AnimVar(AutoMatch = "Var")] // this will try to auto-assign "Is Dead" to this field
 		public string isDeadVar;
 
         [PerItem, AnimVar]
-		public string[] Variables { get; set; }
+		public string[] Variables;
 
 		[AnimVar(GetAnimatorMethod = "GetAnim")]
 		public string anotherVar;

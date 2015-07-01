@@ -20,7 +20,7 @@ namespace VFWExamples
             MemberDrawersHandler.Mapper.Insert<CustomObject, CustomDrawer1>()
                                        .Insert<OverrideAttribute, CustomDrawer2>()
                                        .Insert<Index2D, CustomDrawer3>()
-                                       .Insert<Lookup, LookupDrawer>();
+                                       .Insert<ItemsLookup, LookupDrawer>();
         }
     }
 
@@ -79,7 +79,7 @@ namespace VFWExamples
         }
     }
 
-    public class LookupDrawer : ObjectDrawer<Lookup>
+    public class LookupDrawer : ObjectDrawer<ItemsLookup>
     {
         // since our lookup 'is a' Dictionary, we will use a dictionary drawer
         IDictionaryDrawer<string, int> drawer;
@@ -96,7 +96,7 @@ namespace VFWExamples
                 {
                     new DisplayAttribute(Dict.HorizontalPairs), // apply horizontal display on the dictionary pairs
                     new PerKeyAttribute("Popup"), // popup per key
-                    new PopupAttribute("LookupDrawer.GetValues")
+                    new PopupAttribute("ItemsLookup.GetValues")
                     { 
                         TextField = true, // we want a nice text field
                         TakeLastPathItem = true, // since we're using '/' in our values, we only care about the last item in the path
@@ -109,20 +109,9 @@ namespace VFWExamples
         public override void OnGUI()
         {
             if (memberValue == null)
-                memberValue = new Lookup();
+                memberValue = new ItemsLookup();
 
             drawer.OnGUI();
-        }
-
-        static string[] GetValues()
-        {
-            return new string[]
-            {
-                "Weapons/Berreta", "Weapons/Shotgun", "Weapons/Grenade Launcher", "Weapons/Barry's Gun!", 
-                "Key Item/Manhole Opener", "Key Item/Blue Gem", "Key Item/Jill Sandwich", "Key Item/ Golden Emblem",
-                "Health/Green Herb", "Health/First Aid Spray", "Health/First Aid Kit", "Health/Syringe", 
-                "Ammo/Handgun Ammo", "Ammo/Shotgun Shells", "Ammo/Grenade Rounds", "Ammo/Magnum Ammo", 
-            };
         }
     }
 }

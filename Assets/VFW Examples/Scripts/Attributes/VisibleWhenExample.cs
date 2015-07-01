@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using Vexe.Runtime.Types;
 
 namespace VFWExamples
 {
-	public class VisibleWhenExample : BetterBehaviour
+	public class VisibleWhenExample : BaseBehaviour
 	{
         public int value;
 
@@ -27,6 +28,7 @@ namespace VFWExamples
         public NestedObject[] array;
 	}
 
+    [Serializable]
     public struct NestedObject
     {
         [VisibleWhen("Flag4")]
