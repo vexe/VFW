@@ -2,6 +2,7 @@
 
 using System;
 using System.Reflection;
+using UnityEngine;
 using Vexe.Editor.GUIs;
 using Vexe.Editor.Types;
 using Vexe.Runtime.Extensions;
@@ -64,12 +65,12 @@ namespace Vexe.Editor.Drawers
 				int i = iLoop;
 				var argInfo = argInfos[i];
 
-				argKeys[i] = RuntimeHelper.CombineHashCodes(id, argInfo);
+				argKeys[i] = RuntimeHelper.CombineHashCodes(id, argInfo.ParameterType.Name + argInfo.Name);
 
-				argValues[i] = ValueOrDefault(argInfos[i].ParameterType, argKeys[i]);
+				argValues[i] = TryLoad(argInfos[i].ParameterType, argKeys[i]);
 
                 argMembers[i] = EditorMember.WrapGetSet(
-                        @get         : () => argValues[i],
+                        @get         : () =>  argValues[i],
                         @set         : x => argValues[i] = x,
                         @rawTarget   : rawTarget,
                         @unityTarget : unityTarget,
@@ -100,7 +101,7 @@ namespace Vexe.Editor.Drawers
 						bool argChange = gui.Member(argMembers[i], false);
 						changed |= argChange;
 						if (argChange)
-							TryAdd(argValues[i], argKeys[i]);
+							TrySave(argValues[i], argKeys[i]);
 					}
 				}
 			}
@@ -124,24 +125,30 @@ namespace Vexe.Editor.Drawers
 			return foldout;
 		}
 
-		void TryAdd(object obj, int key)
+		void TrySave(object obj, int key)
 		{
 			if (obj == null) return;
 
 			var type = obj.GetType();
-			if (type == typeof(int))
+            if (type.IsEnum || type == typeof(int))
 				 prefs.Ints[key] = (int)obj;
-			if (type == typeof(string))
+			else if (type == typeof(string))
 				 prefs.Strings[key] = (string)obj;
-			if (type == typeof(float))
+			else if (type == typeof(float))
 				 prefs.Floats[key] = (float)obj;
-			if (type == typeof(bool))
+			else if (type == typeof(bool))
 				 prefs.Bools[key] = (bool)obj;
 		}
 
-		object ValueOrDefault(Type type, int key)
+		object TryLoad(Type type, int key)
 		{
-			if (type == typeof(int))
+            if (type.IsEnum)
+            {
+                int value = prefs.Ints.ValueOrDefault(key);
+                object result = Enum.ToObject(type, value);
+                return result;
+            }
+            if (type == typeof(int))
 				return prefs.Ints.ValueOrDefault(key);
 			if (type == typeof(string))
 				return prefs.Strings.ValueOrDefault(key);

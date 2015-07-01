@@ -45,8 +45,8 @@ namespace VFWExamples
 			[Tags, FilterTags] string tag,
 			[SelectEnum] KeyCode key)
 		{
-			LogFormat(item);
-			LogFormat(tag);
+			Log(item);
+			Log(tag);
 			Log(key);
 		}
 	}
