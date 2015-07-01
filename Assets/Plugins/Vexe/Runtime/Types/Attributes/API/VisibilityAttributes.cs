@@ -9,6 +9,19 @@ namespace Vexe.Runtime.Types
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method)]
 	public class ShowAttribute : Attribute
 	{
+        /// <summary>
+        /// The editor category the annotaed member is added to
+        /// </summary>
+        public string Category;
+
+        public ShowAttribute()
+        {
+        }
+
+        public ShowAttribute(string category)
+        {
+            this.Category = category;
+        }
 	}
 
 	/// <summary>

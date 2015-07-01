@@ -29,8 +29,11 @@ namespace Vexe.Editor.Internal
 				var output = new MembersList();
 				output.AddRange(input.Where(m =>
 				{
-					var memberDef = m.GetCustomAttribute<CategoryAttribute>();
-					return memberDef != null && memberDef.name == def.FullPath;
+					var caetgory = m.GetCustomAttribute<CategoryAttribute>();
+					if (caetgory != null && caetgory.name == def.FullPath)
+                        return true;
+                    var show = m.GetCustomAttribute<ShowAttribute>();
+					return show != null && show.Category == def.FullPath;
 				}));
 				return output;
 			};
