@@ -167,5 +167,10 @@ namespace Vexe.Runtime.Types
         /// Show a search box to filter elements? (uses element.ToString() when matching)
         /// </summary>
         Filter = 1 << 6,
+
+        /// <summary>
+        /// Whether to show a duplicate button that will add clone element at the end of the list.
+        /// </summary>
+        PerItemDuplicate = 1 << 7,
     }
 }
