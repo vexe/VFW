@@ -66,42 +66,24 @@ namespace Vexe.Runtime.Serialization
     /// </summary>
     public class VFWSerializationLogic : ISerializationLogic
     {
-        /// <summary>
-        /// The serialization attributes that this logic uses to determine whether or not a field, property or type is serialiable
-        /// </summary>
-        public readonly SerializationAttributes Attributes;
+        public readonly Type[] SerializeMember;
+
+        public readonly Type[] DontSerializeMember;
 
         /// <summary>
-        /// The default attributes used in VFW
-        /// - [Serialize] and [SerializeField] to tell that a field/property must be serialized
+        /// The default serialization logic used in VFW
+        /// - [Serialize] and to tell that a field/property must be serialized
         /// - [DontSerialize] to tell that a field/property should not be serialized
         /// - no attributes required for a type to be serializable
         /// </summary>
-        public static readonly SerializationAttributes DefaultAttributes = new SerializationAttributes
-        (
-            new[]
-            {
-                // Note: it's always better to annotate with [Serialize] instead of [SerializeField] (read the FAQ)
-                typeof(SerializeField),
-                typeof(SerializeAttribute),
-            },
+        public static readonly VFWSerializationLogic Instance = new VFWSerializationLogic(
+            new Type[] { typeof(SerializeAttribute), typeof(SerializeField) },
+            new Type[] { typeof(DontSerializeAttribute), typeof(NonSerializedAttribute) });
 
-            new[]
-            {
-                // Didn't include NonSerializedAttribute cause it's only applicable to fields
-                typeof(DontSerializeAttribute),
-            },
-
-            // We don't need to annotate types with special attributes to serialize them
-            // since we're using serializers that don't require it
-            Type.EmptyTypes
-        );
-
-        public static readonly VFWSerializationLogic Instance = new VFWSerializationLogic(DefaultAttributes);
-
-        public VFWSerializationLogic(SerializationAttributes attributes)
+        public VFWSerializationLogic(Type[] serializeMemberAttributes, Type[] dontSerializeMemberAttributes)
         {
-            this.Attributes = attributes;
+            this.SerializeMember = serializeMemberAttributes;
+            this.DontSerializeMember = dontSerializeMemberAttributes;
         }
 
         /// <summary>
@@ -154,13 +136,13 @@ namespace Vexe.Runtime.Serialization
         /// </summary>
         public override bool IsSerializableField(FieldInfo field)
         {
-            if (Attributes.DontSerializeMember.Any(field.IsDefined))
+            if (DontSerializeMember.Any(field.IsDefined))
                 return false;
 
             if (field.IsLiteral)
                 return false;
 
-            if (!(field.IsPublic || Attributes.SerializeMember.Any(field.IsDefined)))
+            if (!(field.IsPublic || SerializeMember.Any(field.IsDefined)))
                 return false;
 
             bool serializable = IsSerializableType(field.FieldType);
@@ -178,7 +160,7 @@ namespace Vexe.Runtime.Serialization
         /// </summary>
         public override bool IsSerializableProperty(PropertyInfo property)
         {
-            if (Attributes.DontSerializeMember.Any(property.IsDefined))
+            if (DontSerializeMember.Any(property.IsDefined))
                 return false;
 
             if (!property.IsAutoProperty())
@@ -186,7 +168,7 @@ namespace Vexe.Runtime.Serialization
 
             if (!(property.GetGetMethod(true).IsPublic ||
                   property.GetSetMethod(true).IsPublic ||
-                  Attributes.SerializeMember.Any(property.IsDefined)))
+                  SerializeMember.Any(property.IsDefined)))
                 return false;
 
             bool serializable = IsSerializableType(property.PropertyType);

@@ -2,6 +2,7 @@
 using UnityEngine;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
+using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Runtime.Serialization
 {
@@ -22,12 +23,11 @@ namespace Vexe.Runtime.Serialization
         /// such that all Unity object references are stored in the data's serializedObjects list,
         /// and the serializable members' values in the data's serializedStrings
         /// </summary>
-        public void SerializeTargetIntoData(IVFWObject target)
+        public void SerializeTargetIntoData(UnityObject target, SerializationData data)
         {
-            var data = target.GetSerializationData();
             data.Clear();
 
-            var members = target.GetSerializedMembers();
+            var members = VFWSerializationLogic.Instance.CachedGetSerializableMembers(target.GetType());
             for (int i = 0; i < members.Length; i++)
             {
                 var member    = members[i];
@@ -55,10 +55,9 @@ namespace Vexe.Runtime.Serialization
         /// Fetches the serialized state of the specified target from the specified serialization data
         /// to use it to deserialize/reload the target reassigning all the target's member values
         /// </summary>
-        public void DeserializeTargetFromData(IVFWObject target)
+        public void DeserializeTargetFromData(UnityObject target, SerializationData data)
         {
-            var data = target.GetSerializationData();
-            var members = target.GetSerializedMembers();
+            var members = VFWSerializationLogic.Instance.CachedGetSerializableMembers(target.GetType());
             for(int i = 0; i < members.Length; i++)
             {
                 var member    = members[i];

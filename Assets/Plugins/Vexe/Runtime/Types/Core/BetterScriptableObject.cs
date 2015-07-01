@@ -6,78 +6,44 @@ using Vexe.Runtime.Serialization;
 
 namespace Vexe.Runtime.Types
 {
-    [DefineCategory("", 0, MemberType = CategoryMemberType.All, Exclusive = false, AlwaysHideHeader = true)]
-    [DefineCategory("Dbg", 3f, Pattern = "^dbg")]
-    public abstract class BetterScriptableObject : ScriptableObject, IVFWObject, ISerializationCallbackReceiver
+    /// <summary>
+    /// Inherit this class in your scriptable objects to get the full editor power of Vfw + custom serialization
+    /// Note that it is better to use BaseScriptableObject unless Unity's serialization doesn't work for you and
+    /// you truely need custom serialization
+    /// </summary>
+    public abstract class BetterScriptableObject : BaseScriptableObject, ISerializationCallbackReceiver
     {
         [SerializeField]
         private SerializationData _serializationData;
-
-        [SerializeField]
-        private SerializableType _serializerType;
-
-        /// <summary>
-        /// A persistent identifier used primarly from editor scripts to have editor data persist
-        /// Could be used at runtime as well if you have any usages of a unique id
-        /// Note this is not the same as GetInstanceID, as it seems to change when you reload scenes
-        /// This id gets assigned only once and then serialized.
-        /// </summary>
-        [SerializeField, HideInInspector]
-        private int _id = -1;
-
-        [Display("Serializer Backend"), ShowType(typeof(SerializerBackend))]
-        private Type SerializerType
+        private SerializationData serializationData
         {
-            get
-            {
-                var type = GetSerializerType();
-                if (_serializerType == null || !_serializerType.HasValidName() || _serializerType.Value != type)
-                {
-                    if (!type.IsA<SerializerBackend>())
-                    {
-                        Debug.LogError("Serializer type must inherit BackendSerializer: " + type.Name);
-                        type = SerializerBackend.DefaultType;
-                    }
-                    _serializerType = new SerializableType(type);
-                }
-
-                var result = _serializerType.Value;
-                if (result == null)
-                {
-                    result = type;
-                    _serializerType = new SerializableType(result);
-                }
-                return result;
-
-            }
-            set
-            {
-                if (_serializerType.Value != value && value != null)
-                {
-                    _serializerType.Value = value;
-                    _serializer = value.ActivatorInstance<SerializerBackend>();
-                }
-            }
+            get { return _serializationData ?? (_serializationData = new SerializationData()); }
         }
 
         private SerializerBackend _serializer;
         public SerializerBackend Serializer
         {
-            get { return _serializer ?? (_serializer = SerializerType.ActivatorInstance<SerializerBackend>()); }
+            get
+            {
+                if (_serializer == null)
+                {
+                    var type = GetSerializerType();
+                    _serializer = type.ActivatorInstance<SerializerBackend>();
+                }
+                return _serializer;
+            }
         }
 
         public virtual void OnBeforeSerialize()
         {
-            bool serialize;
-            if (SemiAutomaticSerialization())
-                serialize = _dirty++ < 2;
-            else serialize = RuntimeHelper.IsModified(this, Serializer, GetSerializationData());
-
-            if (serialize)
+#if UNITY_EDITOR
+            if (RuntimeHelper.IsModified(this, Serializer, serializationData))
             {
-                dLog("Serializing: " + GetType().Name);
                 SerializeObject();
             }
+#else
+                SerializeObject();
+#endif
         }
 
         public virtual void OnAfterDeserialize()
@@ -92,50 +58,16 @@ namespace Vexe.Runtime.Types
             DeserializeObject();
         }
 
-        // Logging
-        #region
-        public bool dbg;
-
-        protected void dLogFormat(string msg, params object[] args)
-        {
-            if (dbg) LogFormat(msg, args);
-        }
-
-        protected void dLog(object obj)
-        {
-            if (dbg) Log(obj);
-        }
-
-        protected void LogFormat(string msg, params object[] args)
-        {
-            if (args.IsNullOrEmpty()) args = new object[0];
-            Debug.Log(string.Format(msg, args)); // passing gameObject as context will ping the gameObject that we logged from when we click the log entry in the console!
-        }
-
-        protected void Log(object obj)
-        {
-            Debug.Log(obj);
-        }
-
-        // static logs are useful when logging in nested system.object classes
-        protected static void sLogFormat(string msg, params object[] args)
-        {
-            if (args.IsNullOrEmpty()) args = new object[0];
-            Debug.Log(string.Format(msg, args));
-        }
-
-        protected static void sLog(object obj)
-        {
-            Debug.Log(obj);
-        }
-        #endregion
-
         public virtual void Reset()
         {
             RuntimeHelper.ResetTarget(this);
         }
 
 #if UNITY_EDITOR
+        // this editor hack is needed to make it possible to let Unity Layout draw things after RabbitGUI.
+        // For some reason, if I try to let Unity draw things via obj.Update(), PropertyField(...) and obj.ApplyModifiedProperties(),
+        // it will send deserialization requests which will deserialize the behaviour overriding the new changes made in the property
+        // which means that the property will not be modified. so we delay deserialization for a single editor frame
         private bool _delayDeserialize;
 
         public void DelayNextDeserialize()
@@ -144,64 +76,21 @@ namespace Vexe.Runtime.Types
         }
 #endif
 
-        // IVFWObject implementation
-        #region
         public virtual Type GetSerializerType()
         {
             return SerializerBackend.DefaultType;
         }
 
-        public virtual ISerializationLogic GetSerializationLogic()
+        [ContextMenu("Load behaviour state")]
+        public virtual void DeserializeObject()
         {
-            return VFWSerializationLogic.Instance;
+            Serializer.DeserializeTargetFromData(this, serializationData);
         }
 
-        public virtual RuntimeMember[] GetSerializedMembers()
+        [ContextMenu("Save behaviour state")]
+        public virtual void SerializeObject()
         {
-            var logic = GetSerializationLogic();
-            var members = logic.CachedGetSerializableMembers(GetType());
-            return members;
-        }
-
-        public SerializationData GetSerializationData()
-        {
-            return _serializationData ?? (_serializationData = new SerializationData());
-        }
-
-        public virtual int GetPersistentId()
-        {
-            if (_id == -1)
-                _id = GetInstanceID();
-            return _id;
-        }
-
-        public virtual CategoryDisplay GetDisplayOptions()
-        {
-            return CategoryDisplay.BoxedMembersArea | CategoryDisplay.Headers | CategoryDisplay.BoxedHeaders;
-        }
-
-        public void DeserializeObject()
-        {
-            Serializer.DeserializeTargetFromData(this);
-        }
-
-        public void SerializeObject()
-        {
-            Serializer.SerializeTargetIntoData(this);
-        }
-        #endregion
-
-        [SerializeField, HideInInspector] int _dirty = 0;
-
-        public void MarkChanged()
-        {
-            dLog("Marked: " + name);
-            _dirty = 0;
-        }
-
-        public virtual bool SemiAutomaticSerialization()
-        {
-            return false;
+            Serializer.SerializeTargetIntoData(this, serializationData);
         }
     }
 }

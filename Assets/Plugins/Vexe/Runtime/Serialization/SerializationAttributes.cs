@@ -20,34 +20,3 @@ namespace Vexe.Runtime.Types
     {
     }
 }
-
-namespace Vexe.Runtime.Serialization
-{
-    /// <summary>
-    /// Contains Type arrays for attributes that help determine if a member or type is serializable or not
-    /// </summary>
-    public class SerializationAttributes
-    {
-        /// <summary>
-        /// Tells that a member (fields, auto-properties) must be serialized
-        /// </summary>
-        public readonly Type[] SerializeMember;
-
-        /// <summary>
-        /// Tells that a member (fields, auto-properties) will not be serialized
-        /// </summary>
-        public readonly Type[] DontSerializeMember;
-
-        /// <summary>
-        /// Tells that a type is serializable
-        /// </summary>
-        public readonly Type[] SerializableType;
-
-        public SerializationAttributes(Type[] serializeMember, Type[] dontSerializeMember, Type[] serializableType)
-        {
-            this.SerializeMember     = serializeMember;
-            this.DontSerializeMember = dontSerializeMember;
-            this.SerializableType    = serializableType;
-        }
-    }
-}

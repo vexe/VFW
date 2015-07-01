@@ -92,7 +92,7 @@ namespace Vexe.Editor.Editors
         private List<MembersCategory> _categories;
         private List<MemberInfo> _visibleMembers;
         private SerializedProperty _script;
-        private EditorMember _serializationData, _debug, _serializerType;
+        private EditorMember _serializationData, _debug;
         private int _repaintCount, _spacing;
         private CategoryDisplay _display;
         private Action _onGUIFunction;
@@ -252,10 +252,7 @@ namespace Vexe.Editor.Editors
             OnBeforeInitialized();
 
             // fetch visible members
-            var vfwObj = target as IVFWObject;
-            Assert.NotNull(vfwObj, "Target must implement IVFWObject!");
-            var serialized = vfwObj.GetSerializedMembers();
-            _visibleMembers = VisibilityLogic.CachedGetVisibleMembers(targetType, serialized);
+            _visibleMembers = VisibilityLogic.CachedGetVisibleMembers(targetType);
 
             var drawnByUnity = _visibleMembers
                 .Where(x => x.IsDefined<DrawByUnityAttribute>() || DrawnByUnityTypes.Any(x.GetDataType().IsA));
@@ -363,21 +360,17 @@ namespace Vexe.Editor.Editors
 
             var field = targetType.GetMemberFromAll("_serializationData", Flags.InstancePrivate);
             if (field == null)
-                throw new vMemberNotFound(targetType, "_serializationData");
-
-            _serializationData = EditorMember.WrapMember(field, target, target, id);
+            {
+                if (targetType.IsA<BetterBehaviour>() || targetType.IsA<BetterScriptableObject>())
+                    throw new vMemberNotFound(targetType, "_serializationData");
+            }
+            else _serializationData = EditorMember.WrapMember(field, target, target, id);
 
             field = targetType.GetField("dbg", Flags.InstanceAnyVisibility);
             if (field == null)
                 throw new vMemberNotFound(targetType, "dbg");
 
             _debug = EditorMember.WrapMember(field, target, target, id);
-
-            var serializerType = targetType.GetMemberFromAll("SerializerType", Flags.InstanceAnyVisibility);
-            if (serializerType == null)
-                throw new vMemberNotFound(targetType, "SerializerType");
-
-            _serializerType = EditorMember.WrapMember(serializerType, target, target, id);
 
             OnAfterInitialized();
         }
@@ -435,8 +428,6 @@ namespace Vexe.Editor.Editors
                             prefs.Ints[id + "spacing".GetHashCode()] = _spacing;
                             gui.RequestResetIfRabbit();
                         }
-
-                        gui.Member(_serializerType);
 
                         gui.Member(_serializationData, true);
                     }

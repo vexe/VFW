@@ -23,8 +23,8 @@ namespace Vexe.Runtime.Serialization
             Serializer.AddConverter(new UnityObjectConverter());
             Serializer.AddConverter(new MethodInfoConverter());
 
-            fsConfig.SerializeAttributes = VFWSerializationLogic.Instance.Attributes.SerializeMember;
-            fsConfig.IgnoreSerializeAttributes = VFWSerializationLogic.Instance.Attributes.DontSerializeMember;
+            fsConfig.SerializeAttributes = VFWSerializationLogic.Instance.SerializeMember;
+            fsConfig.IgnoreSerializeAttributes = VFWSerializationLogic.Instance.DontSerializeMember;
         }
 
         public override string Serialize(Type type, object value, object context)
