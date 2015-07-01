@@ -1,20 +1,38 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿using System;
+using UnityEngine;
 
 namespace Vexe.Runtime.Types
 { 
-	public class CachedBehaviour : BetterBehaviour
+	public class CachedBehaviour : BaseBehaviour
 	{
-		private Transform cachedTransform;
-		new public Transform transform
-		{
-			get
-			{
-				if (!cachedTransform)
-					cachedTransform = base.transform;
-				return cachedTransform;
-			}
-		}
+        [NonSerialized] string cachedName;
+        new public string name
+        {
+            get
+            {
+                if (cachedName == null)
+                    cachedName = base.name;
+                return cachedName;
+            }
+            set
+            {
+                if (this.name == value)
+                    return;
+                cachedName = value;
+                base.name = value;
+            }
+        }
+
+        [NonSerialized] Transform cachedTransform;
+        new public Transform transform
+        {
+            get
+            {
+                if (!cachedTransform)
+                    cachedTransform = base.transform;
+                return cachedTransform;
+            }
+        }
 
 		public RectTransform rectTransform
 		{
@@ -108,5 +126,6 @@ namespace Vexe.Runtime.Types
 			get { return transform.localScale; }
 			set { transform.localScale = value; }
 		}
+
 	}
 }
