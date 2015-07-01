@@ -233,7 +233,7 @@ namespace Vexe.Editor.Drawers
                                 if (adding.source is Component)
                                     adding.target = adding.source;
 
-                                var components      = gameObject.GetAllComponents();
+                                var components      = gameObject.GetAllComponentsIncludingSelf();
                                 int targetIdx       = components.IndexOfZeroIfNotFound(adding.target);
                                 var uniqueNames     = components.Select(c => c.GetType().Name).ToList().Uniqify();
                                 var targetSelection = gui.Popup("Target", targetIdx, uniqueNames.ToArray());
@@ -503,7 +503,7 @@ namespace Vexe.Editor.Drawers
                                 if (adding.source is Component)
                                     adding.target = adding.source;
 
-                                var components      = gameObject.GetAllComponents();
+                                var components      = gameObject.GetAllComponentsIncludingSelf();
                                 int cIndex          = components.IndexOfZeroIfNotFound(adding.target);
                                 var uniqueNames     = components.Select(c => c.GetType().Name).ToList().Uniqify();
                                 var targetSelection = gui.Popup("Target", cIndex, uniqueNames.ToArray());
