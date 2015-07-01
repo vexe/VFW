@@ -15,11 +15,12 @@ namespace Vexe.Runtime.Types
     /// Since the keys/values are just likes it means you can access them independantly
     /// There is no hashing. Instead, a linear search is performed when you lookup values
     /// </summary>
-	public class KVPList<TKey, TValue> : IDictionary<TKey, TValue>
+    [Serializable]
+	public class KVPList<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary
 	{
         // Should be just public readonly, but that would not play nice with Unity serialization
-		[SerializeField] private List<TKey> keys;
-		[SerializeField] private List<TValue> values;
+		[SerializeField] List<TKey> keys;
+		[SerializeField] List<TValue> values;
 
         public List<TKey> Keys     { get { return keys;       } }
         public List<TValue> Values { get { return values;     } }
@@ -199,7 +200,7 @@ namespace Vexe.Runtime.Types
             return (index = keys.IndexOf(key)) != -1;
         }
 
-        public struct KVPEnumerator : IEnumerator<KeyValuePair<TKey, TValue>>
+        public struct KVPEnumerator : IEnumerator<KeyValuePair<TKey, TValue>>, IDictionaryEnumerator
         {
             private int _idx;
             private readonly KVPList<TKey, TValue> _list;
@@ -232,6 +233,21 @@ namespace Vexe.Runtime.Types
 
             public void Dispose()
             {
+            }
+
+            public DictionaryEntry Entry
+            {
+                get { throw new NotImplementedException(); }
+            }
+
+            public object Key
+            {
+                get { return Current.Key; }
+            }
+
+            public object Value
+            {
+                get { return Current.Value; }
             }
         }
 
@@ -297,7 +313,63 @@ namespace Vexe.Runtime.Types
 		{
 			return string.Format("<{0}, {1}> (Count = {2})", typeof(TKey).GetNiceName(), typeof(TValue).GetNiceName(), Count);
 		}
-	}
+
+        public void Add(object key, object value)
+        {
+            Add((TKey)key, (TValue)value);
+        }
+
+        public bool Contains(object key)
+        {
+            return ContainsKey((TKey)key);
+        }
+
+        IDictionaryEnumerator IDictionary.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public bool IsFixedSize
+        {
+            get { return false; }
+        }
+
+        ICollection IDictionary.Keys
+        {
+            get { return Keys; }
+        }
+
+        public void Remove(object key)
+        {
+            Remove((TKey)key);
+        }
+
+        ICollection IDictionary.Values
+        {
+            get { return Values; }
+        }
+
+        public object this[object key]
+        {
+            get { return this[(TKey)key]; }
+            set { this[(TKey)key] = (TValue)value; }
+        }
+
+        public void CopyTo(Array array, int index)
+        {
+            throw new NotImplementedException("CopyTo");
+        }
+
+        public bool IsSynchronized
+        {
+            get { return false; }
+        }
+
+        public object SyncRoot
+        {
+            get { return null; }
+        }
+    }
 
 	public static class KVPListExtensions
 	{
