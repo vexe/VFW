@@ -7,6 +7,7 @@ using System.Text;
 namespace Vexe.Runtime.Extensions
 {
     /// <summary>
+    /// (Credits to Fasterflect)
     /// This class encapsulates common <see cref="BindingFlags"/> combinations and provides various
     /// additional Fasterflect-specific flags to further tailor the lookup experience.
     /// </summary>

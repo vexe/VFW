@@ -97,15 +97,12 @@ namespace Vexe.Runtime.Extensions
         public static string GetNiceName(this MemberInfo member)
         {
             var method = member as MethodInfo;
+            string result;
             if (method != null)
-            {
-                return method.GetFullName();
-            }
-            string name = member.Name;
-            if (string.IsNullOrEmpty(name)) return name;
-            return name[0] == '_' ? name.Remove(0, 1).SplitPascalCase() : name.SplitPascalCase();
+                result = method.GetFullName();
+            else result = member.Name;
+            return result.ToTitleCase().SplitPascalCase();
         }
-
 
         public static bool IsStatic(this MemberInfo member)
         {

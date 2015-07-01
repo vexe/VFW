@@ -69,11 +69,21 @@ namespace Vexe.Runtime.Helpers
 			True(condition, string.Empty);
 		}
 
+        public static void False(bool condition, string msg)
+        {
+            True(!condition, msg);
+        }
+
+        public static void False(bool condition)
+        {
+            False(condition, string.Empty);
+        }
+
 		public class AssertionFailure : Exception
 		{
 			public AssertionFailure(string msg) : base(msg)
 			{
 			}
 		}
-	}
+    }
 }
