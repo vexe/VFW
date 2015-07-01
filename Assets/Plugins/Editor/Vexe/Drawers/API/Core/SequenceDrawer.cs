@@ -27,7 +27,6 @@ namespace Vexe.Editor.Drawers
         private Attribute[] _perItemAttributes;
         private TextFilter _filter;
         private string _originalDisplay;
-        private bool _dirty;
 
         public bool UpdateCount = true;
 
@@ -103,25 +102,22 @@ namespace Vexe.Editor.Drawers
 				if (showAdvanced)
 					isAdvancedChecked = gui.CheckButton(isAdvancedChecked, "advanced mode");
 
-				if (!_options.Readonly)
+				if (!_options.Readonly && !_options.HideButtons)
 				{
 					using (gui.State(memberValue.Count > 0))
 					{
 						if (gui.ClearButton("elements"))
-                        { 
+                        {
                             Clear();
-                            _dirty = true;
                         }
                         if (gui.RemoveButton("last element"))
-                        { 
+                        {
                             RemoveLast();
-                            _dirty = true;
                         }
                     }
                     if (gui.AddButton("element", MiniButtonStyle.ModRight))
-                    { 
+                    {
                         AddValue();
-                        _dirty = true;
                     }
 				}
 			}
@@ -135,8 +131,6 @@ namespace Vexe.Editor.Drawers
 				    gui.HelpBox("Sequence is empty");
 				return;
 			}
-
-            _dirty = false;
 
 			// body
 			using (gui.Vertical(_options.GuiBox ? GUI.skin.box : GUIStyle.none))
@@ -182,7 +176,7 @@ namespace Vexe.Editor.Drawers
 				using (gui.Indent(_options.GuiBox ? GUI.skin.box : GUIStyle.none))
 				{
 #if PROFILE
-					Profiler.BeginSample("Sequence Elements");
+					Profiler.BeginSample("Sequence Elements: " + displayText);
 #endif
 					for (int iLoop = 0; iLoop < memberValue.Count; iLoop++)
 					{
@@ -208,7 +202,13 @@ namespace Vexe.Editor.Drawers
 								using (gui.Vertical())
 								{
 									var element = GetElement(i);
+#if PROFILE
+                                    Profiler.BeginSample("Element: " + i);
+#endif
 									gui.Member(element, @ignoreComposition: _perItemAttributes == null);
+#if PROFILE
+                                    Profiler.EndSample();
+#endif
 								}
 							}
 
@@ -217,7 +217,6 @@ namespace Vexe.Editor.Drawers
 								if (_options.Readonly)
 								{
 									memberValue[i] = previous;
-                                    _dirty = true;
 								}
 								else if (_options.UniqueItems)
 								{
@@ -230,7 +229,6 @@ namespace Vexe.Editor.Drawers
 											if (occurances > 1)
 											{
 												memberValue[i] = previous;
-                                                _dirty = true;
 												break;
 											}
 										}
@@ -248,22 +246,19 @@ namespace Vexe.Editor.Drawers
 								if (showAdvanced)
 								{
 									if (gui.MoveDownButton())
-                                    { 
+                                    {
 										MoveElementDown(i);
-                                        _dirty = true;
                                     }
 									if (gui.MoveUpButton())
-                                    { 
+                                    {
 										MoveElementUp(i);
-                                        _dirty = true;
                                     }
 								}
 							}
 
 							if (!_options.Readonly && _options.PerItemRemove && gui.RemoveButton("element", MiniButtonStyle.ModRight))
-                            { 
+                            {
 								RemoveAt(i);
-                                _dirty = true;
                             }
 						}
 					}
@@ -322,13 +317,6 @@ namespace Vexe.Editor.Drawers
 				}
 				gui.Space(3f);
 			}
-
-            if (_dirty)
-            {
-                var vfw = unityTarget as IVFWObject;
-                if (vfw != null)
-                    vfw.MarkChanged();
-            }
 		}
 
 		private EditorMember GetElement(int index)
@@ -381,7 +369,6 @@ namespace Vexe.Editor.Drawers
 		private void AddValue(TElement value)
 		{
 			Insert(memberValue.Count, value);
-            _dirty = true;
 		}
 
 		private void AddValue()
@@ -399,6 +386,7 @@ namespace Vexe.Editor.Drawers
 			public readonly bool GuiBox;
 			public readonly bool UniqueItems;
             public readonly bool Filter;
+            public readonly bool HideButtons;
 
 			public SequenceOptions(Seq options)
 			{
@@ -409,6 +397,7 @@ namespace Vexe.Editor.Drawers
 				GuiBox        = options.HasFlag(Seq.GuiBox);
 				UniqueItems   = options.HasFlag(Seq.UniqueItems);
                 Filter        = options.HasFlag(Seq.Filter);
+                HideButtons   = options.HasFlag(Seq.HideButtons);
 			}
 		}
 	}

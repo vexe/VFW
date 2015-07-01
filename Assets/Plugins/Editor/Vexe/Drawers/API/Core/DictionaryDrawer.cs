@@ -7,8 +7,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
-using Vexe.Editor.Extensions;
-using Vexe.Editor.Helpers;
 using Vexe.Editor.Types;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
@@ -29,7 +27,6 @@ namespace Vexe.Editor.Drawers
         private TextFilter _filter;
         private string _originalDisplay;
         private int _lastUpdatedCount = -1;
-        private bool _dirty;
 
         private TK _tempKey;
 
@@ -77,10 +74,11 @@ namespace Vexe.Editor.Drawers
             if (_options.Filter)
                 _filter = new TextFilter(null, id, true, null);
 
-            if (memberValue == null)
+            if (memberValue == null && !_options.ManualAlloc)
                 memberValue = memberType.Instance<IDictionary<TK, TV>>();
 
-            member.CollectionCount = memberValue.Count;
+            if (memberValue != null)
+                member.CollectionCount = memberValue.Count;
 
             if (_options.TempKey)
             {
@@ -105,7 +103,21 @@ namespace Vexe.Editor.Drawers
             }
 
             if (memberValue == null)
-                memberValue = memberType.Instance<IDictionary<TK, TV>>();
+            {
+                if (_options.ManualAlloc)
+                {
+                    using(gui.Horizontal())
+                    {
+                        gui.Label(member.NiceName + " (Null)");
+                        if (gui.Button("New", GUIStyles.MiniRight, Layout.sFit()))
+                            memberValue = memberType.Instance<IDictionary<TK, TV>>();
+                    }
+                }
+                else memberValue = memberType.Instance<IDictionary<TK, TV>>();
+            }
+
+            if (memberValue == null)
+                return;
 
             member.CollectionCount = memberValue.Count;
 
@@ -155,7 +167,7 @@ namespace Vexe.Editor.Drawers
                             GUI.SetNextControlName(controlName);
                             gui.Member(_tempKeyMember);
                             var e = Event.current;
-                            if (e.isKey && e.keyCode == KeyCode.Return && GUI.GetNameOfFocusedControl() == controlName)
+                            if (e.type == EventType.KeyUp && e.keyCode == KeyCode.Return && GUI.GetNameOfFocusedControl() == controlName)
                             {
                                 AddNewPair();
                                 EditorGUI.FocusTextInControl(controlName);
@@ -163,27 +175,24 @@ namespace Vexe.Editor.Drawers
                         }
                         else gui.FlexibleSpace();
 
-                        using (gui.State(_kvpList.Count > 0))
-                        {
-                            if (gui.ClearButton("dictionary"))
-                            { 
-                                _kvpList.Clear();
-                                _dirty = true;
-                            }
-
-                            if (gui.RemoveButton("last added dictionary pair"))
+                        if (!_options.HideButtons)
+                        { 
+                            using (gui.State(_kvpList.Count > 0))
                             {
-                                if (_options.AddToLast)
-                                    _kvpList.RemoveLast();
-                                else
-                                    _kvpList.RemoveFirst();
+                                if (gui.ClearButton("dictionary"))
+                                    _kvpList.Clear();
 
-                                _dirty = true;
+                                if (gui.RemoveButton("last added dictionary pair"))
+                                {
+                                    if (_options.AddToLast)
+                                        _kvpList.RemoveLast();
+                                    else
+                                        _kvpList.RemoveFirst();
+                                }
                             }
+                            if (gui.AddButton("pair", MiniButtonStyle.ModRight))
+                                AddNewPair();
                         }
-
-                        if (gui.AddButton("pair", MiniButtonStyle.ModRight))
-                            AddNewPair();
                     }
                 }
                 gui.Space(3f);
@@ -299,13 +308,6 @@ namespace Vexe.Editor.Drawers
                 #if PROFILE
                 Profiler.EndSample();
                 #endif
-
-                if (_dirty)
-                {
-                    var vfw = unityTarget as IVFWObject;
-                    if (vfw != null)
-                        vfw.MarkChanged();
-                }
             }
         }
 
@@ -465,8 +467,6 @@ namespace Vexe.Editor.Drawers
 
                 if (_options.TempKey)
                     _tempKey = GetNewKey(_kvpList);
-
-                _dirty = true;
             }
             catch (ArgumentException)
             {
@@ -483,16 +483,20 @@ namespace Vexe.Editor.Drawers
             public readonly bool Filter;
             public readonly bool AddToLast;
             public readonly bool TempKey;
+            public readonly bool ManualAlloc;
+            public readonly bool HideButtons;
 
 			public DictionaryOptions(Dict options)
 			{
-                Readonly        = options.HasFlag(Dict.Readonly);
-                ForceExpand     = options.HasFlag(Dict.ForceExpand);
-                HideHeader      = options.HasFlag(Dict.HideHeader);
-                HorizontalPairs = options.HasFlag(Dict.HorizontalPairs);
-                Filter          = options.HasFlag(Dict.Filter);
-                AddToLast       = options.HasFlag(Dict.AddToLast);
-                TempKey         = options.HasFlag(Dict.TempKey);
+                Readonly           = options.HasFlag(Dict.Readonly);
+                ForceExpand        = options.HasFlag(Dict.ForceExpand);
+                HideHeader         = options.HasFlag(Dict.HideHeader);
+                HorizontalPairs    = options.HasFlag(Dict.HorizontalPairs);
+                Filter             = options.HasFlag(Dict.Filter);
+                AddToLast          = options.HasFlag(Dict.AddToLast);
+                TempKey            = options.HasFlag(Dict.TempKey);
+                ManualAlloc        = options.HasFlag(Dict.ManualAlloc);
+                HideButtons        = options.HasFlag(Dict.HideButtons);
 			}
 		}
     }

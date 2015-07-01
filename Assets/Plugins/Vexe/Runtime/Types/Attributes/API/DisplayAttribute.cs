@@ -123,6 +123,19 @@ namespace Vexe.Runtime.Types
         /// Show a temporary adding area for keys? (enter key and hit return to add a new pair with that key value)
         /// </summary>
         TempKey = 1 << 8,
+
+        /// <summary>
+        /// Should leave the dictionary value null if it was? (by default we allocate a new one if null)
+        /// This is useful if you have say, an array of dictionaries and you're populating the
+        /// values from code, and you don't want the drawer to mess with the values
+        /// </summary>
+        ManualAlloc = 1 << 9,
+
+        /// <summary>
+        /// Hide the add/remove/clear buttons?
+        /// Useful if you're only populating the dictionary from code, but you still want to edit the values in the inspector
+        /// </summary>
+        HideButtons = 1 << 10,
     }
 
     [Flags]
@@ -167,5 +180,11 @@ namespace Vexe.Runtime.Types
         /// Show a search box to filter elements? (uses element.ToString() when matching)
         /// </summary>
         Filter = 1 << 6,
+
+        /// <summary>
+        /// Hide the add/remove/clear buttons?
+        /// Useful if you're only populating the sequence from code, but you still want to edit the values in the inspector
+        /// </summary>
+        HideButtons = 1 << 7,
     }
 }
