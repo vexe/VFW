@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEditor;
@@ -47,7 +47,7 @@ namespace Vexe.Editor.Types
                     string result = null;
 
                     if (name.IsPrefix("m_"))
-                        result = name.Replace("m_", "");
+                        result = name.Remove(0, 1);
                     else result = name;
 
                     result = result.ToTitleCase();
