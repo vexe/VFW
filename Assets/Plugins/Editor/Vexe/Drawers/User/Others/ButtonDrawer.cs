@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+using System;
+using System.Reflection;
 using UnityEngine;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
@@ -34,31 +35,44 @@ namespace Vexe.Editor.Drawers
             _params = parameters.Length;
             if (_params > 2)
             {
-                Debug.LogError("Button method {0} must take either no parameters, one value parameter of type {1} or two parameters, first of type {2} and an integer index"
-                        .FormatWith(attribute.Method, memberTypeName, memberTypeName));
+                Debug.LogError("Button method {0} must take either no parameters, " +
+                                "one parameter of type {1} or two parameters if the member was a list/array, " + 
+                                "first parameter must be of the list/array element type, second is an integer index"
+                                .FormatWith(attribute.Method, memberTypeName));
                 goto Init;
             }
             if (_params > 0)
             {
-                if (!parameters[0].ParameterType.IsA(memberType))
+                if (_params == 1)
                 {
-                    Debug.LogError("Button method ({0}) first parameter must be of a '{1}' type"
-                         .FormatWith(attribute.Method, memberTypeName));
-                    goto Init;
+                    if (!parameters[0].ParameterType.IsA(memberType))
+                    {
+                        Debug.LogError("Button method ({0}) first parameter must be of a '{1}' type"
+                             .FormatWith(attribute.Method, memberTypeName));
+                        goto Init;
+                    }
                 }
-
-                if (_params == 2)
+                else
                 {
+                    Type elementType;
+                    if (member.IsCollection)
+                        elementType = memberType;
+                    else if (!memberType.TryGetSequenceElementType(out elementType))
+                    {
+                        Debug.LogError("Method {0} has two parameters, member {1} must be a sequence (list/array)"
+                             .FormatWith(attribute.Method, member.Name));
+                        goto Init;
+                    }
+                    if (!parameters[0].ParameterType.IsA(elementType))
+                    {
+                        Debug.LogError("Button method ({0}) first parameter must be of a '{1}' type"
+                             .FormatWith(attribute.Method, memberTypeName));
+                        goto Init;
+                    }
                     if (parameters[1].ParameterType != typeof(int))
                     {
                         Debug.LogError("Button method {0} second parameter must be an integer index"
                              .FormatWith(attribute.Method));
-                        goto Init;
-                    }
-                    if (!memberType.IsCollection())
-                    {
-                        Debug.LogError("Method {0} has two parameters, member {1} must be a collection (list/array/dictionary)"
-                             .FormatWith(attribute.Method, member.Name));
                         goto Init;
                     }
                 }

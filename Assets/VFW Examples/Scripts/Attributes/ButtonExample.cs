@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+using System;
+using UnityEngine;
 using Vexe.Runtime.Types;
 
 namespace VFWExamples
 {
-    public class ButtonExample : BetterBehaviour
+    public class ButtonExample : BaseBehaviour
     {
         [Button("Log1", "1", "toolbarButton"),
          Button(0, "Log2", "2"),
@@ -24,6 +25,7 @@ namespace VFWExamples
             array[index] = GetComponent<Transform>();
         }
 
+        [Serializable]
         public struct ButtonStruct
         {
             [PerItem, Button("LogGO", "Log"),

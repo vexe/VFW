@@ -11,6 +11,24 @@ namespace Vexe.Runtime.Extensions
 {
     public static class TypeExtensions
     {
+        public static bool TryGetSequenceElementType(this Type type, out Type element)
+        {
+            if (type.IsArray)
+            {
+                element = type.GetElementType();
+                return true;
+            }
+
+            if (!type.IsIList())
+            { 
+                element = null;
+                return false;
+            }
+
+            element = type.GetProperty("Item").PropertyType;
+            return true;
+        }
+
         public static bool IsStatic(this Type type)
         {
             return type.IsSealed && type.IsAbstract;

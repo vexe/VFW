@@ -78,6 +78,11 @@ namespace Vexe.Editor.Types
             set { Set(value); }
         }
 
+        public bool IsCollection
+        {
+            get { return ElementIndex != -1; }
+        }
+
         private Action<object> _set;
         private Func<object> _get;
 
