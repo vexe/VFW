@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -53,6 +53,8 @@ namespace Vexe.Editor.Drawers
                     var go = drag as GameObject;
                     if (go != null)
                     {
+                        if (!memberType.IsA<Component>())
+                            continue;
                         var c = go.GetComponent(memberType);
                         if (c != null)
                             return c;
