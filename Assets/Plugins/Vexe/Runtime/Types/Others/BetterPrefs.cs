@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 #if UNITY_EDITOR
 using UnityEditor;
-using System;
+using System.IO;
+using System.Linq;
 #endif
 
 namespace Vexe.Runtime.Types
@@ -48,20 +50,28 @@ namespace Vexe.Runtime.Types
         }
 
 #if UNITY_EDITOR
-        const string EditorPrefsPath  = "Assets/Plugins/Editor/Vexe/ScriptableAssets/BetterEditorPrefs.asset";
-        const string RuntimePrefsPath = "Assets/Plugins/Vexe/Runtime/ScriptableAssets/BetterPrefs.asset";
-
         static BetterPrefs instance;
         public static BetterPrefs GetEditorInstance()
         {
-            if (instance == null)
+            if (instance == null || !AssetDatabase.Contains(instance))
             {
-                instance = AssetDatabase.LoadAssetAtPath<BetterPrefs>(EditorPrefsPath);
+                var dirs = Directory.GetDirectories("Assets", "Vexe", SearchOption.AllDirectories);
+                var editorDir = dirs.FirstOrDefault(x => Directory.GetParent(x).Name == "Editor");
+                var prefsDir = Path.Combine(editorDir, "ScriptableAssets");
+                if (editorDir == null || !Directory.Exists(prefsDir))
+                {
+                    Debug.LogError("Unable to create editor prefs asset at Editor/Vexe/ScriptableAssets (couldn't find folder). Please make sure that path exists 'somewhere' in your project");
+                    return instance != null ? instance : instance = CreateInstance<BetterPrefs>();
+                }
+
+                var path = Path.Combine(prefsDir, "BetterEditorPrefs.asset");
+                instance = AssetDatabase.LoadAssetAtPath<BetterPrefs>(path);
                 if (instance == null)
                 {
                     instance = ScriptableObject.CreateInstance<BetterPrefs>();
-                    AssetDatabase.CreateAsset(instance, EditorPrefsPath);
-                    AssetDatabase.ImportAsset(EditorPrefsPath, ImportAssetOptions.ForceUpdate);
+                    AssetDatabase.CreateAsset(instance, path);
+                    AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+                    AssetDatabase.Refresh();
                 }
             }
 

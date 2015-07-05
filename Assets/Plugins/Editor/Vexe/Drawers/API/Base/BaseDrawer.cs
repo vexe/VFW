@@ -53,7 +53,7 @@ namespace Vexe.Editor.Drawers
             if (prefs == null)
                 prefs = BetterPrefs.GetEditorInstance();
             if (foldouts == null)
-                foldouts = new Foldouts(prefs);
+                foldouts = new Foldouts();
         }
 
         public BaseDrawer Initialize(EditorMember member, Attribute[] attributes, BaseGUI gui)
@@ -66,7 +66,7 @@ namespace Vexe.Editor.Drawers
             this.gui        = gui;
 
             if (_dynamicFormatter != null)
-            { 
+            {
                 _formatArgs[0] = member.Value;
                 displayText = _dynamicFormatter(rawTarget, _formatArgs);
             }
@@ -97,7 +97,7 @@ namespace Vexe.Editor.Drawers
                     if (method.ReturnType != typeof(string) && method.GetParameters().Length > 0)
                         Debug.Log("Format Method should return a string and take no parameters: " + method);
                     else
-                    { 
+                    {
                         _dynamicFormatter = method.DelegateForCall<object, string>();
                         _formatArgs[0] = member.Value;
                         displayText = _dynamicFormatter(rawTarget, _formatArgs);

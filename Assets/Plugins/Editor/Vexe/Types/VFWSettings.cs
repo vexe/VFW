@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -59,8 +60,6 @@ namespace Vexe.Editor.Types
         [Comment("Should postfix the display text of a member with `(Readonly)` if it's annotated with [ReadonlyAttribute]?")]
         public bool DisplayReadonlyIfTrue = true;
 
-        private const string SettingsPath = "Assets/Plugins/Editor/Vexe/ScriptableAssets/VFWSettings.asset";
-
         [Show, Comment("Resets all settings to their defaults")]
         public void Reset()
         {
@@ -76,14 +75,25 @@ namespace Vexe.Editor.Types
         static VFWSettings instance;
         public static VFWSettings GetInstance()
         {
-            if (instance == null)
+            if (instance == null || !AssetDatabase.Contains(instance))
             {
-                instance = AssetDatabase.LoadAssetAtPath(SettingsPath, typeof(VFWSettings)) as VFWSettings;
+                var dirs = Directory.GetDirectories("Assets", "Vexe", SearchOption.AllDirectories);
+                var editorDir = dirs.FirstOrDefault(x => Directory.GetParent(x).Name == "Editor");
+                var prefsDir = Path.Combine(editorDir, "ScriptableAssets");
+                if (editorDir == null || !Directory.Exists(prefsDir))
+                {
+                    Debug.LogError("Unable to create Vfw settings asset at Editor/Vexe/ScriptableAssets (couldn't find folder). Please make sure that path exists 'somewhere' in your project");
+                    return instance != null ? instance : instance = CreateInstance<VFWSettings>();
+                }
+
+                var path = Path.Combine(prefsDir, "VFWSettings.asset");
+                instance = AssetDatabase.LoadAssetAtPath<VFWSettings>(path);
                 if (instance == null)
                 {
-                    instance = CreateInstance<VFWSettings>();
-                    AssetDatabase.CreateAsset(instance, SettingsPath);
-                    AssetDatabase.ImportAsset(SettingsPath, ImportAssetOptions.ForceUpdate);
+                    instance = ScriptableObject.CreateInstance<VFWSettings>();
+                    AssetDatabase.CreateAsset(instance, path);
+                    AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+                    AssetDatabase.Refresh();
                 }
             }
             return instance;

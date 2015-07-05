@@ -121,7 +121,7 @@ namespace Vexe.Editor.Editors
                 prefs = BetterPrefs.GetEditorInstance();
 
             if (foldouts == null)
-                foldouts = new Foldouts(prefs);
+                foldouts = new Foldouts();
 
             var component = target as Component;
             gameObject = component == null ? null : component.gameObject;

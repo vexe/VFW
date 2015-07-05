@@ -6,18 +6,16 @@ namespace Vexe.Editor.Types
 {
 	public class Foldouts
 	{
-		private readonly BetterPrefs prefs;
-
-		public Foldouts(BetterPrefs prefs)
-		{
-			this.prefs = prefs;
-		}
-
 		public bool this[int key]
 		{
-			get { return prefs.Bools.ValueOrDefault(key); }
+			get
+            {
+                var prefs = BetterPrefs.GetEditorInstance();
+                return prefs.Bools.ValueOrDefault(key);
+            }
 			set
 			{
+                var prefs = BetterPrefs.GetEditorInstance();
 				prefs.Bools[key] = value;
 				EditorUtility.SetDirty(prefs);
 			}
