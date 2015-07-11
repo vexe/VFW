@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,6 +8,14 @@ namespace Vexe.Runtime.Extensions
 {
 	public static class OtherExtensions
 	{
+        /// <summary>
+        /// Sets the stream's length to 0
+        /// </summary>
+        public static void Reset(this MemoryStream memory)
+        {
+            memory.SetLength(0);
+        }
+
         /// <summary>
         /// http://stackoverflow.com/questions/4108828/generic-extension-method-to-see-if-an-enum-contains-a-flag
         /// </summary>

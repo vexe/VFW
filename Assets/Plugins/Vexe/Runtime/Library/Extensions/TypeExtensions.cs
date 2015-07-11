@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +11,13 @@ namespace Vexe.Runtime.Extensions
 {
     public static class TypeExtensions
     {
+        public static bool IsNumeric(this Type type)
+        {
+            if (type == typeof(bool) || type == typeof(char))
+                return false;
+            return type.IsPrimitive;
+        }
+
         public static bool TryGetSequenceElementType(this Type type, out Type element)
         {
             if (type.IsArray)
