@@ -249,7 +249,18 @@ namespace Vexe.Editor.Drawers
                         {
                             if (pairStr == null)
                                 pairStr = FormatPair(dKey, dValue);
-                            foldouts[entryKey] = gui.Foldout(pairStr, foldouts[entryKey], Layout.Auto);
+
+                            if (!_options.HideElementLabel)
+                            {
+                                foldouts[entryKey] = gui.Foldout(pairStr, foldouts[entryKey], Layout.Auto);
+                            }
+                            else
+                            {
+                                if (dValue != null && dValue.GetType().Namespace == "System")
+                                {
+                                    DrawValue(i, entryKey + 2);       
+                                }
+                            }
                         }
 
                         #if PROFILE
@@ -273,7 +284,11 @@ namespace Vexe.Editor.Drawers
                         else
                             using (gui.Indent())
                             {
-                                DrawKey(i, entryKey + 1);
+                                if (!_options.HideKeyNameField)
+                                {
+                                    DrawKey(i, entryKey + 1);
+                                }
+
                                 DrawValue(i, entryKey + 2);
                             }
                         #if PROFILE
@@ -484,6 +499,8 @@ namespace Vexe.Editor.Drawers
             public readonly bool Readonly;
             public readonly bool ForceExpand;
             public readonly bool HideHeader;
+            public readonly bool HideElementLabel;
+            public readonly bool HideKeyNameField;
             public readonly bool HorizontalPairs;
             public readonly bool Filter;
             public readonly bool AddToLast;
@@ -496,6 +513,8 @@ namespace Vexe.Editor.Drawers
                 Readonly           = options.HasFlag(Dict.Readonly);
                 ForceExpand        = options.HasFlag(Dict.ForceExpand);
                 HideHeader         = options.HasFlag(Dict.HideHeader);
+                HideElementLabel   = options.HasFlag(Dict.HideElementLabel);
+                HideKeyNameField = options.HasFlag(Dict.HideKeyNameField);
                 HorizontalPairs    = options.HasFlag(Dict.HorizontalPairs);
                 Filter             = options.HasFlag(Dict.Filter);
                 AddToLast          = options.HasFlag(Dict.AddToLast);
