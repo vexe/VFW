@@ -1,4 +1,4 @@
-﻿//#define PROFILE
+//#define PROFILE
 
 using System;
 using System.Collections.Generic;
@@ -201,9 +201,10 @@ namespace Vexe.Editor.Drawers
 							{
 								using (gui.Vertical())
 								{
-									var element = GetElement(i);
-									gui.Member(element, @ignoreComposition: _perItemAttributes == null);
-								}
+                                    var element = GetElement(i);
+                                    using (gui.If(!_options.Readonly && _elementType.IsNumeric(), gui.LabelWidth(15f)))
+                                        gui.Member(element, @ignoreComposition: _perItemAttributes == null);
+                                }
 							}
 
 							if (gui.HasChanged())
@@ -254,7 +255,6 @@ namespace Vexe.Editor.Drawers
                             { 
 								RemoveAt(i);
                             }
-
 
                             ///Only valid for Classes implementing ICloneable
                             if (typeof(ICloneable).IsAssignableFrom(_elementType) && elementValue != null)
@@ -331,7 +331,7 @@ namespace Vexe.Editor.Drawers
 			{
 				var element = EditorMember.WrapIListElement(
 					@attributes  : _perItemAttributes,
-					@elementName : string.Empty,
+					@elementName : _elementType.IsNumeric() && !_options.Readonly ? "~" : string.Empty,
                     @elementType : typeof(TElement),
 					@elementId   : RuntimeHelper.CombineHashCodes(id, index)
 				);

@@ -1,4 +1,4 @@
-﻿//#define PROFILE
+//#define PROFILE
 //#define DBG
 
 using System;
@@ -271,11 +271,13 @@ namespace Vexe.Editor.Drawers
                             }
                         }
                         else
+                        { 
                             using (gui.Indent())
                             {
                                 DrawKey(i, entryKey + 1);
                                 DrawValue(i, entryKey + 2);
                             }
+                        }
                         #if PROFILE
                         Profiler.EndSample();
                         #endif
@@ -319,13 +321,39 @@ namespace Vexe.Editor.Drawers
         public void DrawKey(int index, int id)
         {
             var keyMember = GetElement(_keyElements, _kvpList.Keys, index, id + 1);
-            gui.Member(keyMember, @ignoreComposition: _perKeyAttributes == null);
+            using(gui.If(!_options.Readonly && typeof(TK).IsNumeric(), gui.LabelWidth(15f)))
+            { 
+                if (_options.Readonly)
+                {
+                    var previous = keyMember.Value;
+                    var changed = gui.Member(keyMember, @ignoreComposition: _perKeyAttributes == null);
+                    if (changed)
+                        keyMember.Value = previous;
+                }
+                else
+                { 
+                    gui.Member(keyMember, @ignoreComposition: _perKeyAttributes == null);
+                }
+            }
         }
 
         public void DrawValue(int index, int id)
         {
             var valueMember = GetElement(_valueElements, _kvpList.Values, index, id + 2);
-            gui.Member(valueMember, @ignoreComposition: _perValueAttributes == null);
+            using(gui.If(!_options.Readonly && typeof(TV).IsNumeric(), gui.LabelWidth(15f)))
+            {
+                if (_options.Readonly)
+                {
+                    var previous = valueMember.Value;
+                    var changed = gui.Member(valueMember, @ignoreComposition: _perValueAttributes == null);
+                    if (changed)
+                        valueMember.Value = previous;
+                }
+                else
+                {
+                    gui.Member(valueMember, @ignoreComposition: _perValueAttributes == null);
+                }
+            }
         }
 
         private EditorMember GetElement<T>(List<EditorMember> elements, List<T> source, int index, int id)
@@ -339,7 +367,7 @@ namespace Vexe.Editor.Drawers
                     attrs = _perValueAttributes;
 
                 var element = EditorMember.WrapIListElement(
-                    @elementName : string.Empty,
+                    @elementName : typeof(T).IsNumeric() && !_options.Readonly ? "~" : string.Empty,
                     @elementType : typeof(T),
                     @elementId   : RuntimeHelper.CombineHashCodes(id, index),
                     @attributes  : attrs
