@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEditor;
 using UnityEngine;
 using Vexe.Runtime.Extensions;
@@ -80,6 +80,8 @@ namespace Vexe.Editor.GUIs
 
         public virtual void OnEnable() { }
         public virtual void OnDisable() { }
+
+        public abstract IDisposable If(bool condition, IDisposable body);
 
 		public void BeginCheck()
 		{
@@ -270,5 +272,5 @@ namespace Vexe.Editor.GUIs
             Double,
             Long
         }
-	}
+    }
 }

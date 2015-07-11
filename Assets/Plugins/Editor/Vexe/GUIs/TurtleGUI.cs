@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEditor;
 using UnityEngine;
 using System.Reflection;
@@ -234,6 +234,11 @@ namespace Vexe.Editor.GUIs
         public override long Long(GUIContent content, long value, Layout option)
         {
             return EditorGUILayout.LongField(content, value, option);
+        }
+
+        public override IDisposable If(bool condition, IDisposable body)
+        {
+            throw new NotImplementedException();
         }
     }
 }

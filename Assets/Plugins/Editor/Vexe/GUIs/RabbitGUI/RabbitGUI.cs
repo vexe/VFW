@@ -1,4 +1,4 @@
-﻿//#define dbg_level_1
+//#define dbg_level_1
 //#define dbg_level_2
 #define dbg_controls
 
@@ -444,9 +444,17 @@ namespace Vexe.Editor.GUIs
             _pendingLayout = true;
         }
 
-        public void Dispose()
+        void IDisposable.Dispose()
         {
             End();
+        }
+
+        public override IDisposable If(bool condition, IDisposable body)
+        {
+            if (condition)
+                return body;
+            body.Dispose();
+            return null;
         }
 
         public override Bounds BoundsField(GUIContent content, Bounds value, Layout option)
