@@ -290,24 +290,29 @@ namespace Vexe.Editor.Drawers
                 #endif
                 // Write
                 {
-                    memberValue.Clear();
-                    for (int i = 0; i < _kvpList.Count; i++)
-                    {
-                        var key = _kvpList.Keys[i];
-                        var value = _kvpList.Values[i];
-                        try
-                        {
-                            memberValue.Add(key, value);
-                        }
-                        catch (ArgumentException) //@Todo: figure out a more forgiveful way to handle this
-                        {
-                            Log("Key already exists: " + key);
-                        }
-                    }
+                    Write();
                 }
                 #if PROFILE
                 Profiler.EndSample();
                 #endif
+            }
+        }
+
+        private void Write()
+        {
+            memberValue.Clear();
+            for (int i = 0; i < _kvpList.Count; i++)
+            {
+                var key = _kvpList.Keys[i];
+                var value = _kvpList.Values[i];
+                try
+                {
+                    memberValue.Add(key, value);
+                }
+                catch (ArgumentException) //@Todo: figure out a more forgiveful way to handle this
+                {
+                    Log("Key already exists: " + key);
+                }
             }
         }
 
@@ -347,6 +352,7 @@ namespace Vexe.Editor.Drawers
             try
             {
                 var e = elements[index];
+                e.Write = Write;
                 e.InitializeIList(source, index, rawTarget, unityTarget);
                 return e;
             }

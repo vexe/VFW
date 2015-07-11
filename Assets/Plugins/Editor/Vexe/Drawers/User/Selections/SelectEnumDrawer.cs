@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Vexe.Editor.Windows;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
@@ -19,7 +19,10 @@ namespace Vexe.Editor.Drawers
 					@setTarget: name =>
 					{
 						if (names[currentIndex] != name)
+                        { 
 							memberValue = name.ParseEnum(memberType);
+                            member.Write();
+                        }
 					},
 					@getValueName: name => name,
 					@title: memberTypeName + "s"

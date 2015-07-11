@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +18,7 @@ namespace Vexe.Editor.Types
         public object RawTarget;
         public UnityObject UnityTarget;
         public string DisplayText;
+        public Action Write = () => { };
 
         // These are set when the member is an element of a collection (list, array, dictionary)
         // So you can use these to query whether or not an element is a collection element (Elemnts != null or ElementIndex != -1)
