@@ -135,6 +135,18 @@ namespace Vexe.Runtime.Types
         /// to be automatically allocated)
         /// </summary>
         ManualAlloc = 1 << 8,
+
+        /// <summary>
+        /// Hides the dictionary key name field. This means there is no option to rename the keys from the editor.
+        /// </summary>
+        HideKeyNameField= 1 << 9,
+
+        /// <summary>
+        /// Hides the elements Label. This means the key name and value type will not be shown.
+        /// Use it in conjuntion With HideKeyNameField to a minimal view.
+        /// (If your value is a class, You could add the key name to the value's ToString method to provide some visual feedback.)
+        /// </summary>
+        HideElementLabel= 1 << 10,
     }
 
     [Flags]
