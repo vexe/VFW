@@ -22,7 +22,7 @@ namespace Vexe.Runtime.Types
     /// if you're not sure whether or not there's a value registered with a certain key.
     /// There's also an overload that lets you specify the default value to use.
     /// </summary>
-    [CreateAssetMenu]
+    [CreateAssetMenu(menuName = "Vexe/BetterPrefs")]
     public class BetterPrefs : BaseScriptableObject
     {
         [Serializable] public class LookupIntInt : SerializableDictionary<int, int> { }
