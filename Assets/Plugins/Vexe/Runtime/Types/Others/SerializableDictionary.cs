@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using UnityEngine;
 /// Serializable by Unity's serialization system - Extracted from System.Collections.Generic (not a wrapper)
 /// </summary>
 [Serializable, DebuggerDisplay("Count = {Count}")]
-public class SerializableDictionary<TKey, TValue> : IDictionary<TKey, TValue>
+public class SerializableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary
 {
     [SerializeField] int[] _Buckets;
     [SerializeField] int[] _HashCodes;
@@ -522,7 +522,7 @@ public class SerializableDictionary<TKey, TValue> : IDictionary<TKey, TValue>
         return GetEnumerator();
     }
 
-    public struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>
+    public struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>, IDictionaryEnumerator
     {
         private readonly SerializableDictionary<TKey, TValue> _Dictionary;
         private int _Version;
@@ -580,5 +580,79 @@ public class SerializableDictionary<TKey, TValue> : IDictionary<TKey, TValue>
         public void Dispose()
         {
         }
+
+        public DictionaryEntry Entry
+        {
+            get { return new DictionaryEntry(Key, Value); }
+        }
+
+        public object Key
+        {
+            get { return Current.Key; }
+        }
+
+        public object Value
+        {
+            get { return Current.Value; }
+        }
     }
+
+    // IDictionary
+    #region
+    public void Add(object key, object value)
+    {
+        Add((TKey)key, (TValue)value);
+    }
+
+    public bool Contains(object key)
+    {
+        return ContainsKey((TKey)key);
+    }
+
+    IDictionaryEnumerator IDictionary.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    public bool IsFixedSize
+    {
+        get { return false; }
+    }
+
+    ICollection IDictionary.Keys
+    {
+        get { return _Keys.Take(Count).ToArray(); }
+    }
+
+    ICollection IDictionary.Values
+    {
+        get { return _Values.Take(Count).ToArray(); }
+    }
+
+    public void Remove(object key)
+    {
+        Remove((TKey)key);
+    }
+
+    public object this[object key]
+    {
+        get { return this[(TKey)key]; }
+        set { this[(TKey)key] = (TValue)value; }
+    }
+
+    public void CopyTo(Array array, int index)
+    {
+        CopyTo((KeyValuePair<TKey, TValue>[])array, index);
+    }
+
+    public bool IsSynchronized
+    {
+        get { throw new NotImplementedException(); }
+    }
+
+    public object SyncRoot
+    {
+        get { throw new NotImplementedException(); }
+    }
+    #endregion
 }
