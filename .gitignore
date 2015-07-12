@@ -30,3 +30,6 @@ ehthumbs.db
 Thumbs.db
 Assets/Temp.meta
 Rebracer.xml
+pc_Data/
+pc.exe
+UnityVS.config
