@@ -1,6 +1,6 @@
+using System;
 using UnityEngine;
 using Vexe.FastSave;
-using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
 
 namespace FSExamples

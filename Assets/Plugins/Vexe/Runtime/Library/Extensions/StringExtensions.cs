@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -84,11 +84,6 @@ namespace Vexe.Runtime.Extensions
 		public static string FormatWith(this string str, params object[] args)
 		{
 			return string.Format(str, args);
-		}
-
-		public static byte[] GetBytes(this string str)
-		{
-			return Convert.FromBase64String(str);
 		}
 
 		/// <summary>

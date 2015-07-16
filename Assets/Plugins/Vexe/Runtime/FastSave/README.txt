@@ -85,7 +85,7 @@ _________________
     Load.GameObjectFromStream(bytes, target); // load/deserialize 'into' target
 
     Notes:
-    1- GetString and GetBytes are extension methods in Vexe.Runtime.Extensions
+    1- GetString and GetBytes are extension methods in System
     2- You can also use the extension methods in FSExtensions.cs so you can say:
        byte[] bytes = myGo.SaveToMemory(memoryStream);
     3- You can also save/load system objects, via: Save.ObjectToX and Load.ObjectFromX
