@@ -142,12 +142,12 @@ namespace Vexe.FastSave
 
         public static void ComponentToStream(Stream stream, Type type, Component value)
         {
-            Common.Serializer.Serialize(stream, type, value);
+            FSCommon.Serializer.Serialize(stream, type, value);
         }
 
         public static void ObjectToStream<T>(Stream stream, T value)
         {
-            Common.Serializer.Serialize(stream, value.GetType(), value);
+            FSCommon.Serializer.Serialize(stream, value.GetType(), value);
         }
         #endregion
 

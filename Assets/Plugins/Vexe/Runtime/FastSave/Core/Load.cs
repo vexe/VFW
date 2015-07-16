@@ -150,13 +150,13 @@ namespace Vexe.FastSave
 
         public static void ComponentFromStream(Stream stream, Type type, Component into)
         {
-            Common.Serializer.Deserialize(stream, type, ref into);
+            FSCommon.Serializer.Deserialize(stream, type, ref into);
         }
 
         public static T ObjectFromStream<T>(Stream stream)
         {
             T instance = default(T);
-            Common.Serializer.Deserialize(stream, typeof(T), ref instance);
+            FSCommon.Serializer.Deserialize(stream, typeof(T), ref instance);
             return instance;
         }
         #endregion

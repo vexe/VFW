@@ -6,11 +6,11 @@ using Vexe.Runtime.Serialization;
 
 namespace Vexe.FastSave
 {
-    public static class Common
+    public static class FSCommon
     {
         public static readonly BinaryX20 Serializer;
 
-        static Common()
+        static FSCommon()
         {
             BinaryX20.Log = Debug.Log;
 
