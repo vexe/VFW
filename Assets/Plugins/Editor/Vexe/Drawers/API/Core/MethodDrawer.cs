@@ -1,7 +1,8 @@
-﻿//#define DBG
+//#define DBG
 
 using System;
 using System.Reflection;
+using System.Collections;
 using UnityEngine;
 using Vexe.Editor.GUIs;
 using Vexe.Editor.Types;
@@ -24,8 +25,10 @@ namespace Vexe.Editor.Drawers
         private string comment;
 
 		private object rawTarget;
+        private UnityObject unityTarget;
 		private int id;
 		private BaseGUI gui;
+        private bool isCoroutine;
 
 		private BetterPrefs prefs { get { return BetterPrefs.GetEditorInstance(); } }
 
@@ -39,10 +42,13 @@ namespace Vexe.Editor.Drawers
 		{
 			this.gui = gui;
 			this.rawTarget = rawTarget;
+            this.unityTarget = unityTarget;
 			this.id = id;
 
 			if (initialized) return;
 			initialized = true;
+
+            isCoroutine = method.ReturnType == typeof(IEnumerator);
 
             var commentAttr = method.GetCustomAttribute<CommentAttribute>();
             if (commentAttr != null)
@@ -113,11 +119,17 @@ namespace Vexe.Editor.Drawers
 			using (gui.Horizontal())
 			{
 				if (gui.Button(niceName, GUIStyles.Mini))
-					invoke(rawTarget, argValues);
+                {
+                    var mb = unityTarget as MonoBehaviour;
+                    if (isCoroutine && mb != null)
+                        mb.StartCoroutine(invoke(rawTarget, argValues) as IEnumerator);
+                    else
+                        invoke(rawTarget, argValues);
+                }
 
 				gui.Space(12f);
 				if (argMembers.Length > 0)
-				{ 
+				{
 					foldout = gui.Foldout(foldout);
 					gui.Space(-11.5f);
 				}
