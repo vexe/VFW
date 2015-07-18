@@ -23,7 +23,7 @@ namespace Vexe.Editor
     /// Note that the order of mapping matter. That's why only 'Insert' is public and not Add. You're not meant as a user
     /// not modify the order of the built-in drawers.
     /// For instance RecursiveDrawer must always come last, as it's meant to be a 'fallback' drawer.
-    /// 
+    ///
     /// Please see RegisterCustomDrawerExample.cs for sample usage of this system.
     /// </summary>
     public class TypeDrawerMapper
@@ -148,7 +148,8 @@ namespace Vexe.Editor
                         .Add<fSliderAttribute, fSliderDrawer>()
                         .Add<iSliderAttribute, iSliderDrawer>()
                         .Add<ParagraphAttribute, ParagraphDrawer>()
-                        .Add<ButtonAttribute, ButtonDrawer>();
+                        .Add<ButtonAttribute, ButtonDrawer>()
+                        .Add<ResourcePathAttribute, ResourcePathDrawer>();
                 }
                 // Popups
                 {
