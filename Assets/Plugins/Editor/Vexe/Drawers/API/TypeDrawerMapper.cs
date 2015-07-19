@@ -148,7 +148,9 @@ namespace Vexe.Editor
                         .Add<fSliderAttribute, fSliderDrawer>()
                         .Add<iSliderAttribute, iSliderDrawer>()
                         .Add<ParagraphAttribute, ParagraphDrawer>()
-                        .Add<ButtonAttribute, ButtonDrawer>();
+                        .Add<ButtonAttribute, ButtonDrawer>()
+                        .Add<HelpButtonAttribute, HelpButtonDrawer>();
+                        
                 }
                 // Popups
                 {

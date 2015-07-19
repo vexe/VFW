@@ -6,6 +6,9 @@ namespace VFWExamples
 {
     public class ButtonExample : BaseBehaviour
     {
+        [HelpButton("This is a help text")]
+        public string showHelp;
+
         [Button("Log1", "1", "toolbarButton"),
          Button(0, "Log2", "2"),
          Button(1, "Log3", "3", "miniButtonRight")]
