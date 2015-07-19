@@ -60,14 +60,14 @@ namespace Vexe.Editor.Drawers
 
 			UnityObject gameObject = gameObjects [0];
 			var fullPath = AssetDatabase.GetAssetPath(gameObject);
-			string basePath = fullPath.Substring (0, 17);
-			return basePath.Equals (ResourcesBasePath());
+			return fullPath.Contains ("/Resources/");
 		}
 
 		private string GetPath(UnityObject input)
 		{
 			var fullPath = AssetDatabase.GetAssetPath(input);
-			var relativePath = PathRelativeToResources(fullPath);
+			var resourcesIndex = fullPath.IndexOf ("/Resources/");
+			var relativePath = fullPath.Substring (resourcesIndex + 11);
 			var result = PathWithoutExtension (relativePath);
 
 			return result;
