@@ -33,16 +33,16 @@ public class SerializableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, I
         get { return _Count - _FreeCount; }
     }
 
-    public TValue this[TKey key, TValue defaultValue]
-    {
-        get
-        {
-            int index = FindIndex(key);
-            if (index >= 0)
-                return _Values[index];
-            return defaultValue;
-        }
-    }
+    //public TValue this[TKey key, TValue defaultValue]
+    //{
+    //    get
+    //    {
+    //        int index = FindIndex(key);
+    //        if (index >= 0)
+    //            return _Values[index];
+    //        return defaultValue;
+    //    }
+    //}
 
     public TValue this[TKey key]
     {
@@ -321,15 +321,16 @@ public class SerializableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, I
 
     public TValue ValueOrDefault(TKey key)
     {
-        int index = FindIndex(key);
-        if (index >= 0)
-            return _Values[index];
-        return default(TValue);
+        return ValueOrDefault(key, default(TValue));
     }
     
     public TValue ValueOrDefault(TKey key, TValue defaultValue)
     {
-        return this[key, defaultValue];
+        //return this[key, defaultValue];
+        int index = FindIndex(key);
+        if (index >= 0)
+            return _Values[index];
+        return defaultValue;
     }
 
     private static class PrimeHelper

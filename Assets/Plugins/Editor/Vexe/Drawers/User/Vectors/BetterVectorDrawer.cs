@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using Vexe.Editor.Types;
 using Vexe.Runtime.Extensions;
@@ -86,7 +86,7 @@ namespace Vexe.Editor.Drawers
         protected override Vector2 Paste()
         {
             int key = RuntimeHelper.CombineHashCodes(id, "Clip");
-            return BetterPrefs.GetEditorInstance().Vector3s[key, memberValue];
+            return BetterPrefs.GetEditorInstance().Vector3s.ValueOrDefault(key, memberValue);
         }
 
 		protected override Vector2 Randomize() { return new Vector2(rand(), rand()); }
@@ -117,7 +117,7 @@ namespace Vexe.Editor.Drawers
         protected override Vector3 Paste()
         {
             int key = RuntimeHelper.CombineHashCodes(id, "Clip");
-            return BetterPrefs.GetEditorInstance().Vector3s[key, memberValue];
+            return BetterPrefs.GetEditorInstance().Vector3s.ValueOrDefault(key, memberValue);
         }
 
 		protected override Vector3 Randomize() { return new Vector3(rand(), rand(), rand()); }
