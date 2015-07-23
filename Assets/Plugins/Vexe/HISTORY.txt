@@ -492,7 +492,7 @@ Cleanup/Refactoring/Changes:
 - Moved the category files from the Runtime folder to Attributes/API
 
 Additions:
-- Added a SerializableDictionary (not a wrapper) extracted from System.Collections.Generic (LINK)
+- Added a SerializableDictionary (not a wrapper) extracted from System.Collections.Generic
 - Added a 'fit' option in Layout (matches width with content)
 - Added HideButtons options for sequence/dictionary and ManualAlloc to dictionary drawing
 - Added ToTitleCase string extension method (MY_INT_VALUE => MyIntValue)
@@ -511,3 +511,22 @@ Improvements:
     [Show, Category("MyCategory")] int my_value;
     we can say:
     [Show("MyCategory")] int my_value;
+
+_______________
+-- VFW 1.3.4 --
+
+NEW: FastSave: Runtime saving/loading solution! (under Vexe/Runtime)
+     README file included in FastSave folder.
+     Simple example scenes under VFWExamples
+
+Fixes:
+- ButtonDrawer error when applying button PerItem on a sequence
+- RecursiveDrawer error when dragging gameObjects into struct fields
+- #39 Vfw asset paths are more flexible (you can move Vfw root wherever you like)
+- #42 SelectEnum doesn't change dictionary keys/values when applied PerKey/PerValue
+- Dict.Readonly didn't have any effect on the dictionary keys/values
+
+Improvements/Small additions:
+- Array/List/Dictionary: A small tilde is displayed as label in front of numeric elements to quickly modify values
+- Extension methods: MemoryStream.Reset and Type.IsNumeric
+- RabbitGUI 'If' conditional execution of IDisposable blocks (See Dictionary/Sequence drawer for examples)
