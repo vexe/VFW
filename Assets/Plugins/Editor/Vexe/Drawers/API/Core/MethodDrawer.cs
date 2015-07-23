@@ -1,4 +1,4 @@
-﻿//#define DBG
+//#define DBG
 
 using System;
 using System.Reflection;
