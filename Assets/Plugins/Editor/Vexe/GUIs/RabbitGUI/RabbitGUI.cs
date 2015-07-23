@@ -956,5 +956,14 @@ namespace Vexe.Editor.GUIs
                 return EditorGUI.LongField(position, content, value);
             return value;
         }
+
+        public override void MinMaxSlider(GUIContent label, ref float minValue, ref float maxValue, float minLimit, float maxLimit, Layout option)
+        {
+            var data = new ControlData(label, GUIStyles.MinMaxSlider, option, ControlType.Slider);
+
+            Rect position;
+            if (CanDrawControl(out position, data))
+                EditorGUI.MinMaxSlider(label, position, ref minValue, ref maxValue, minLimit, maxLimit);
+        }
     }
 }

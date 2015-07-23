@@ -147,6 +147,7 @@ namespace Vexe.Editor
                         .Add<ShowTypeAttribute, ShowTypeDrawer>()
                         .Add<fSliderAttribute, fSliderDrawer>()
                         .Add<iSliderAttribute, iSliderDrawer>()
+                        .Add<vSliderAttribute, vSliderDrawer>()
                         .Add<ParagraphAttribute, ParagraphDrawer>()
                         .Add<ButtonAttribute, ButtonDrawer>();
                 }

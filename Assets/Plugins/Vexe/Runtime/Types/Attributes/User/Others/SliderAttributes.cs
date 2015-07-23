@@ -31,4 +31,19 @@ namespace Vexe.Runtime.Types
 			this.right = right;
 		}
 	}
+
+	/// <summary>
+	/// Apply to a Vector2 to store the min/max range in it
+	/// </summary>
+	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Parameter)]
+    public class vSliderAttribute : DrawnAttribute
+    {
+        public readonly float left, right;
+
+        public vSliderAttribute(float left, float right)
+        {
+            this.left = left;
+            this.right = right;
+        }
+    }
 }

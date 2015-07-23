@@ -50,5 +50,17 @@ namespace Vexe.Editor.GUIs
 		{
 			return Mathf.RoundToInt(FloatSlider(content, (float)value, (float)leftValue, (float)rightValue, option));
 		}
+
+        public void MinMaxSlider(ref float minValue, ref float maxValue, float minLimit, float maxLimit)
+        {
+            MinMaxSlider(string.Empty, ref minValue, ref maxValue, minLimit, maxLimit);
+        }
+
+        public void MinMaxSlider(string label, ref float minValue, ref float maxValue, float minLimit, float maxLimit)
+        {
+            MinMaxSlider(GetContent(label), ref minValue, ref maxValue, minLimit, maxLimit, Layout.None);
+        }
+
+        public abstract void MinMaxSlider(GUIContent content, ref float minValue, ref float maxValue, float minLimit, float maxLimit, Layout option);
 	}
 }

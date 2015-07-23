@@ -32,6 +32,6 @@ namespace Vexe.Editor
         public static readonly GUIStyle HelpBox                  = EditorStyles.helpBox;
         public static readonly GUIStyle TextFieldDropDown        = typeof(EditorStyles).GetProperty("textFieldDropDown", Flags.StaticAnyVisibility).GetValue(null, null) as GUIStyle;
         public static readonly GUIStyle TextFieldDropDownText    = typeof(EditorStyles).GetProperty("textFieldDropDownText", Flags.StaticAnyVisibility).GetValue(null, null) as GUIStyle;
-
+        public static readonly GUIStyle MinMaxSlider             = typeof(EditorStyles).GetProperty("minMaxHorizontalSliderThumb", Flags.StaticAnyVisibility).GetValue(null, null) as GUIStyle;
     }
 }

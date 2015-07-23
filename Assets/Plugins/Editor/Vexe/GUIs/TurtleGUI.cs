@@ -240,5 +240,10 @@ namespace Vexe.Editor.GUIs
         {
             throw new NotImplementedException();
         }
+
+        public override void MinMaxSlider(GUIContent label, ref float minValue, ref float maxValue, float minLimit, float maxLimit, Layout option)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
