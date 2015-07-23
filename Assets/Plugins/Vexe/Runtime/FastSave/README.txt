@@ -179,6 +179,8 @@ _________________
 - No interface with other serializers (JSON etc). Just a home-cooked Binary serializer for now.
 - No way to extend the system/add support for new component types without modifying existing code
 - No versioning/backward type compatibility from the serializer
+- No error/status codes returned from the saving/loading methods (will eventually be added but not
+  sure if it's really necessary for all methods and if it is what is the right approach for it)
 
 Hope you find it useful! Cheers!
 - vexe
