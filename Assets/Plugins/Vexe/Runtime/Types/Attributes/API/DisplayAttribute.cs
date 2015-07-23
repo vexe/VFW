@@ -56,10 +56,20 @@ namespace Vexe.Runtime.Types
         /// </summary>
         public Dict DictOpt;
 
+        /// <summary>
+        /// Customizes the dispaly of class/struct fields
+        /// </summary>
+        public Obj ObjOpt;
+
         public float? DisplayOrder;
 
         public DisplayAttribute()
         {
+        }
+
+        public DisplayAttribute(Obj objOpt)
+        {
+            this.ObjOpt = objOpt;
         }
 
         public DisplayAttribute(Seq seqOpt)
@@ -81,6 +91,20 @@ namespace Vexe.Runtime.Types
         {
             this.FormatLabel = formatLabel;
         }
+    }
+
+    [Flags]
+    public enum Obj
+    {
+        /// <summary>
+        /// Automatically tries to allocate value for the member if it was null
+        /// </summary>
+        AutoAlloc = 1,
+
+        /// <summary>
+        /// Makes it not possible to show the selection window changing the object type
+        /// </summary>
+        DisablePicker = 1 << 1,
     }
 
     [Flags]
