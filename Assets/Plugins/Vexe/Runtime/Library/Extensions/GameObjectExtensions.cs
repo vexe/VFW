@@ -29,7 +29,43 @@ namespace Vexe.Runtime.Extensions
 			return parent == null ? string.Empty : parent.name;
 		}
 
-		public static bool HasComponent(this Transform source, Type componentType)
+        // Works just like GetComponent<T>, except also works with interface types
+	    public static T GetIComponent<T>(this GameObject go) where T : class 
+		{
+	        return go.GetComponent(typeof (T)) as T;
+	    }
+
+        // Works just like GetComponentInChildren, except also works with interface types
+	    public static T GetIComponentInChildren<T>(this GameObject go) where T : class 
+		{
+	        return go.GetComponentInChildren(typeof (T)) as T;
+	    }
+
+        // Works just like GetComponentInParent, except also works with interface types
+	    public static T GetIComponentInParent<T>(this GameObject go) where T : class 
+		{
+	        return go.GetComponentInParent(typeof (T)) as T;
+	    }
+
+        // Works just like GetComponents, except also works with interface types
+        public static T[] GetIComponents<T>(this GameObject go) where T : class 
+		{
+            return go.GetComponents(typeof(T)).OfType<T>().ToArray();
+        }
+
+        // Works just like GetComponentInChildren, except also works with interface types
+        public static T[] GetIComponentsInChildren<T>(this GameObject go) where T : class 
+		{
+            return go.GetComponentsInChildren(typeof(T)).OfType<T>().ToArray();
+        }
+
+        // Works just like GetComponentsInParent, except also works with interface types
+        public static T[] GetIComponentsInParent<T>(this GameObject go) where T : class 
+		{
+            return go.GetComponentsInParent(typeof(T)).OfType<T>().ToArray();
+        }
+
+        public static bool HasComponent(this Transform source, Type componentType)
 		{
 			return HasComponent(source.gameObject, componentType);
 		}
@@ -49,14 +85,14 @@ namespace Vexe.Runtime.Extensions
 			return source.GetComponent(componentName) != null;
 		}
 
-		public static bool HasComponent<T>(this Transform source) where T : Component
+		public static bool HasComponent<T>(this Transform source) where T : class
 		{
 			return HasComponent<T>(source.gameObject);
 		}
 
-		public static bool HasComponent<T>(this GameObject source) where T : Component
+		public static bool HasComponent<T>(this GameObject source) where T : class
 		{
-			return source.GetComponent<T>() != null;
+			return source.GetIComponent<T>() != null;
 		}
 
 		/// <summary>
@@ -223,7 +259,7 @@ namespace Vexe.Runtime.Extensions
 			return result == null ? go.AddComponent(componentType) : result;
 		}
 
-		public static T GetOrAddComponent<T>(this GameObject go) where T : Component
+		public static T GetOrAddComponent<T>(this GameObject go) where T : class
 		{
 			return GetOrAddComponent(go, typeof(T)) as T;
 		}
