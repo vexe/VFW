@@ -1,89 +1,52 @@
 ﻿using System;
 using UnityEditor;
 using UnityEngine;
-using Vexe.Editor.Helpers;
-using Vexe.Editor.Windows;
-using Vexe.Runtime.Extensions;
-using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Types;
 using UnityObject = UnityEngine.Object;
-using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Vexe.Editor.Drawers
 {
-	public class ResourcePathDrawer : AttributeDrawer<string, ResourcePathAttribute>
-	{
-		public override void OnGUI()
-		{
-			using (gui.Horizontal()) {
-				gui.Label(displayText);
+	public class ResourcePathDrawer : AttributeDrawer<string, ResourcePathAttribute> {
+        
+	    private Type resourceType;
+	    private UnityObject target;
 
+	    protected override void Initialize() {
+	        resourceType = attribute.ResourceType;
+	        target = Resources.Load(memberValue);
+	    }
 
-				UnityObject obj = null;
-				if(memberValue != null) {
-					obj = Resources.Load (memberValue);
-				}
+	    public override void OnGUI() {
 
-				bool isNull = memberValue == null;
-				bool isResourceMissing = (obj == null && !isNull);
-				gui.TextLabel(isNull ? "null" : (isResourceMissing? "(missing resource "+ memberValue +")" : memberValue));
+	        using (gui.Vertical()) {
+                using (gui.Horizontal()) {
+                    target = gui.Object(displayText, target, resourceType, false);
 
-				var fieldRect = gui.LastRect;
-				{
-					GUIHelper.PingField(fieldRect, obj, false);
-				}
-				if (gui.ClearButton("Clear resource"))
-				{
-					obj = null;
-				}
+                    if (gui.ClearButton("Resource")) {
+                        target = null;
+                    }
 
-				var drop = gui.RegisterFieldForDrop<UnityObject>(fieldRect,objects => objects[0],AcceptInsideResourcesFolder);
-				if (drop != null)
-				{
-					memberValue = GetPath(drop);
-				}
-				else if(obj != null) {
-					memberValue = GetPath(obj);
-				}
-				else if(!isResourceMissing){
-					memberValue = null;
-				}
-			}
-
-
+                    if (target == null)
+                        memberValue = "";
+                    else
+                        memberValue = Regex.Replace(AssetDatabase.GetAssetPath(target), ".*Resources/(.*)\\..*", "$1");
+                }
+	            if (target != null) {
+	                using (gui.Indent()) {
+                        if (!AssetDatabase.Contains(target))
+                            gui.Label("Object is not an Asset, and will not be saved.");
+                        else if (!IsResource(target))
+                            gui.Label("Object is not a Resource, and will not be saved.");
+                        else
+                            gui.Label("Resource Path: " + memberValue);
+                    }
+	            }
+            }
 		}
 
-		private bool AcceptInsideResourcesFolder(UnityObject[] gameObjects) {
-			if (gameObjects.Length != 1) {
-				return false;
-			}
-
-			UnityObject gameObject = gameObjects [0];
-			var fullPath = AssetDatabase.GetAssetPath(gameObject);
-			return fullPath.Contains ("/Resources/");
-		}
-
-		private string GetPath(UnityObject input)
-		{
-			var fullPath = AssetDatabase.GetAssetPath(input);
-			var resourcesIndex = fullPath.IndexOf ("/Resources/");
-			var relativePath = fullPath.Substring (resourcesIndex + 11);
-			var result = PathWithoutExtension (relativePath);
-
-			return result;
-		}
-
-		private string PathRelativeToResources(string path) {
-			return path.Substring (17);
-		}
-
-		private string ResourcesBasePath() {
-			return "Assets/Resources/";
-		}
-
-		private string PathWithoutExtension(string path) {
-			string extension = Path.GetExtension(path);
-			return path.Substring(0, path.Length - extension.Length);
+		private bool IsResource(UnityObject input) {
+		    return Regex.IsMatch(AssetDatabase.GetAssetPath(input), ".*Resources/.*");
 		}
 	}
 }

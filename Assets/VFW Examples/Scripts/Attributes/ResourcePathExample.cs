@@ -4,14 +4,27 @@ using Vexe.Runtime.Types;
 
 public class ResourcePathExample : BaseBehaviour {
 
-	[Comment("Drag and drop a file here. Only objects inside the Resources folder will be accepted")]
+	[Comment("Enter any object here. It's resource path will be saved to the string.")]
 	[ResourcePath]
-	public string topLevelResource;
-
-	[Comment("Nested paths are also supported. Note that the file extension is note store so you can use Resources.Load() directly")]
+	public string generalResource;
+	
+	[Comment("Object types can be filtered by providing a type object in the attribute declaration.")]
+	[ResourcePath(typeof(AudioClip))]
+	public string audioClipResource;
+	
+	[Comment("Providing no type, or a non-asset type will default to the general Unity Object type.")]
+	[ResourcePath(typeof(string))]
+	public string attemptAtStringResource;
+	
+	[Comment("Enter any non-asset object here. It will provide a warning saying it doesn't save objects that aren't assets.")]
 	[ResourcePath]
-	public string nestedResource;
-
+	public string nonAssetPath;
+	
+	[Comment("Enter any non-resource asset object here. It will provide a warning saying it doesn't save objects that aren't Resources.")]
+	[ResourcePath]
+	public string nonAssetPath;
+	
+	[Comment("If a Resource is deleted, the value will reset to None (null).")]
 	[ResourcePath]
 	public string missingResource;
 
