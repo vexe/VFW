@@ -22,7 +22,7 @@ public class ResourcePathExample : BaseBehaviour {
 	
 	[Comment("Enter any non-resource asset object here. It will provide a warning saying it doesn't save objects that aren't Resources.")]
 	[ResourcePath]
-	public string nonAssetPath;
+	public string nonResourcePath;
 	
 	[Comment("If a Resource is deleted, the value will reset to None (null).")]
 	[ResourcePath]
