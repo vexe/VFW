@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
 
 namespace VFWExamples
@@ -14,6 +15,22 @@ namespace VFWExamples
 
 		[AnimVar(GetAnimatorMethod = "GetAnim")]
 		public string anotherVar;
+
+        // Also works on ints, gets you the hash/id value of the variable instead
+        [AnimVar]
+	    public int animHashVar;
+
+        // Can also get you the AnimatorControllerParameter object itself if need be
+	    [AnimVar]
+	    public AnimatorControllerParameter ACPVar;
+
+        // Can be filtered based on type
+        [AnimVar(ParameterType.Bool)]
+	    public int boolVar;
+
+        // The filter is a mask, so a group of types can be included
+	    [AnimVar(ParameterType.Float | ParameterType.Int)]
+	    public int floatOrIntVar;
 
 		private Animator GetAnim()
 		{
