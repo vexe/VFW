@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using Vexe.Runtime.Extensions;
+﻿using UnityEngine;
 using Vexe.Runtime.Types;
 
 namespace VFWExamples
@@ -25,11 +23,11 @@ namespace VFWExamples
 	    public AnimatorControllerParameter ACPVar;
 
         // Can be filtered based on type
-        [AnimVar(ParameterType.Bool)]
+        [AnimVar(Filter = ParameterType.Bool)]
 	    public int boolVar;
 
         // The filter is a mask, so a group of types can be included
-	    [AnimVar(ParameterType.Float | ParameterType.Int)]
+	    [AnimVar(Filter = ParameterType.Float | ParameterType.Int)]
 	    public int floatOrIntVar;
 
 		private Animator GetAnim()
