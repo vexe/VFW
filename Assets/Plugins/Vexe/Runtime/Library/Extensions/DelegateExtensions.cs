@@ -97,7 +97,7 @@ namespace Vexe.Runtime.Extensions
         /// </summary>
         public static TReturn SafeInvoke<TReturn>(this Func<TReturn> del)
         {
-            return del == null ? del() : default(TReturn);
+            return del != null ? del() : default(TReturn);
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace Vexe.Runtime.Extensions
         /// </summary>
         public static TReturn SafeInvoke<TReturn, T0>(this Func<T0, TReturn> del, T0 arg0)
         {
-            return del == null ? del(arg0) : default(TReturn);
+            return del != null ? del(arg0) : default(TReturn);
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace Vexe.Runtime.Extensions
         /// </summary>
         public static TReturn SafeInvoke<TReturn, T0, T1>(this Func<T0, T1, TReturn> del, T0 arg0, T1 arg1)
         {
-            return del == null ? del(arg0, arg1) : default(TReturn);
+            return del != null ? del(arg0, arg1) : default(TReturn);
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Vexe.Runtime.Extensions
         /// </summary>
         public static TReturn SafeInvoke<TReturn, T0, T1, T2>(this Func<T0, T1, T2, TReturn> del, T0 arg0, T1 arg1, T2 arg2)
         {
-            return del == null ? del(arg0, arg1, arg2) : default(TReturn);
+            return del != null ? del(arg0, arg1, arg2) : default(TReturn);
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace Vexe.Runtime.Extensions
         /// </summary>
         public static TReturn SafeInvoke<TReturn, T0, T1, T2, T3>(this Func<T0, T1, T2, T3, TReturn> del, T0 arg0, T1 arg1, T2 arg2, T3 arg3)
         {
-            return del == null ? del(arg0, arg1, arg2, arg3) : default(TReturn);
+            return del != null ? del(arg0, arg1, arg2, arg3) : default(TReturn);
         }
 
         /// <summary>
