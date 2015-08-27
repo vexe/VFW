@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using Vexe.Runtime.Serialization;
 using Vexe.Runtime.Types;
+using Vexe.Runtime.Extensions;
 
 namespace Vexe.Editor.Types
 {
@@ -75,27 +76,39 @@ namespace Vexe.Editor.Types
         static VFWSettings instance;
         public static VFWSettings GetInstance()
         {
-            if (instance == null || !AssetDatabase.Contains(instance))
+            if (instance == null)
             {
-                var dirs = Directory.GetDirectories("Assets", "Vexe", SearchOption.AllDirectories);
-                var editorDir = dirs.FirstOrDefault(x => Directory.GetParent(x).Name == "Editor");
-                var prefsDir = Path.Combine(editorDir, "ScriptableAssets");
-                if (editorDir == null || !Directory.Exists(prefsDir))
+                // First attempt is to find the pref instance anywhere in the AssetDatabase
+                var prefPath = AssetDatabase.FindAssets("t:VFWSettings").Select(x => AssetDatabase.GUIDToAssetPath(x)).FirstOrDefault();
+                if (prefPath != null)
                 {
-                    Debug.LogError("Unable to create Vfw settings asset at Editor/Vexe/ScriptableAssets (couldn't find folder). Please make sure that path exists 'somewhere' in your project");
-                    return instance != null ? instance : instance = CreateInstance<VFWSettings>();
+                    instance = AssetDatabase.LoadAssetAtPath<VFWSettings>(prefPath);
                 }
-
-                var path = Path.Combine(prefsDir, "VFWSettings.asset");
-                instance = AssetDatabase.LoadAssetAtPath<VFWSettings>(path);
-                if (instance == null)
+                else
                 {
-                    instance = ScriptableObject.CreateInstance<VFWSettings>();
-                    AssetDatabase.CreateAsset(instance, path);
-                    AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
-                    AssetDatabase.Refresh();
+                    // Otherwise create one on the spot
+                    instance = CreateInstance<VFWSettings>();
                 }
             }
+
+            if (AssetDatabase.Contains(instance))
+                return instance;
+
+            const string root = "Assets";
+            var dirs = Directory.GetDirectories(root, "Vexe", SearchOption.AllDirectories);
+            var editorDir = dirs.FirstOrDefault(x => Directory.GetParent(x).Name == "Editor") ?? string.Empty;
+
+            var prefsDir = Path.Combine(editorDir, "ScriptableAssets");
+            if (editorDir.IsNullOrEmpty() || !Directory.Exists(prefsDir))
+            {
+                Debug.LogError("Unable to create editor prefs asset at Editor/Vexe/ScriptableAssets (couldn't find folder). Creating in project root instead...");
+                prefsDir = root;
+            }
+
+            var path = Path.Combine(prefsDir, "VFWSettings.asset");
+            AssetDatabase.CreateAsset(instance, path);
+            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+            AssetDatabase.Refresh();
             return instance;
         }
 
@@ -104,7 +117,7 @@ namespace Vexe.Editor.Types
             [MenuItem("Tools/Vexe/VFW Settings")]
             public static void SelectSettings()
             {
-                Selection.activeObject = VFWSettings.GetInstance();
+                Selection.activeObject = GetInstance();
             }
         }
     }

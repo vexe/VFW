@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-
+using Vexe.Runtime.Extensions;
 #if UNITY_EDITOR
 using UnityEditor;
 using System.IO;
@@ -53,25 +53,14 @@ namespace Vexe.Runtime.Types
         static BetterPrefs instance;
         public static BetterPrefs GetEditorInstance()
         {
-            if (instance == null || !AssetDatabase.Contains(instance))
-            {
-                var dirs = Directory.GetDirectories("Assets", "Vexe", SearchOption.AllDirectories);
-                var editorDir = dirs.FirstOrDefault(x => Directory.GetParent(x).Name == "Editor");
-                var prefsDir = Path.Combine(editorDir, "ScriptableAssets");
-                if (editorDir == null || !Directory.Exists(prefsDir))
-                {
-                    Debug.LogError("Unable to create editor prefs asset at Editor/Vexe/ScriptableAssets (couldn't find folder). Please make sure that path exists 'somewhere' in your project");
-                    return instance != null ? instance : instance = CreateInstance<BetterPrefs>();
-                }
-
-                var path = Path.Combine(prefsDir, "BetterEditorPrefs.asset");
-                instance = AssetDatabase.LoadAssetAtPath<BetterPrefs>(path);
-                if (instance == null)
-                {
-                    instance = ScriptableObject.CreateInstance<BetterPrefs>();
-                    AssetDatabase.CreateAsset(instance, path);
-                    AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
-                    AssetDatabase.Refresh();
+            if (instance == null) {
+                // First attempt is to find the pref instance anywhere in the AssetDatabase
+                var prefPath = AssetDatabase.FindAssets("t:BetterPrefs BetterEditorPrefs").Select(x => AssetDatabase.GUIDToAssetPath(x)).FirstOrDefault();
+                if (prefPath != null) {
+                    instance = AssetDatabase.LoadAssetAtPath<BetterPrefs>(prefPath);
+                } else {
+                    // Otherwise create one on the spot
+                    instance = CreateInstance<BetterPrefs>();
                 }
             }
 
@@ -82,6 +71,24 @@ namespace Vexe.Runtime.Types
             if (instance.Colors == null) instance.Colors = new LookupIntColor();
             if (instance.Vector3s == null) instance.Vector3s = new LookupIntVector3();
 
+            // Add instance to the Asset Database if it isn't there already.
+            if (AssetDatabase.Contains(instance))
+                return instance;
+
+            const string root = "Assets";
+            var dirs = Directory.GetDirectories(root, "Vexe", SearchOption.AllDirectories);
+            var editorDir = dirs.FirstOrDefault(x => Directory.GetParent(x).Name == "Editor") ?? string.Empty;
+
+            var prefsDir = Path.Combine(editorDir, "ScriptableAssets");
+            if (editorDir.IsNullOrEmpty() || !Directory.Exists(prefsDir)) {
+                Debug.LogError("Unable to create editor prefs asset at Editor/Vexe/ScriptableAssets (couldn't find folder). Creating in project root instead...");
+                prefsDir = root;
+            }
+
+            var path = Path.Combine(prefsDir, "BetterEditorPrefs.asset");
+            AssetDatabase.CreateAsset(instance, path);
+            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+            AssetDatabase.Refresh();
             return instance;
         }
 #endif
