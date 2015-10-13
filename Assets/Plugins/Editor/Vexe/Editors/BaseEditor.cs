@@ -99,7 +99,6 @@ namespace Vexe.Editor.Editors
         private string[] _membersDrawnByUnityLayout;
         private BaseGUI _gui;
         private Vector4 _padding = Vector4.zero;
-        private float _storedWight = 0;
 
         static Dictionary<int, BaseGUI> _guiCache = new Dictionary<int, BaseGUI>();
 
@@ -161,11 +160,16 @@ namespace Vexe.Editor.Editors
             // creating the delegate once, reducing allocation
             if (_onGUIFunction == null)
                 _onGUIFunction = OnGUI;
-
+            //Create invisible Box with standart layout for calculating correction factor and correct padding
+            //padding have change to Vector4 with 
+            //x - left border
+            //y - right border
+            //z - top border
+            //w - bottom border
             GUILayout.Box(" ", GUIStyles.Label, GUILayout.ExpandWidth(true), GUILayout.Height(0f));
             Rect tempRect = GUILayoutUtility.GetLastRect();
 
-
+            //calculate padding in repaint, correction constant will be choosing manually
             if (Event.current.type == EventType.Repaint)
             {
                 _padding.x = 0f;
