@@ -76,7 +76,7 @@ namespace Vexe.Editor.GUIs
 		protected abstract VerticalBlock BeginVertical(GUIStyle style);
 		protected abstract void EndHorizontal();
 		protected abstract void EndVertical();
-		public abstract void OnGUI(Action guiCode, Vector2 padding, int targetId);
+		public abstract void OnGUI(Action guiCode, Vector4 padding, int targetId);
 
         public virtual void OnEnable() { }
         public virtual void OnDisable() { }

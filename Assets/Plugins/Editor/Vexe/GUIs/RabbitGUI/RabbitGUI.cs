@@ -60,6 +60,7 @@ namespace Vexe.Editor.GUIs
         private bool _storedValidRect;
         private int _id;
         private static BetterPrefs _prefs;
+        private float _widthCorrection = 0f;
 
         static MethodCaller<object, string> _scrollableTextArea;
         static MethodCaller<object, Gradient> _gradientField;
@@ -148,8 +149,9 @@ namespace Vexe.Editor.GUIs
             }
         }
 
-        public override void OnGUI(Action guiCode, Vector2 padding, int targetId)
+        public override void OnGUI(Action guiCode, Vector4 padding, int targetId)
         {
+            _widthCorrection = padding.y;
             _id = targetId;
 
             if (!_validRect.HasValue)
@@ -179,14 +181,15 @@ namespace Vexe.Editor.GUIs
 
             if (_validRect.HasValue)
             {
-                var start = new Rect(_validRect.Value.x + padding.x, _validRect.Value.y,
+                
+                var start = new Rect(_validRect.Value.x + padding.x, _validRect.Value.y + padding.z,
                     EditorGUIUtility.currentViewWidth - padding.y, _validRect.Value.height);
 
                 using (Begin(start))
                     guiCode();
             }
 
-            GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth - 35f, Height);
+            GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth - 35f, Height - padding.w);
 
             OnFinishedLayoutReserve.SafeInvoke();
         }
@@ -272,15 +275,14 @@ namespace Vexe.Editor.GUIs
                     _currentPhase = GUIPhase.Layout;
                     EditorHelper.RepaintAllInspectors();
                 }
-                else
-                {
-                    bool resized = _prevInspectorWidth != EditorGUIUtility.currentViewWidth;
+                else {
+                    bool resized = _prevInspectorWidth != EditorGUIUtility.currentViewWidth + _widthCorrection;
                     if (resized)
                     {
                         #if dbg_level_1
                             Debug.Log("Resized inspector. Doing layout in next phase");
                         #endif
-                        _prevInspectorWidth = EditorGUIUtility.currentViewWidth;
+                        _prevInspectorWidth = EditorGUIUtility.currentViewWidth + _widthCorrection;
                         _currentPhase = GUIPhase.Layout;
                     }
                 }
