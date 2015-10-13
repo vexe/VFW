@@ -98,6 +98,8 @@ namespace Vexe.Editor.Editors
         private Action _onGUIFunction;
         private string[] _membersDrawnByUnityLayout;
         private BaseGUI _gui;
+        private Vector4 _padding = Vector4.zero;
+        private float _storedWight = 0;
 
         static Dictionary<int, BaseGUI> _guiCache = new Dictionary<int, BaseGUI>();
 
@@ -160,9 +162,19 @@ namespace Vexe.Editor.Editors
             if (_onGUIFunction == null)
                 _onGUIFunction = OnGUI;
 
-            // I found 25 to be a good padding value such that there's not a whole lot of empty space wasted
-            // and the vertical inspector scrollbar doesn't obstruct our controls
-            gui.OnGUI(_onGUIFunction, new Vector2(0f, 25f), id);
+            GUILayout.Box(" ", GUIStyles.Label, GUILayout.ExpandWidth(true), GUILayout.Height(0f));
+            Rect tempRect = GUILayoutUtility.GetLastRect();
+
+
+            if (Event.current.type == EventType.Repaint)
+            {
+                _padding.x = 0f;
+                _padding.y = EditorGUIUtility.currentViewWidth - tempRect.width;
+                _padding.z = -4f - tempRect.height;
+                _padding.w = 4f;
+            }
+            
+            gui.OnGUI(_onGUIFunction, _padding, id);
 
             // addresses somes cases of editor slugishness when selecting gameObjects
             if (_repaintCount < 3)
