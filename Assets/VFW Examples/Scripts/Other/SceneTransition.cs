@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Vexe.Runtime.Types
 {
@@ -16,7 +17,7 @@ namespace Vexe.Runtime.Types
 		[Show]
 		public void LoadScene()
 		{
-			Application.LoadLevel(scene);
+			SceneManager.LoadScene(scene);
 		}
 	}
 }
