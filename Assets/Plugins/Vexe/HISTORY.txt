@@ -530,3 +530,13 @@ Improvements/Small additions:
 - Array/List/Dictionary: A small tilde is displayed as label in front of numeric elements to quickly modify values
 - Extension methods: MemoryStream.Reset and Type.IsNumeric
 - RabbitGUI 'If' conditional execution of IDisposable blocks (See Dictionary/Sequence drawer for examples)
+
+_______________
+-- VFW 1.3.5 --
+
+- Deprecated BetterBehaviour/BetterScriptableObject and custom serialization. Use Unity's standard serialization.
+- Deprecated uDelegate, uAction, uFunc, etc. Use UnityEvents instead.
+- Fixed errors on web player
+- Fixed Unity 5.3 errors
+- Deprecated BetterPrefs. There are no more editor .asset files. Visit the actual VFWSettings.cs file to modify the stuff that's in it. Foldout values are now saved as part of BaseBehaviour (in an EditorRecord object) (Editor only, no runtime overhead)
+- "Drag drop" area shows when an array/list is empty as well
