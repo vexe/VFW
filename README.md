@@ -6,7 +6,6 @@
 - [Usage](#usage)
 - [Features](#heres-a-birds-eye-view-for-some-of-the-features)
   - [A new drawing API](#feature-drawing-api)
-  - [An improved serialization system](#feature-improved-serialization)
   - [Helper types](#feature-helper-types)
   - [Tons of property attributes](#feature-property-attributes)
 - [Screenshots](#screenshots)
@@ -28,30 +27,27 @@
   - [How do you serialize a BetterBehaviour to file?](#faq-how-to-serialize)
 
 ### What:
-  - VFW is both a runtime and editor extension that offers much more advance features than what comes out of the box with Unity. A better drawing API, a faster GUI layout system for editor drawing, a custom serialization system, tons of attributes/drawers, helper types and more. 
+  - VFW is an editor extension that offers much more advance editor extensibility features than what comes out of the box with Unity. A better drawing API, a faster GUI layout system for editor drawing, tons of attributes/drawers, helper types and more. 
  
 ### Usage:
-  - Import the VFW unitypackage into your project.
-  - Inherit BetterBehaviour instead of MonoBehaviour and BetterScriptableObject instead of ScriptableObject, and don't forget to add your using statement:
+  - Download and extract the .Zip from github. You will see 3 folders: Plugins, VFW Examples and VFW Deprecated, all you need is the Plugins folder.
+  - Inherit BaseBehaviour instead of MonoBehaviour and BaseScriptableObject instead of ScriptableObject, and don't forget to add your using statement. See the examples that come with the packagefor more details.
 
 ```csharp
-using Vexe.Runtime.Types; // for BetterBehaviour, BetterScriptableObject and uAction
-using System.Collections.Generic; // for List
-using UnityEngine; // for GameObject
+using Vexe.Runtime.Types;
 
-public class TestBehaviour : BetterBehaviour
+public class TestBehaviour : BaseBehaviour
 {
-    public Dictionary<int, GameObject> someDictionary;
-    public uAction someAction;
-    public List<int[]> someList { get; set; }
+    [PerItem, Tags, OnChanged("Log")]
+		public string[] enemyTags;
+		
+		[Inline]
+		public GameObject go;
+		
+		[Display(Seq.LineNumbers | Seq.Filter), PerItem("Whitespace"), Whitespace(Left = 5f)]
+    public ItemsLookup[] ComplexArray;
 }
 
-public class TestScriptableObject : BetterScriptableObject
-{
-    public Dictionary<int, GameObject> someDictionary;
-    public uAction someAction;
-    public List<int[]> someList { get; set; }
-}
 ```
 
 
@@ -61,33 +57,19 @@ public class TestScriptableObject : BetterScriptableObject
 1. You can write drawers for pretty much 'any' System.Type!
 1. Can be applied on any 'member' (method, property or field) You can write a single drawer and apply it on fields or properties! DRY!
 1. The API is strongly typed (uses generics). You get a strong reference to attribute you're writing your drawer for
-1. Fields/properties are dealt with equally the same. This is possible via a 'DataMember' wrapper around them. That wrapper is strongly-typed, there's also a weak-typed version of it. No more dealing with SerializedProperties!
+1. Fields/properties are dealt with equally the same. This is possible via a 'EditorMember' wrapper around them. That wrapper is strongly-typed, there's also a weak-typed version of it. No more dealing with SerializedProperties!
 1. You can expose 'any' member even if it wasn't serializable! (inspector exposure is independent of serialization).
-1. Fields, properties, methods, generics, interfaces, abstract objects, dictionaries, arrays, lists, etc. All are exposed and serializable.
+1. Fields, properties, methods, generics, interfaces, abstract objects, dictionaries, arrays, lists, etc. Could all be exposed.
 1. Attribute composition works very well, as long as you compose correctly (just like Unity's 'order' attribute, you get an 'id' that you could use to sort your composite attributes).
 1. You can re-use your drawers everywhere! Drawers target a System.Object as opposed to Unity's targeting UnityEngine.Object. So you could easily use your drawers in an EditorWindow for instance.
 1. The drawing API is so flexible, that you can use drawers on members that don't have any attributes on them! pseudo: MemberField(someMember, someAttributes);
 1. When dealing with collections, you have the option whether you want to apply attributes on the collection itself, or its individual elements.
-1. You can use both GUILayout and GUI!
+1. You can use GUILayout, GUI and a custom fast layout system: RabbitGUI!
 1. You can have your composite drawers target specific areas of your target field. So you get a OnLeftGUI, OnRightGUI, OnBottomGUI and OnUpperGUI (for the left, right, bottom, and upper sides of your field) - Composition level: Korean!
 1. Custom/shorter attributes to show/hide things: [Show], [Hide]
 1. Focus on writing your drawers' logic without having to write any type-checks/validation to make sure your attributes are applied on the right field/property type. Apply a Popup on a GameObject field, it just gets ignored.
 
-####2- <a name="feature-improved-serialization">An improved serialization system that has the following features</a>:
-1. Polymorphic types (interfaces and abstract/base system objects)
-1. Generic types. (you can go crazy with nesting generics. i.e. Dictionary<int, Dictionary<List<ISomeInterface>>>)
-1. Auto-properties (properties with side-effects are *not* serialized. Instead, you just serialize the backing field behind it)
-1. static fields/auto-properties can be serialized *only* in BetterBehaviours, not in any arbitrary System.Object
-1. readonly fields!
-1. Structs, custom classes and Nullables!
-1. Most common collection types: arrays (one dimensional), List<T>, Dictionary<TK, TV>, Stack<T>, Queue<T> and HashSet<T>
-1. Delegates support with Action/Func-like equivalents: uAction and uFunc (supports up to 4 type arguments)
-1. You can have your own serialization logic with your own attributes! (more on the default serialization logic/attributes shortly)
-
-
 ####3- <a name="feature-helper-types">Helper types</a>:
-1. The generic event system from uFAction.
-1. BetterAnimator (an Animator wrapper that lets you easily modify the animator's floats, bools, ints, etc)
 1. SelectionMemorizer: memorizes your objects selections. Ctrl.Shift.- to go back, Ctrl.Shift.+ to go forward.
 1. BetterUndo: a simple undo system implemented via the command pattern that lets you take direct control of what is it to be done, and how it is to be undone
 1. RabbitGUI: A much faster and cleaner GUI layouting system than Unity's GUILayout/EditorGUILayout with similar API and some extra features.
@@ -98,35 +80,28 @@ public class TestScriptableObject : BetterScriptableObject
 1. **Enums**: *EnumMask* (one that works! - credits to Bunny83), *SelectEnum* (gives you the ability to right-click an enum to show the values in a selection window - useful for enums with large values)
 1. **Popups**: *AnimVar* (shows all the variables available in the attached Animator component), *Popup* (your usual popup - could take a method name to generate the values at runtime), *Tags* (displays all available tags in a popup), *InputAxis* (gives you all the available input axes like Horizontal etc)
 1. **Randoms**: Rand (sets a float/int to a random value with a randomize button)
-1. **Requirements**: *Required*, *RequiredFromThis*, *RequiredFromChildren*, *RequiredFromParents* (Signifies that the annotated field is required for things to work properly. Extremely useful, makes assigning variables/configuring less of a pain by assigning fields automatically for you, just tell it where to look - you could tell it to add the component if not found)
 1. **Vectors**: *BetterVector* (gives you the ability to zero, normalize and copy/paste vector values)
-1. **Others**: *Draggable* (allows you to drag/drop the field itself), *Path* (allows you to drag/drop objects to a string field to take their string value - useful if you have a path field for a folder/file instead of manually writing its path you just drag-drop it, works on GameObjects too). *Readonly* (makes your field unmodifiable), *ShowType* (displays a popup for all the runtime types children for a given System.Type). *OnChanged* (my fav! lets you choose a callback method or property/field to set when your field value changes!), *Assignable* (lets you assign your fields/properties from a source object)
-1. **Selections**: *SelectObj*, *SelectEnum*, *SelectScene*: give you a selection window to select objects (from children, parents, etc), enums and scenes in that order.
+1. **Others**: *Draggable* (allows you to drag/drop the field itself), *Path* (allows you to drag/drop objects to a string field to take their string value - useful if you have a path field for a folder/file instead of manually writing its path you just drag-drop it, works on GameObjects too). *OnChanged* (my fav! lets you choose a callback method or property/field to set when your field value changes!), *Assignable* (lets you assign your fields/properties from a source object)
+1. **Selections**: *SelectEnum*, *SelectScene*: give you a selection window to select objects (from children, parents, etc), enums and scenes in that order.
 1. **Filters**: *FilterEnum*, *FilterTags*: give you a small text field to quickly filter out values to quickly assign your enums/tags
-1. **Categories**: *DefineCategory*: defines a member category and lets you categorize your behavior members according to custom rules and filters. *Category*: annotate members with this, to include them in a certain category. IgnoreCategories: Ignore (hide) previously defined categories. *BasicView*: displays your behavior in an uncategorized style. *MinimalView*: even more basic than the previous.
+1. **Categories**: *DefineCategory*: defines a member category and lets you categorize your behavior members according to custom rules and filters. *Category*: annotate members with this, to include them in a certain category. IgnoreCategories: Ignore (hide) previously defined categories.
 1. **Collections**: *Seq*: lets you customize the way your sequence (array/list) looks. *PerItem*: indicated that you want your composite attributes to be drawn on each element of a sequence (array/list). *PerKey/PerValue*: indicates that you want to apply your custom attributes on each key/value of a dictionary.
 
 ### Screenshots:
 - [UnityTypes](http://i.imgur.com/O5klA26.png)
 - [ShowType](http://i.imgur.com/WlLhnXn.png)
 - [Sequences](http://i.imgur.com/vtPe4SN.png)
-- [SelectObj](http://i.imgur.com/eOHFBw3.png)
 - [SelectEnum](http://i.imgur.com/srCJepM.png)
 - [Popups](http://i.imgur.com/HNeuUSB.png)
 - [InputAxis](http://i.imgur.com/UN7qf2d.png)
-- [Nullables](http://i.imgur.com/7q9Lx99.png)
 - [ShowMethod](http://i.imgur.com/O5n2gCv.png)
-- [Abstracts](http://i.imgur.com/f71qvqQ.png)
-- [Interfaces](http://i.imgur.com/ODwc6hT.png)
 - [Inline](http://i.imgur.com/vHZORHn.png)
-- [Generics/Nesting](http://i.imgur.com/8ZdCdXf.png)
-- [Delegates](http://i.imgur.com/ALGlmux.png)
 - [AnimVar](http://i.imgur.com/q0lINLZ.png)
 - [Filters](http://i.imgur.com/J0F5Msb.png)
 - [Attributes in EditorWindow](http://i.imgur.com/2b8YOJu.png)
 - [Assignable](http://i.imgur.com/MzIPxVD.png)
 
-### Tutorials/Videos (read the video description to see what it covers):
+### [OLD] Tutorials/Videos (read the video description to see what it covers):
 1. [Intro / API Overview](https://www.youtube.com/watch?v=9AnTNGKjAK0)
 1. [Attributes 1](https://www.youtube.com/watch?v=jsNXBY2VJ6g)
 1. [Attributes 2](https://www.youtube.com/watch?v=y3XJKnOCrcU)
@@ -149,7 +124,9 @@ public class TestScriptableObject : BetterScriptableObject
 1. For help, improvements/suggestions, bug reports: you could post here, pm me or email me at askvexe@gmail.com. I will try to reply ASAP and help as best as I can.
 1. I always use the latest version of Unity for development. Before you report an issue, please make sure you're using the latest version too. If the issue is still there, report it.
 
-### FAQ: 
+### FAQ:
+1. <a name="faq-license">**Why did you take out the custom serialization features?**</a>
+  - [Read post No. 441](http://forum.unity3d.com/threads/open-source-vfw-134-drawers-save-system-serialize-interfaces-generics-autoprops-delegates.266165/page-9#post-2478086).
 1. <a name="faq-license">**License?**</a>
   - [MIT](http://choosealicense.com/licenses/mit/).
 1. <a name="faq-needs-pro">**Does this require Unity Pro?** 
