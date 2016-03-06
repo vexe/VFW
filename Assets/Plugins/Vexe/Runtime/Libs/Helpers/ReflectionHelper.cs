@@ -56,7 +56,7 @@ namespace Vexe.Runtime.Helpers
 
         public static MemberInfo CachedGetMember(Type objType, string memberName)
         {
-            return _cachedGetMember(ItemPair.Create(objType, memberName));
+            return _cachedGetMember(ItemTuple.Create(objType, memberName));
         }
 
         static ReflectionHelper()

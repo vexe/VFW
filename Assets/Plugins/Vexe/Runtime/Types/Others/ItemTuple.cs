@@ -43,7 +43,7 @@ namespace Vexe.Runtime.Types
 		}
 	}
 
-	public static class ItemPair
+	public static class ItemTuple
 	{
 		public static ItemTuple<T1, T2> Create<T1, T2>(T1 item1, T2 second)
 		{

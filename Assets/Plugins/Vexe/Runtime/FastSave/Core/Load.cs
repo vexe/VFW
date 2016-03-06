@@ -103,25 +103,25 @@ namespace Vexe.FastSave
             if (newHierarchy)
             {
                 GameObjectFromStream(stream, root);
-                list.Add(ItemPair.Create(root, 0));
+                list.Add(ItemTuple.Create(root, 0));
                 for (int i = 0; i < numSavedChildren - 1; i++)
                 {
                     var depth = stream.ReadInt();
                     var go = new GameObject();
                     GameObjectFromStream(stream, go);
-                    list.Add(ItemPair.Create(go, depth));
+                    list.Add(ItemTuple.Create(go, depth));
                 }
             }
             else
             {
                 GameObjectFromStream(stream, root);
-                list.Add(ItemPair.Create(root, 0));
+                list.Add(ItemTuple.Create(root, 0));
                 for (int i = 0; i < numSavedChildren - 1; i++)
                 {
                     var depth = stream.ReadInt();
                     var go = children[i + 1].gameObject;
                     GameObjectFromStream(stream, go);
-                    list.Add(ItemPair.Create(go, depth));
+                    list.Add(ItemTuple.Create(go, depth));
                 }
             }
 

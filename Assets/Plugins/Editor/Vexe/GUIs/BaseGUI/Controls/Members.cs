@@ -28,7 +28,7 @@ namespace Vexe.Editor.GUIs
             if (member.MemberType == MemberTypes.Method)
             {
                 var method = member as MethodInfo;
-                var methodKey = Cache.GetMethodKey(ItemPair.Create(id, method));
+                var methodKey = Cache.GetMethodKey(ItemTuple.Create(id, method));
                 var methodDrawer = MemberDrawersHandler.GetMethodDrawer(methodKey);
                 methodDrawer.Initialize(method, rawTarget, unityTarget, methodKey, this, prefs);
                 wrappedMember = null;
@@ -36,7 +36,7 @@ namespace Vexe.Editor.GUIs
             }
             else
             {
-                var cachedMember = Cache.GetMember(ItemPair.Create(member, id));
+                var cachedMember = Cache.GetMember(ItemTuple.Create(member, id));
                 cachedMember.RawTarget = rawTarget;
                 cachedMember.UnityTarget = unityTarget;
                 wrappedMember = cachedMember;
