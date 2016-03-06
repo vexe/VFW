@@ -98,7 +98,7 @@ namespace Vexe.FastSave
             var children = root.GetComponentsInChildren<Transform>();
             var newHierarchy = numSavedChildren != children.Length;
 
-            var list = new List<ItemPair<GameObject, int>>(numSavedChildren);
+            var list = new List<ItemTuple<GameObject, int>>(numSavedChildren);
 
             if (newHierarchy)
             {

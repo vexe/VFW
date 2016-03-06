@@ -52,7 +52,7 @@ namespace Vexe.Runtime.Helpers
         public readonly static Func<Type, List<MemberInfo>> CachedGetMembers;
         public readonly static Func<Type[]> CachedGetRuntimeTypes;
 
-        readonly static Func<ItemPair<Type, string>, MemberInfo> _cachedGetMember;
+        readonly static Func<ItemTuple<Type, string>, MemberInfo> _cachedGetMember;
 
         public static MemberInfo CachedGetMember(Type objType, string memberName)
         {
@@ -64,7 +64,7 @@ namespace Vexe.Runtime.Helpers
             CachedGetMembers = new Func<Type, List<MemberInfo>>(type =>
                 GetMembers(type).ToList()).Memoize();
 
-            _cachedGetMember = new Func<ItemPair<Type, string>, MemberInfo>(tup =>
+            _cachedGetMember = new Func<ItemTuple<Type, string>, MemberInfo>(tup =>
             {
                 var members = tup.Item1.GetMember(tup.Item2, Flags.StaticInstanceAnyVisibility);
                 if (members.IsNullOrEmpty())

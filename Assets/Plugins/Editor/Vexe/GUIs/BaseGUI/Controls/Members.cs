@@ -166,25 +166,25 @@ namespace Vexe.Editor.GUIs
 
         private static class Cache
         {
-            private static Func<ItemPair<int, MethodInfo>, int> _getMethodKey;
-            public static Func<ItemPair<int, MethodInfo>, int> GetMethodKey
+            private static Func<ItemTuple<int, MethodInfo>, int> _getMethodKey;
+            public static Func<ItemTuple<int, MethodInfo>, int> GetMethodKey
             {
                 get
                 {
                     //@Note: I expected the hash code for a MethodInfo to be persistent but it turns out I was wrong
                     //This was leading to the method foldout not being persistent between assembly reloads
                     //So I went for the method full name as a hash instead
-                    return _getMethodKey ?? (_getMethodKey = new Func<ItemPair<int, MethodInfo>, int>(x =>
+                    return _getMethodKey ?? (_getMethodKey = new Func<ItemTuple<int, MethodInfo>, int>(x =>
                         RuntimeHelper.CombineHashCodes(x.Item1, x.Item2.GetFullName())).Memoize());
                 }
             }
 
-            private static Func<ItemPair<MemberInfo, int>, EditorMember> _getMember;
-            public static Func<ItemPair<MemberInfo, int>, EditorMember> GetMember
+            private static Func<ItemTuple<MemberInfo, int>, EditorMember> _getMember;
+            public static Func<ItemTuple<MemberInfo, int>, EditorMember> GetMember
             {
                 get
                 {
-                    return _getMember ?? (_getMember = new Func<ItemPair<MemberInfo, int>, EditorMember>(x =>
+                    return _getMember ?? (_getMember = new Func<ItemTuple<MemberInfo, int>, EditorMember>(x =>
                         EditorMember.WrapMember(x.Item1, null, null, x.Item2)).Memoize());
                 }
             }
