@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Vexe.Runtime.Extensions;
-using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Types;
 
 namespace Vexe.Editor.Internal
-{ 
+{
     public static class ConditionalVisibility
     {
         static Dictionary<MemberInfo, MethodCaller<object, bool>> _isVisibleCache = new Dictionary<MemberInfo, MethodCaller<object, bool>>();
@@ -20,7 +20,7 @@ namespace Vexe.Editor.Internal
 
                 var attr = member.GetCustomAttribute<VisibleWhenAttribute>();
                 if (attr == null)
-                { 
+                {
                     _isVisibleCache[member] = AlwaysVisible;
                     return true;
                 }
@@ -51,34 +51,34 @@ namespace Vexe.Editor.Internal
                         return true;
                     }
 
-                    Assert.True(attr.Operator == '|' || attr.Operator == '&',
+                    Assert.IsTrue(attr.Operator == '|' || attr.Operator == '&',
                         "Only AND ('&') and OR ('|') operators are supported");
 
                     MethodCaller<object, bool> condition = null;
-                    switch(conditionMember.MemberType)
+                    switch (conditionMember.MemberType)
                     {
                         case MemberTypes.Field:
-                            // I feel like there should be a shorter way of doing this...
-                            if (negate)
-                                condition = (x, y) => !(bool)(conditionMember as FieldInfo).GetValue(x);
-                            else 
-                                condition = (x, y) => (bool)(conditionMember as FieldInfo).GetValue(x);
-                            break;
+                        // I feel like there should be a shorter way of doing this...
+                        if (negate)
+                            condition = (x, y) => !(bool)(conditionMember as FieldInfo).GetValue(x);
+                        else
+                            condition = (x, y) => (bool)(conditionMember as FieldInfo).GetValue(x);
+                        break;
                         case MemberTypes.Property:
-                            if (negate)
-                                condition = (x, y) => !(bool)(conditionMember as PropertyInfo).GetValue(x, null);
-                            else 
-                                condition = (x, y) => (bool)(conditionMember as PropertyInfo).GetValue(x, null);
-                            break;
+                        if (negate)
+                            condition = (x, y) => !(bool)(conditionMember as PropertyInfo).GetValue(x, null);
+                        else
+                            condition = (x, y) => (bool)(conditionMember as PropertyInfo).GetValue(x, null);
+                        break;
                         case MemberTypes.Method:
-                            if (negate)
-                                condition = (x, y) => !(bool)(conditionMember as MethodInfo).Invoke(x, y);
-                            else 
-                                condition = (x, y) => (bool)(conditionMember as MethodInfo).Invoke(x, y);
-                            break;
+                        if (negate)
+                            condition = (x, y) => !(bool)(conditionMember as MethodInfo).Invoke(x, y);
+                        else
+                            condition = (x, y) => (bool)(conditionMember as MethodInfo).Invoke(x, y);
+                        break;
                     }
 
-                    Assert.NotNull(condition, "Should have assigned a condition by now for member type: " + conditionMember.MemberType);
+                    Assert.IsNotNull(condition, "Should have assigned a condition by now for member type: " + conditionMember.MemberType);
                     conditions.Add(condition);
                 }
 

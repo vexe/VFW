@@ -43,7 +43,7 @@ namespace BX20Serializer
 
         public virtual MemberInfo[] GetMembers(Type type)
         {
-            return ctx.Serializer._Logic.CachedGetSerializableMembers(type);
+            return X20Logic.CachedGetSerializableMembers(type);
         }
     }
 

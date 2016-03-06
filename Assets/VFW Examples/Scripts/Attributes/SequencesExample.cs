@@ -30,14 +30,5 @@ namespace VFWExamples
         // for more details see CollectionElementExample.cs
 		[PerItem("Tags"), Tags, Comment("This comment is applied on the array")]
 		public string[] Tags;
-
-		// Notice here we're not using PerItem, which means any attribute we mention would be applied
-		// on the sequence (array/list) itself, and not its elements
-		// In this case however, BetterV3 is an attribute that you use to draw a Vector3,
-		// and not sequences of Vector3 which means here we applied it somewhere we shouldn't
-		// so we will get an error saying BetterV3 can't handle List<Vector3>.
-        // After that we'll fallback to the drawer of List<Vector3> which is ListDrawer<T>
-        // Uncomment to give it a try!
-        //public List<Vector3> RegularVectors { get; set; }
 	}
 }

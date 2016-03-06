@@ -53,8 +53,7 @@ namespace Vexe.Editor.Types
 
                     result = result.ToTitleCase();
 
-                    var settings = VFWSettings.GetInstance();
-                    if (!settings.UseHungarianNotation)
+                    if (!VFWSettings.UseHungarianNotation)
                         return result.SplitPascalCase();;
 
                     if (name.Length > 1 && char.IsLower(result[0]) && char.IsUpper(result[1]))
@@ -120,15 +119,13 @@ namespace Vexe.Editor.Types
             if (displayAttr != null && MemberDrawersHandler.IsApplicableAttribute(memberType, displayAttr, attributes))
                 displayFormat = displayAttr.FormatLabel;
 
-            var settings = VFWSettings.GetInstance();
-
             if (displayFormat == null)
             {
                 if (Type.IsImplementerOfRawGeneric(typeof(IDictionary<,>)))
-                    displayFormat = settings.DictionaryFormat;
+                    displayFormat = VFWSettings.DefaultDictionaryFormat;
                 else if (Type.IsImplementerOfRawGeneric(typeof(IList<>)))
-                    displayFormat = settings.SequenceFormat;
-                else displayFormat = settings.MemberFormat;
+                    displayFormat = VFWSettings.DefaultSequenceFormat;
+                else displayFormat = VFWSettings.DefaultMemberFormat;
             }
 
             var iter = Formatters.GetEnumerator();
@@ -309,7 +306,7 @@ namespace Vexe.Editor.Types
         {
             var members = targetType.GetMember(memberName, MemberTypes.Field | MemberTypes.Property, Flags.StaticInstanceAnyVisibility);
             if (members.IsNullOrEmpty())
-                throw new vMemberNotFound(targetType, memberName);
+                ErrorHelper.MemberNotFound(targetType, memberName);
             return members[0];
         }
 
@@ -415,7 +412,7 @@ namespace Vexe.Editor.Types
             }
             catch(InvalidCastException)
             {
-                throw new vInvalidCast(value, TypeNiceName);
+                ErrorHelper.InvalidCast(value, TypeNiceName);
             }
         }
     }

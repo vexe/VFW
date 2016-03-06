@@ -67,6 +67,14 @@ namespace Vexe.Editor.Drawers
         }
     }
 
+    public class ByteDrawer : BasicDrawer<byte>
+    {
+        protected override byte DoField(string text, byte value)
+        {
+            return (byte)gui.Int(text, value);
+        }
+    }
+
     public class StringDrawer : BasicDrawer<string>
     {
         protected override string DoField(string text, string value)

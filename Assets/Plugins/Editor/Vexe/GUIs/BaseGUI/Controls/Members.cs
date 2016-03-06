@@ -28,15 +28,15 @@ namespace Vexe.Editor.GUIs
             if (member.MemberType == MemberTypes.Method)
             {
                 var method = member as MethodInfo;
-                var methodKey = Cache.GetMethodKey(Tuple.Create(id, method));
+                var methodKey = Cache.GetMethodKey(ItemPair.Create(id, method));
                 var methodDrawer = MemberDrawersHandler.GetMethodDrawer(methodKey);
-                methodDrawer.Initialize(method, rawTarget, unityTarget, methodKey, this);
+                methodDrawer.Initialize(method, rawTarget, unityTarget, methodKey, this, prefs);
                 wrappedMember = null;
                 return methodDrawer.OnGUI();
             }
             else
             {
-                var cachedMember = Cache.GetMember(Tuple.Create(member, id));
+                var cachedMember = Cache.GetMember(ItemPair.Create(member, id));
                 cachedMember.RawTarget = rawTarget;
                 cachedMember.UnityTarget = unityTarget;
                 wrappedMember = cachedMember;
@@ -64,7 +64,7 @@ namespace Vexe.Editor.GUIs
         {
             attributes = attributes ?? Empty;
             var memberDrawer = MemberDrawersHandler.GetMemberDrawer(member, attributes, ignoreComposition);
-            memberDrawer.Initialize(member, attributes, this);
+            memberDrawer.Initialize(member, attributes, this, prefs);
             return Member(member, attributes, memberDrawer, ignoreComposition);
         }
 
@@ -97,7 +97,7 @@ namespace Vexe.Editor.GUIs
             }
 
             for (int i = 0; i < composites.Count; i++)
-                composites[i].Initialize(member, attributes, this);
+                composites[i].Initialize(member, attributes, this, prefs);
 
             bool changed = false;
 
@@ -166,25 +166,25 @@ namespace Vexe.Editor.GUIs
 
         private static class Cache
         {
-            private static Func<Tuple<int, MethodInfo>, int> _getMethodKey;
-            public static Func<Tuple<int, MethodInfo>, int> GetMethodKey
+            private static Func<ItemPair<int, MethodInfo>, int> _getMethodKey;
+            public static Func<ItemPair<int, MethodInfo>, int> GetMethodKey
             {
                 get
                 {
                     //@Note: I expected the hash code for a MethodInfo to be persistent but it turns out I was wrong
                     //This was leading to the method foldout not being persistent between assembly reloads
                     //So I went for the method full name as a hash instead
-                    return _getMethodKey ?? (_getMethodKey = new Func<Tuple<int, MethodInfo>, int>(x =>
+                    return _getMethodKey ?? (_getMethodKey = new Func<ItemPair<int, MethodInfo>, int>(x =>
                         RuntimeHelper.CombineHashCodes(x.Item1, x.Item2.GetFullName())).Memoize());
                 }
             }
 
-            private static Func<Tuple<MemberInfo, int>, EditorMember> _getMember;
-            public static Func<Tuple<MemberInfo, int>, EditorMember> GetMember
+            private static Func<ItemPair<MemberInfo, int>, EditorMember> _getMember;
+            public static Func<ItemPair<MemberInfo, int>, EditorMember> GetMember
             {
                 get
                 {
-                    return _getMember ?? (_getMember = new Func<Tuple<MemberInfo, int>, EditorMember>(x =>
+                    return _getMember ?? (_getMember = new Func<ItemPair<MemberInfo, int>, EditorMember>(x =>
                         EditorMember.WrapMember(x.Item1, null, null, x.Item2)).Memoize());
                 }
             }

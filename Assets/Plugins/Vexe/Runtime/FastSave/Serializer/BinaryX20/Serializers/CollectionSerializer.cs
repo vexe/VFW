@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Vexe.Runtime.Extensions;
+using Vexe.Runtime.Helpers;
 
 namespace BX20Serializer
 {
@@ -82,7 +83,7 @@ namespace BX20Serializer
             }
 
             if (result == null)
-                throw new vMemberNotFound(collection, "Add/Push/Enqueue");
+                ErrorHelper.MemberNotFound(collection, "Add/Push/Enqueue");
 
             return result;
         }
@@ -94,7 +95,7 @@ namespace BX20Serializer
                 _ClearMethods[collection] = result = collection.GetMethod("Clear");
 
             if (result == null)
-                throw new vMemberNotFound(collection, "Clear");
+                ErrorHelper.MemberNotFound(collection, "Clear");
 
             return result;
         }

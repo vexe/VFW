@@ -1,20 +1,59 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using UnityEngine;
+using UnityObject = UnityEngine.Object;
 
 namespace BX20Serializer
-{ 
-    internal class X20Logic
+{
+    public static class X20Logic
     {
-        public readonly Func<Type, MemberInfo[]> CachedGetSerializableMembers;
+        public static Type[] SerializeMemberAttributes;
+        public static Type[] DontSerializeMemberAttributes;
 
-        private readonly FieldPredicate _IsSerializableField;
-        private readonly PropertyPredicate _IsSerializableProperty;
+        public static FieldPredicate IsSerializableFieldPredicate;
+        public static PropertyPredicate IsSerializablePropertyPredicate;
 
-        public X20Logic(FieldPredicate isSerializableField, PropertyPredicate isSerializableProperty)
+        public static readonly Func<Type, MemberInfo[]> CachedGetSerializableMembers;
+
+        public static bool IsSerializableMember(MemberInfo member)
         {
-            _IsSerializableField = isSerializableField;
-            _IsSerializableProperty = isSerializableProperty;
+            if (member.MemberType == MemberTypes.Method)
+                return false;
+
+            var field = member as FieldInfo;
+            if (field != null)
+            {
+                if (IsSerializableFieldPredicate != null)
+                    return IsSerializableFieldPredicate(field);
+
+                return DefaultIsSerializableField(field);
+            }
+
+            var property = member as PropertyInfo;
+            if (property != null)
+            {
+                if (IsSerializablePropertyPredicate != null)
+                    return IsSerializablePropertyPredicate(property);
+
+                return DefaultIsSerializableProperty(property);
+            }
+
+            return false;
+        }
+
+        public static Type[] GetSerializableMembersTypes(Type forType)
+        {
+            var members = CachedGetSerializableMembers(forType);
+            var result = X20Reflection.GetMembersTypes(members);
+            return result;
+        }
+
+
+        static X20Logic()
+        {
+            SerializeMemberAttributes = new Type[] { typeof(SerializeField) };
+            DontSerializeMemberAttributes = new Type[] { typeof(NonSerializedAttribute) };
 
             CachedGetSerializableMembers = new Func<Type, MemberInfo[]>(type =>
             {
@@ -24,27 +63,94 @@ namespace BX20Serializer
             }).Memoize();
         }
 
-        public bool IsSerializableMember(MemberInfo member)
+
+        public static bool IsSerializableType(Type type)
         {
-            if (member.MemberType == MemberTypes.Method)
+            if (type.IsPrimitive || type.IsEnum || type == typeof(string)
+                || typeof(UnityObject).IsAssignableFrom(type)
+                || IsUnityType(type))
+                return true;
+
+            if (type.IsArray)
+                return type.GetArrayRank() == 1 && IsSerializableType(type.GetElementType());
+
+            if (type.IsInterface)
+                return true;
+
+            if (NotSupportedTypes.Any(type.IsA))
                 return false;
 
-            var field = member as FieldInfo;
-            if (field != null)
-                return _IsSerializableField(field);
+            if (SupportedTypes.Any(type.IsA))
+                return true;
 
-            var property = member as PropertyInfo;
-            if (property != null)
-                return _IsSerializableProperty(property);
+            if (type.IsGenericType)
+                return type.GetGenericArguments().All(IsSerializableType);
 
+            return true;
+        }
+
+        public static bool DefaultIsSerializableField(FieldInfo field)
+        {
+            if (DontSerializeMemberAttributes.Any(field.IsDefined))
+                return false;
+
+            if (field.IsLiteral)
+                return false;
+
+            if (!(field.IsPublic || SerializeMemberAttributes.Any(field.IsDefined)))
+                return false;
+
+            bool serializable = IsSerializableType(field.FieldType);
+            return serializable;
+        }
+
+        public static bool DefaultIsSerializableProperty(PropertyInfo property)
+        {
+            if (DontSerializeMemberAttributes.Any(property.IsDefined))
+                return false;
+
+            if (!property.IsAutoProperty())
+                return false;
+
+            if (!(property.GetGetMethod(true).IsPublic ||
+                  property.GetSetMethod(true).IsPublic ||
+                  SerializeMemberAttributes.Any(property.IsDefined)))
+                return false;
+
+            bool serializable = IsSerializableType(property.PropertyType);
+            return serializable;
+        }
+
+        public static bool IsUnityType(Type type)
+        {
+            for (int i = 0; i < UnityTypes.Length; i++)
+                if (type == UnityTypes[i])
+                    return true;
             return false;
         }
 
-        public Type[] GetSerializableMembersTypes(Type forType)
+        public static readonly Type[] UnityTypes =
         {
-            var members = CachedGetSerializableMembers(forType);
-            var result = X20Reflection.GetMembersTypes(members);
-            return result;
-        }
+            typeof(Vector3),
+            typeof(Vector2),
+            typeof(Vector4),
+            typeof(Rect),
+            typeof(Quaternion),
+            typeof(Matrix4x4),
+            typeof(Color),
+            typeof(Color32),
+            typeof(LayerMask),
+            typeof(Bounds)
+        };
+
+        public static readonly Type[] NotSupportedTypes =
+        {
+            typeof(Delegate)
+        };
+
+        public static readonly Type[] SupportedTypes =
+        {
+            typeof(Type)
+        };
     }
 }

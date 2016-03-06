@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
@@ -8,7 +8,7 @@ namespace VFWExamples
     /// <summary>
     /// An example showing how to display things differently
     /// </summary>
-    public class DisplayExample : BetterBehaviour
+    public class DisplayExample : BaseBehaviour
     {
         [Display("Classified!!!")]
         public int secret;
@@ -20,10 +20,10 @@ namespace VFWExamples
         public ItemInfo[] items;
 
 		[Display("$name :: $type")]
-		public GameObject[] gameObjs { get; set; }
+		public GameObject[] gameObjs;
 
 		[Display("$name", FormatKVPair = "[Key: $key, Value: $value]")]
-		public Dictionary<string, Transform> Transforms { get; set; }
+		public Lookup Transforms;
 
         public DisplayOrderExample example = new DisplayOrderExample();
 
@@ -34,9 +34,12 @@ namespace VFWExamples
         {
             return value == null ? "Null" : value.GetType().GetNiceName();
         }
+
+        [Serializable] public class Lookup : SerializableDictionary<string, Transform> { }
     }
 
-    public class Health
+    [Serializable]
+    public struct Health
     {
         public int Min, Max, Current;
 
@@ -47,6 +50,7 @@ namespace VFWExamples
         }
     }
 
+    [Serializable]
     public struct ItemInfo
     {
         public uint Cost;
@@ -61,6 +65,7 @@ namespace VFWExamples
 	/// <summary>
 	/// An example showing how to explictly state the order that members are displayed in
 	/// </summary>
+    [Serializable]
 	public struct DisplayOrderExample
 	{
 		[Display(2.5f)] public int three;
@@ -70,6 +75,7 @@ namespace VFWExamples
 		[Display(0f)]   public int two;
 		[Display(11f)]  public Five five;
 
+        [Serializable]
 		public struct Five
 		{
 			[Display(1f)] public float seven;

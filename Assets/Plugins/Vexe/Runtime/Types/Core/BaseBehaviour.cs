@@ -73,5 +73,9 @@ namespace Vexe.Runtime.Types
         }
 
         #endregion
+
+#if UNITY_EDITOR
+        public EditorRecord Prefs = new EditorRecord();
+#endif
     }
 }

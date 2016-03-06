@@ -2,36 +2,38 @@
 using UnityEngine;
 using Vexe.Editor.Types;
 using Vexe.Runtime.Extensions;
+using Vexe.Runtime.Helpers;
 
 namespace Vexe.Editor.Drawers
 {
-	public abstract class ObjectDrawer<T> : BaseDrawer
-	{
-		protected T memberValue
-		{
-			get
+    public abstract class ObjectDrawer<T> : BaseDrawer
+    {
+        protected T memberValue
+        {
+            get
             {
                 try
                 {
                     return (T)member.Value;
                 }
-                catch(InvalidCastException)
+                catch (InvalidCastException)
                 {
-                    throw new vInvalidCast(member.TypeNiceName, typeof(T).GetNiceName());
+                    ErrorHelper.InvalidCast(member.TypeNiceName, typeof(T).GetNiceName());
+                    return default(T);
                 }
             }
-			set { member.Value = value; }
-		}
+            set { member.Value = value; }
+        }
 
-		public void MemberField()
-		{
-			MemberField(member);
-		}
+        public void MemberField()
+        {
+            MemberField(member);
+        }
 
-		public void MemberField(EditorMember member)
-		{
-			gui.Member(member, false);
-		}
+        public void MemberField(EditorMember member)
+        {
+            gui.Member(member, false);
+        }
 
         public override bool CanHandle(Type memberType)
         {
@@ -43,10 +45,10 @@ namespace Vexe.Editor.Drawers
             return EditorMember.WrapMember(memberName, typeof(T), memberValue, unityTarget, id);
         }
 
-		public sealed override void OnLeftGUI() { }
-		public sealed override void OnRightGUI() { }
-		public sealed override void OnUpperGUI() { }
-		public sealed override void OnLowerGUI() { }
-		public sealed override void OnMemberDrawn(Rect area) { }
-	}
+        public sealed override void OnLeftGUI() { }
+        public sealed override void OnRightGUI() { }
+        public sealed override void OnUpperGUI() { }
+        public sealed override void OnLowerGUI() { }
+        public sealed override void OnMemberDrawn(Rect area) { }
+    }
 }

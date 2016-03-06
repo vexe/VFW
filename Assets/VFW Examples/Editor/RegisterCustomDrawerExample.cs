@@ -103,7 +103,7 @@ namespace VFWExamples
                         HideUpdate = true, // we don't care about updating the popup values
                         Filter = true, // since we have many values, it'd be nice if we can filter them quickly
                     },
-                }, gui);
+                }, gui, prefs);
         }
 
         public override void OnGUI()

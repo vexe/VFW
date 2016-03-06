@@ -3,7 +3,7 @@ using Vexe.Runtime.Types;
 
 namespace VFWExamples
 {
-	public class DrawnByUnityLayoutExample : BetterBehaviour
+	public class DrawnByUnityLayoutExample : BaseBehaviour
 	{
         public Index2D drawnByVfwLayout;
 

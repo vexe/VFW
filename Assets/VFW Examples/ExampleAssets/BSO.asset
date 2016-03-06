@@ -11,17 +11,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c49ab732a309aae45aa0aa8837cd0a70, type: 3}
   m_Name: BSO
   m_EditorClassIdentifier: 
-  _serializationData:
-    serializedObjects: []
-    serializedStrings:
-      keys:
-      - KeyCode Jump
-      - Vector3 Target
-      - string[] tags
-      values:
-      - '"None"'
-      - '{"x":0.0,"y":0.0,"z":0.0}'
-      - '[]'
   _id: 702
   dbg: 0
+  Prefs:
+    _Buckets: ffffffffffffffff010000000400000005000000ffffffffffffffff
+    _HashCodes: 95ada563167911089e65e649c596540553fa7e0c54fa7e0c00000000
+    _Next: ffffffffffffffff00000000ffffffff020000000300000000000000
+    _Count: 6
+    _Version: 1004
+    _FreeList: -1
+    _FreeCount: 0
+    _Keys: 95ada563167911889e65e6c9c596540553fa7e0c54fa7e0c00000000
+    _Values:
+    - ValueString: 
+      ValueFloat: 0
+      Type: 0
+    - ValueString: 
+      ValueFloat: 0
+      Type: 0
+    - ValueString: 
+      ValueFloat: 0
+      Type: 0
+    - ValueString: 
+      ValueFloat: 0
+      Type: 0
+    - ValueString: 
+      ValueFloat: 0
+      Type: 0
+    - ValueString: 
+      ValueFloat: 0
+      Type: 0
+    - ValueString: 
+      ValueFloat: 0
+      Type: 0
+  tags: []
+  Jump: 0
+  Target: {x: 0, y: 0, z: 0}
   obj: {fileID: 0}

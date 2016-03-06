@@ -11,6 +11,7 @@ using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Types;
 using UnityObject = UnityEngine.Object;
+using UnityEngine.Assertions;
 
 namespace Vexe.FastSave
 {
@@ -97,30 +98,30 @@ namespace Vexe.FastSave
             var children = root.GetComponentsInChildren<Transform>();
             var newHierarchy = numSavedChildren != children.Length;
 
-            var list = new List<Tuple<GameObject, int>>(numSavedChildren);
+            var list = new List<ItemPair<GameObject, int>>(numSavedChildren);
 
             if (newHierarchy)
             {
                 GameObjectFromStream(stream, root);
-                list.Add(Tuple.Create(root, 0));
+                list.Add(ItemPair.Create(root, 0));
                 for (int i = 0; i < numSavedChildren - 1; i++)
                 {
                     var depth = stream.ReadInt();
                     var go = new GameObject();
                     GameObjectFromStream(stream, go);
-                    list.Add(Tuple.Create(go, depth));
+                    list.Add(ItemPair.Create(go, depth));
                 }
             }
             else
             {
                 GameObjectFromStream(stream, root);
-                list.Add(Tuple.Create(root, 0));
+                list.Add(ItemPair.Create(root, 0));
                 for (int i = 0; i < numSavedChildren - 1; i++)
                 {
                     var depth = stream.ReadInt();
                     var go = children[i + 1].gameObject;
                     GameObjectFromStream(stream, go);
-                    list.Add(Tuple.Create(go, depth));
+                    list.Add(ItemPair.Create(go, depth));
                 }
             }
 
@@ -165,27 +166,25 @@ namespace Vexe.FastSave
         #region
         public static bool MarkedFromFile(string path)
         {
-            using(var file = File.OpenRead(path))
+            using (var file = File.OpenRead(path))
                 return MarkedFromStream(file);
         }
 
         public static void GameObjectFromFile(string path, GameObject into)
         {
-            Assert.PathExists(path);
             using (var file = File.OpenRead(path))
                 GameObjectFromStream(file, into);
         }
 
         public static void ComponentFromFile(string path, Component into)
         {
-            Assert.PathExists(path);
             using (var file = File.OpenRead(path))
                 ComponentFromStream(file, into);
         }
 
         public static void HierarchyFromFile(string path, GameObject root)
         {
-            using(var file = File.OpenRead(path))
+            using (var file = File.OpenRead(path))
                 HierarchyFromStream(file, root);
         }
         #endregion
@@ -194,7 +193,7 @@ namespace Vexe.FastSave
         #region
         public static bool MarkedFromMemory(byte[] bytes)
         {
-            using(var memory = new MemoryStream(bytes))
+            using (var memory = new MemoryStream(bytes))
                 return MarkedFromStream(memory);
         }
 

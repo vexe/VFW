@@ -9,7 +9,7 @@ namespace Vexe.Runtime.Types
 	/// and have it reference the one you're interested in
 	/// </summary>
 	
-	public class GOInliner : BetterBehaviour
+	public class GOInliner : BaseBehaviour
 	{
 		[Inline]
 		public GameObject target;

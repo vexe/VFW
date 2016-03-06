@@ -2,7 +2,7 @@
 
 namespace VFWExamples
 {
-	public class DecorationsExample : BetterBehaviour
+	public class DecorationsExample : BaseBehaviour
 	{
 		[Comment("This is a string property!!!!")]
 		public string StrProperty { get; set; }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vexe.Editor.Drawers;
 using Vexe.Runtime.Extensions;
+using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Types;
 using UnityObject = UnityEngine.Object;
 
@@ -59,6 +60,7 @@ namespace Vexe.Editor
                     .Add<int, IntDrawer>()
                     .Add<uint, UIntDrawer>()
                     .Add<float, FloatDrawer>()
+                    .Add<float, ByteDrawer>()
                     .Add<double, DoubleDrawer>()
                     .Add<long, LongDrawer>()
                     .Add<bool, BoolDrawer>()
@@ -75,11 +77,6 @@ namespace Vexe.Editor
                     .Add<PopupAttribute, PopupDrawer>()
                     .Add<Enum, EnumDrawer>(true)
                     .Add<UnityObject, UnityObjectDrawer>(true);
-            }
-            // Delegates
-            {
-                this.Add<uDelegate, uDelegateDrawer>()
-                    .Add<IBaseDelegate, DelegateDrawer>(true);
             }
             // Collections
             {
@@ -167,7 +164,6 @@ namespace Vexe.Editor
                 // Selections
                 {
                     this.Add<SelectEnumAttribute, SelectEnumDrawer>()
-                        .Add<SelectObjAttribute, SelectObjDrawer>()
                         .Add<SelectSceneAttribute, SelectSceneDrawer>();
                 }
                 // Vectors
@@ -204,7 +200,7 @@ namespace Vexe.Editor
         public TypeDrawerMapper Insert(Type type, Type drawerType, bool isForChildren, Func<Type, Type, Type> bakeDrawerType)
         {
             if (!drawerType.IsA<BaseDrawer>())
-                throw new vTypeMismatch(typeof(BaseDrawer), drawerType);
+                ErrorHelper.TypeMismatch(typeof(BaseDrawer), drawerType);
 
             _types.Insert(type);
             _drawerTypes.Insert(drawerType);

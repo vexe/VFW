@@ -43,8 +43,6 @@ namespace BX20Serializer
 
         private int _CurrentRefId;
 
-        internal readonly X20Logic _Logic;
-
         /// <summary>
         /// 1: runtime type info (polymorphic serialization), cycle/serialize by reference, string cache
         /// 0: string cache
@@ -63,10 +61,8 @@ namespace BX20Serializer
             }
         }
 
-        public BinaryX20(FieldPredicate isSerializableField, PropertyPredicate isSerializableProperty)
+        public BinaryX20()
         {
-            _Logic = new X20Logic(isSerializableField, isSerializableProperty);
-
             _Serializers = new List<BaseSerializer>()
             {
                 PrimitiveSerializer.Instance,

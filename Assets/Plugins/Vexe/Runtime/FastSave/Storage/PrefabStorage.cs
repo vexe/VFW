@@ -1,8 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Vexe.Runtime.Types;
-using Vexe.Runtime.Helpers;
-using Vexe.Runtime.Extensions;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -18,7 +16,6 @@ namespace Vexe.FastSave
 
         public GameObject Get(int id)
         {
-            Assert.InBounds(Prefabs, id, "Prefabs");
             return Prefabs[id];
         }
 
@@ -50,7 +47,7 @@ namespace Vexe.FastSave
             }
         }
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR && !UNITY_WEBPLAYER
         [Show] void Populate()
         {
             Prefabs.Clear();

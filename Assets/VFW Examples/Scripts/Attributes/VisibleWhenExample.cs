@@ -21,8 +21,8 @@ namespace VFWExamples
         public int member3;
 
         public bool Flag1;
-        public bool Flag2 { get { return value > 10; } }
-        public bool Flag3() { return value < 5; }
+        [Show] public bool Flag2 { get { return value > 10; } }
+        [Show] public bool Flag3() { return value < 5; }
 
         // just to make sure visibility works on system objects too and not just behaviours
         public NestedObject[] array;

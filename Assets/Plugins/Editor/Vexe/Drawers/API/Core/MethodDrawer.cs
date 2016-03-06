@@ -30,16 +30,17 @@ namespace Vexe.Editor.Drawers
 		private BaseGUI gui;
         private bool isCoroutine;
 
-		private BetterPrefs prefs { get { return BetterPrefs.GetEditorInstance(); } }
+		private EditorRecord prefs;
 
 		private bool foldout
 		{
-			get { return prefs.Bools.ValueOrDefault(id); }
-			set { prefs.Bools[id] = value; }
+			get { return prefs[id]; }
+			set { prefs[id] = value; }
 		}
 
-		public void Initialize(MethodInfo method, object rawTarget, UnityObject unityTarget, int id, BaseGUI gui)
+		public void Initialize(MethodInfo method, object rawTarget, UnityObject unityTarget, int id, BaseGUI gui, EditorRecord prefs)
 		{
+            this.prefs = prefs;
 			this.gui = gui;
 			this.rawTarget = rawTarget;
             this.unityTarget = unityTarget;
@@ -143,31 +144,31 @@ namespace Vexe.Editor.Drawers
 
 			var type = obj.GetType();
             if (type.IsEnum || type == typeof(int))
-				 prefs.Ints[key] = (int)obj;
+				 prefs[key] = (int)obj;
 			else if (type == typeof(string))
-				 prefs.Strings[key] = (string)obj;
+				 prefs[key] = (string)obj;
 			else if (type == typeof(float))
-				 prefs.Floats[key] = (float)obj;
+				 prefs[key] = (float)obj;
 			else if (type == typeof(bool))
-				 prefs.Bools[key] = (bool)obj;
+				 prefs[key] = (bool)obj;
 		}
 
 		object TryLoad(Type type, int key)
 		{
             if (type.IsEnum)
             {
-                int value = prefs.Ints.ValueOrDefault(key);
+                int value = prefs[key];
                 object result = Enum.ToObject(type, value);
                 return result;
             }
             if (type == typeof(int))
-				return prefs.Ints.ValueOrDefault(key);
+				return prefs[key];
 			if (type == typeof(string))
-				return prefs.Strings.ValueOrDefault(key);
+				return prefs[key];
 			if (type == typeof(float))
-				return prefs.Floats.ValueOrDefault(key);
+				return prefs[key];
 			if (type == typeof(bool))
-				return prefs.Bools.ValueOrDefault(key);
+				return prefs[key];
 			return type.GetDefaultValue();
 		}
 	}

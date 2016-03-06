@@ -10,24 +10,24 @@ namespace VFWExamples
 		public static void CreateAsset()
 		{
 			var ex = ScriptableObject.CreateInstance<BSOExample>();
-			UnityEditor.AssetDatabase.CreateAsset(ex, "Assets/Plugins/Vexe/Runtime/Examples/ExampleAssets/BSO.asset");
+			UnityEditor.AssetDatabase.CreateAsset(ex, "Assets/BSO.asset");
 		}
 	}
 #endif
 
-	public class BSOExample : BetterScriptableObject
+	public class BSOExample : BaseScriptableObject
 	{
-		[Serialize, Tags, PerItem]
-		private string[] tags;
+		[Tags, PerItem]
+		public string[] tags;
 
 		[SelectEnum]
-		public KeyCode Jump { get; set; }
+		public KeyCode Jump;
 
 		[BetterV3]
-		public Vector3 Target { get; set; }
+		public Vector3 Target;
 
 		[Show]
-		private void method()
+		void method()
 		{
 			Debug.Log("method");
 		}

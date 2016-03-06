@@ -5,15 +5,18 @@ using Vexe.Runtime.Types;
 
 namespace VFWExamples
 {
-    public class UsingExample : BetterBehaviour
+    [Serializable] public class Lookup1 : SerializableDictionary<string, int> { }
+    [Serializable] public class Lookup2 : SerializableDictionary<string, KeyCode> { }
+
+    public class UsingExample : BaseBehaviour
     {
         // if we don't mention the class name, we will look
         // inside classes marked with [AttributeContainer]
         [PerItem, Using("MyAttributes")]
-        public List<Dictionary<string, int>> muchLess;
+        public List<Lookup1> muchLess;
 
         [Using("MyContainer.MyAttributes")]
-        public Dictionary<string, KeyCode> Clutter { get; set; }
+        public Lookup2 Clutter;
 
         [AttributeContainer]
         public static class MyContainer

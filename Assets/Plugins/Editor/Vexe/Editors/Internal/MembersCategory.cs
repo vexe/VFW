@@ -12,7 +12,7 @@ namespace Vexe.Editor.Internal
 {
     public class MembersCategory
     {
-        private static readonly BetterPrefs _prefs = BetterPrefs.GetEditorInstance();
+        private readonly EditorRecord _prefs;
 
         private readonly int _id;
         private CategoryDisplay _display;
@@ -42,8 +42,9 @@ namespace Vexe.Editor.Internal
             }
         }
 
-        public MembersCategory(string fullPath, float displayOrder, int id)
+        public MembersCategory(string fullPath, float displayOrder, int id, EditorRecord prefs)
         {
+            _prefs = prefs;
             this.DisplayOrder = displayOrder;
             this.FullPath = fullPath;
             this.Name = FullPath.Substring(FullPath.LastIndexOf('/') + 1);
@@ -72,8 +73,8 @@ namespace Vexe.Editor.Internal
             using (gui.Horizontal(boxed ? GUIStyles.ToolbarButton : GUIStyle.none))
             {
                 gui.Space(10f);
-                foldout = gui.Foldout(Name, _prefs.Bools.ValueOrDefault(_id, true), Layout.Auto);
-                _prefs.Bools[_id] = foldout;
+                foldout = gui.Foldout(Name, _prefs.ValueOrDefault(_id, true), Layout.Auto);
+                _prefs[_id] = foldout;
             }
 
             return foldout;

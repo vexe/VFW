@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace VFWExamples
 { 
-    public class CollectionElementExample : BetterBehaviour
+    public class CollectionElementExample : BaseBehaviour
     {
         // apply Comment on array
         [Comment("Array 1: Just a comment")]

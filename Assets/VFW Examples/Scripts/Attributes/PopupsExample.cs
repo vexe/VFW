@@ -14,13 +14,13 @@ namespace VFWExamples
         // we also tell it to use a text field so we can input values that are not
         // in the popup should we want that
         [Popup("Factors", TextField = true)]
-		public string Factor;
+		public string factor;
 
 		// PerItem indicates that the attributes are applied per element, and not on the array
 		// in this case, Tags and OnChanged will be applied on each element
 		// if the value of any element changes, LogFactor is calling with the new value
 		[PerItem, Tags, OnChanged("Log")]
-		public string[] EnemyTags;
+		public string[] enemyTags;
 
 		[Tags]
 		public string playerTag;
@@ -50,7 +50,7 @@ namespace VFWExamples
     [Serializable]
 	public struct SomeStruct
 	{
-		[Popup("target.Factors")] // get it from the UnityEngine.Object target (in this case, PopupsExample script)
+		[Popup("target.Factors")] // get the popup values from the UnityEngine.Object target (in this case, PopupsExample script)
 		public string factor;
 	}
 }

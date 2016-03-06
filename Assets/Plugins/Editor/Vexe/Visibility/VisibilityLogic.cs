@@ -5,11 +5,11 @@ using System.Reflection;
 using UnityEngine;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Helpers;
-using Vexe.Runtime.Serialization;
 using Vexe.Runtime.Types;
+using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Editor.Visibility
-{ 
+{
     public static class VisibilityLogic
     {
         public static readonly VisibilityAttributes Attributes;
@@ -52,13 +52,10 @@ namespace Vexe.Editor.Visibility
         /// <summary>
         /// Determines whether or not 'member' should be visible in the inspector
         /// The logic goes like this:
-        /// If member was a method it is visible only if it's annotated with [Show]
-        /// If member was a field/property it is visible if
+        /// If member was a method or property it is visible only if it's annotated with [Show]
+        /// If member was a field it is visible if
         /// 1- it's annotated with [Show]
         /// 2- OR if it's serializable
-        /// To determine if a field/property is serializable:
-        /// 1- If the 'serialized' member array is null, we use the default VFWSerializationLogic
-        /// 2- otherwise we see if that field/property is contained within the serialized array
         /// </summary>
         public static bool IsVisibleMember(MemberInfo member)
         {
@@ -67,7 +64,7 @@ namespace Vexe.Editor.Visibility
 
             var field = member as FieldInfo;
             if (field != null)
-            { 
+            {
                 if (Attributes.Hide.Any(field.IsDefined))
                     return false;
 
@@ -77,7 +74,7 @@ namespace Vexe.Editor.Visibility
                 if (field.IsDefined<SerializeField>())
                     return true;
 
-                return VFWSerializationLogic.Instance.IsSerializableField(field);
+                return IsSerializableField(field);
             }
 
             var property = member as PropertyInfo;
@@ -96,12 +93,74 @@ namespace Vexe.Editor.Visibility
             if (Attributes.Show.Any(property.IsDefined))
                 return true;
 
-            return VFWSerializationLogic.Instance.IsSerializableProperty(property);
+            return false;
         }
 
         static HashSet<string> IgnoredUnityProperties = new HashSet<string>()
         {
             "tag", "enabled", "name", "hideFlags"
+        };
+
+        public static bool IsSerializableType(Type type)
+        {
+            if (type.IsPrimitive || type.IsEnum || type == typeof(string)
+                || type.IsA<UnityObject>()
+                || IsUnityStructType(type))
+                return true;
+
+            if (type.IsArray)
+                return type.GetArrayRank() == 1 && IsSerializableType(type.GetElementType());
+
+            if (type.IsInterface)
+                return true;
+
+            if (type.IsA<Delegate>())
+                return false;
+
+            if (type.IsA<Type>())
+                return true;
+
+            if (type.IsGenericType)
+                return type.GetGenericArguments().All(IsSerializableType);
+
+            return true;
+        }
+
+        public static bool IsSerializableField(FieldInfo field)
+        {
+            if (field.IsDefined<NonSerializedAttribute>())
+                return false;
+
+            if (field.IsLiteral)
+                return false;
+
+            if (!(field.IsPublic || field.IsDefined<SerializeField>()))
+                return false;
+
+            bool serializable = IsSerializableType(field.FieldType);
+            return serializable;
+        }
+
+        public static bool IsUnityStructType(Type type)
+        {
+            for (int i = 0; i < UnityStructTypes.Length; i++)
+                if (type == UnityStructTypes[i])
+                    return true;
+            return false;
+        }
+
+        public static readonly Type[] UnityStructTypes =
+        {
+            typeof(Vector3),
+            typeof(Vector2),
+            typeof(Vector4),
+            typeof(Rect),
+            typeof(Quaternion),
+            typeof(Matrix4x4),
+            typeof(Color),
+            typeof(Color32),
+            typeof(LayerMask),
+            typeof(Bounds)
         };
     }
 }

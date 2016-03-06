@@ -2,7 +2,6 @@ using System;
 using BX20Serializer;
 using UnityEngine;
 using Vexe.FastSave.Serializers;
-using Vexe.Runtime.Serialization;
 
 namespace Vexe.FastSave
 {
@@ -14,13 +13,10 @@ namespace Vexe.FastSave
         {
             BinaryX20.Log = Debug.Log;
 
-            var logic = new VFWSerializationLogic(
-                @serializeMemberAttributes:     new Type[] { typeof(SaveAttribute) },
-                @dontSerializeMemberAttributes: new Type[] { typeof(DontSaveAttribute) });
+            X20Logic.SerializeMemberAttributes = new Type[] { typeof(SaveAttribute) };
+            X20Logic.DontSerializeMemberAttributes = new Type[] { typeof(DontSaveAttribute) };
 
-            Serializer = new BinaryX20(
-                logic.IsSerializableField,
-                logic.IsSerializableProperty);
+            Serializer = new BinaryX20();
 
             var ecs = new ExplicitComponentSerializer();
             ecs.Add<Transform>("position", "eulerAngles", "localScale")

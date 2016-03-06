@@ -25,8 +25,7 @@ namespace Vexe.Editor.Drawers
         protected Type memberType          { get { return member.Type;         } }
         protected Type targetType          { get { return rawTarget.GetType(); } }
 
-        protected static BetterPrefs prefs;
-        protected static Foldouts foldouts;
+        protected EditorRecord prefs;
 
         private bool _hasInit;
         private MethodCaller<object, string> _dynamicFormatter;
@@ -35,8 +34,8 @@ namespace Vexe.Editor.Drawers
 
         protected bool foldout
         {
-            get { return foldouts[id]; }
-            set { foldouts[id] = value; }
+            get { return prefs.ValueOrDefault(id, false); }
+            set { prefs[id] = value; }
         }
 
         protected GameObject gameObject
@@ -48,18 +47,13 @@ namespace Vexe.Editor.Drawers
             }
         }
 
-        public BaseDrawer()
-        {
-            if (prefs == null)
-                prefs = BetterPrefs.GetEditorInstance();
-            if (foldouts == null)
-                foldouts = new Foldouts();
-        }
-
-        public BaseDrawer Initialize(EditorMember member, Attribute[] attributes, BaseGUI gui)
+        public BaseDrawer Initialize(EditorMember member, Attribute[] attributes, BaseGUI gui, EditorRecord prefs)
         {
             if (attributes == null)
                 attributes = Empty;
+
+            if (this.prefs == null)
+                this.prefs = prefs;
 
             this.member     = member;
             this.attributes = attributes;

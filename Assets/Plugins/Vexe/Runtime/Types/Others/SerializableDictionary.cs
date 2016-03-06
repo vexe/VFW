@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
+using Vexe.Runtime.Helpers;
 
 /// <summary>
 /// Serializable by Unity's serialization system - Extracted from System.Collections.Generic (not a wrapper)
@@ -11,15 +12,24 @@ using UnityEngine;
 [Serializable, DebuggerDisplay("Count = {Count}")]
 public class SerializableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary
 {
-    [SerializeField] int[] _Buckets;
-    [SerializeField] int[] _HashCodes;
-    [SerializeField] int[] _Next;
-    [SerializeField] int _Count;
-    [SerializeField] int _Version;
-    [SerializeField] int _FreeList;
-    [SerializeField] int _FreeCount;
-    [SerializeField] TKey[] _Keys;
-    [SerializeField] TValue[] _Values;
+    [SerializeField]
+    int[] _Buckets;
+    [SerializeField]
+    int[] _HashCodes;
+    [SerializeField]
+    int[] _Next;
+    [SerializeField]
+    int _Count;
+    [SerializeField]
+    int _Version;
+    [SerializeField]
+    int _FreeList;
+    [SerializeField]
+    int _FreeCount;
+    [SerializeField]
+    TKey[] _Keys;
+    [SerializeField]
+    TValue[] _Values;
 
     readonly IEqualityComparer<TKey> _Comparer;
 
@@ -33,17 +43,6 @@ public class SerializableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, I
         get { return _Count - _FreeCount; }
     }
 
-    //public TValue this[TKey key, TValue defaultValue]
-    //{
-    //    get
-    //    {
-    //        int index = FindIndex(key);
-    //        if (index >= 0)
-    //            return _Values[index];
-    //        return defaultValue;
-    //    }
-    //}
-
     public TValue this[TKey key]
     {
         get
@@ -51,7 +50,9 @@ public class SerializableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, I
             int index = FindIndex(key);
             if (index >= 0)
                 return _Values[index];
-            throw new KeyNotFoundException(key.ToString());
+
+            ErrorHelper.KeyNotFound(key.ToString());
+            return default(TValue);
         }
 
         set { Insert(key, value, false); }
@@ -323,7 +324,7 @@ public class SerializableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, I
     {
         return ValueOrDefault(key, default(TValue));
     }
-    
+
     public TValue ValueOrDefault(TKey key, TValue defaultValue)
     {
         //return this[key, defaultValue];

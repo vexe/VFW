@@ -82,7 +82,7 @@ namespace Vexe.FastSave
         static AssetStorage GetStore()
         {
             AssetStorage store = null;
-#if UNITY_EDITOR
+#if UNITY_EDITOR && !UNITY_WEBPLAYER
             var storeName = typeof(AssetStorage).Name + ".asset";
             var directory = Directory.GetDirectories("Assets", "FastSave", SearchOption.AllDirectories).FirstOrDefault();
             if (directory == null)

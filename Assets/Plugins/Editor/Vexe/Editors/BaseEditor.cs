@@ -18,6 +18,7 @@ using UnityObject = UnityEngine.Object;
 
 namespace Vexe.Editor.Editors
 {
+    using UnityEngine.Assertions;
     using Editor = UnityEditor.Editor;
 
     public abstract class BaseEditor : Editor
@@ -48,10 +49,11 @@ namespace Vexe.Editor.Editors
                 {
                     if (!_guiCache.TryGetValue(id, out _gui))
                     {
-                        #if DBG
+#if DBG
                         Debug.Log("New gui instance for: " + target.GetType().Name);
-                        #endif
-                        _gui = new RabbitGUI();
+#endif
+                        Assert.IsNotNull(prefs);
+                        _gui = new RabbitGUI(prefs);
                         _guiCache[id] = _gui;
                     }
                 }
@@ -78,26 +80,20 @@ namespace Vexe.Editor.Editors
         protected GameObject gameObject;
 
         /// <summary>
-        /// Storage asset for editor-only settings/values
+        /// Storage for editor-only settings/values
         /// </summary>
-        protected static BetterPrefs prefs;
-
-        /// <summary>
-        /// A handly little wrapper for prefs.Bools - mainly used for setting foldout values
-        /// So instead of saying prefs.Bools[key] = value; we just say foldouts[key] = value;
-        /// And instead of: var value = prefs.Bools.ValueOrDefault(key); we just: var value = foldouts[key];
-        /// </summary>
-        protected static Foldouts foldouts;
+        protected EditorRecord prefs;
 
         private List<MembersCategory> _categories;
         private List<MemberInfo> _visibleMembers;
         private SerializedProperty _script;
-        private EditorMember _serializationData, _debug;
+        private EditorMember _debug;
         private int _repaintCount, _spacing;
         private CategoryDisplay _display;
         private Action _onGUIFunction;
         private string[] _membersDrawnByUnityLayout;
         private BaseGUI _gui;
+        private Vector4 _padding = Vector4.zero;
 
         static Dictionary<int, BaseGUI> _guiCache = new Dictionary<int, BaseGUI>();
 
@@ -111,17 +107,34 @@ namespace Vexe.Editor.Editors
 
         protected bool foldout
         {
-            get { return foldouts[id]; }
-            set { foldouts[id] = value; }
+            get { return prefs[id]; }
+            set { prefs[id] = value; }
         }
 
         private void OnEnable()
         {
             if (prefs == null)
-                prefs = BetterPrefs.GetEditorInstance();
+            {
+                var t0 = target as BaseBehaviour;
+                if (t0)
+                {
+                    if (t0.Prefs == null)
+                        t0.Prefs = new EditorRecord();
 
-            if (foldouts == null)
-                foldouts = new Foldouts();
+                    prefs = t0.Prefs;
+                }
+                else
+                {
+                    var t1 = target as BaseScriptableObject;
+                    if (t1)
+                    {
+                        if (t1.Prefs == null)
+                            t1.Prefs = new EditorRecord();
+
+                        prefs = t1.Prefs;
+                    }
+                }
+            }
 
             var component = target as Component;
             gameObject = component == null ? null : component.gameObject;
@@ -159,10 +172,25 @@ namespace Vexe.Editor.Editors
             // creating the delegate once, reducing allocation
             if (_onGUIFunction == null)
                 _onGUIFunction = OnGUI;
+            //Create invisible Box with standart layout for calculating correction factor and correct padding
+            //padding have change to Vector4 with 
+            //x - left border
+            //y - right border
+            //z - top border
+            //w - bottom border
+            GUILayout.Box(" ", GUIStyles.Label, GUILayout.ExpandWidth(true), GUILayout.Height(0f));
+            Rect tempRect = GUILayoutUtility.GetLastRect();
 
-            // I found 25 to be a good padding value such that there's not a whole lot of empty space wasted
-            // and the vertical inspector scrollbar doesn't obstruct our controls
-            gui.OnGUI(_onGUIFunction, new Vector2(0f, 25f), id);
+            //calculate padding in repaint, correction constant will be choosing manually
+            if (Event.current.type == EventType.Repaint)
+            {
+                _padding.x = 0f;
+                _padding.y = EditorGUIUtility.currentViewWidth - tempRect.width;
+                _padding.z = -4f - tempRect.height;
+                _padding.w = 4f;
+            }
+
+            gui.OnGUI(_onGUIFunction, _padding, id);
 
             // addresses somes cases of editor slugishness when selecting gameObjects
             if (_repaintCount < 3)
@@ -176,7 +204,7 @@ namespace Vexe.Editor.Editors
         {
             serializedObject.Update();
 
-            for(int i = 0; i < _membersDrawnByUnityLayout.Length; i++)
+            for (int i = 0; i < _membersDrawnByUnityLayout.Length; i++)
             {
                 var memberName = _membersDrawnByUnityLayout[i];
                 var property = serializedObject.FindProperty(memberName);
@@ -186,22 +214,7 @@ namespace Vexe.Editor.Editors
                     continue;
                 }
 
-                EditorGUI.BeginChangeCheck();
-
                 EditorGUILayout.PropertyField(property, true);
-
-                if (EditorGUI.EndChangeCheck())
-                { 
-                    var bb = target as BetterBehaviour;
-                    if (bb != null)
-                        bb.DelayNextDeserialize();
-                    else
-                    { 
-                        var bso = target as BetterScriptableObject;
-                        if (bso != null)
-                        bso.DelayNextDeserialize();
-                    }
-                }
             }
 
             serializedObject.ApplyModifiedProperties();
@@ -247,7 +260,7 @@ namespace Vexe.Editor.Editors
             // allocate categories
             _categories = new List<MembersCategory>();
 
-            var multiple	= targetType.GetCustomAttribute<DefineCategoriesAttribute>(true);
+            var multiple = targetType.GetCustomAttribute<DefineCategoriesAttribute>(true);
             var definitions = targetType.GetCustomAttributes<DefineCategoryAttribute>(true);
             if (multiple != null)
                 definitions = definitions.Concat(multiple.names.Select(n => new DefineCategoryAttribute(n, 1000)));
@@ -285,12 +298,12 @@ namespace Vexe.Editor.Editors
                 {
                     var path = paths[i];
 
-                    var current = (parent == null ?  _categories :
+                    var current = (parent == null ? _categories :
                         parent.NestedCategories).FirstOrDefault(c => c.FullPath == path);
 
                     if (current == null)
                     {
-                        current = new MembersCategory(path, d.Order, id);
+                        current = new MembersCategory(path, d.Order, id, prefs);
                         if (i == 0)
                             _categories.Add(current);
                         if (parent != null)
@@ -321,37 +334,27 @@ namespace Vexe.Editor.Editors
             }
 
             var getDisplayOptions = targetType.GetMethod("GetDisplayOptions");
-            if (getDisplayOptions == null)
-                throw new vMemberNotFound(targetType, "GetDisplayOptions");
+            Assert.IsNotNull(getDisplayOptions);
 
-            var vfwSettings = VFWSettings.GetInstance();
-
-            // does target override GetDisplayOptions? if so set that as the default value,
             // otherwise whatever value is in our settings asset
-            var defaultDisplay = (getDisplayOptions.DeclaringType == typeof(BetterBehaviour) ||
-                                  getDisplayOptions.DeclaringType == typeof(BetterScriptableObject)) ?
-                                  vfwSettings.DefaultDisplay : (CategoryDisplay)getDisplayOptions.Invoke(target);
+            var defaultDisplay = (getDisplayOptions.DeclaringType == typeof(BaseBehaviour) ||
+                                  getDisplayOptions.DeclaringType == typeof(BaseScriptableObject)) ?
+                                  VFWSettings.DefaultDisplay : (CategoryDisplay)getDisplayOptions.Invoke(target);
 
-            var displayKey = RuntimeHelper.CombineHashCodes(id, "display");
-            var displayValue = prefs.Ints.ValueOrDefault(displayKey, (int)defaultDisplay);
-            _display = displayValue == -1 ? vfwSettings.DefaultDisplay : (CategoryDisplay)displayValue;
-            prefs.Ints[displayKey] = (int)_display;
+            int displayKey = RuntimeHelper.CombineHashCodes(id, "display");
+            int displayValue = prefs.ValueOrDefault(displayKey, (int)defaultDisplay);
+            _display = displayValue == -1 ? VFWSettings.DefaultDisplay : (CategoryDisplay)displayValue;
+            prefs[displayKey] = (int)_display;
 
             var spacingKey = RuntimeHelper.CombineHashCodes(id, "spacing");
-            _spacing = prefs.Ints.ValueOrDefault(spacingKey, vfwSettings.DefaultSpacing);
-            prefs.Ints[spacingKey] = _spacing;
+            _spacing = prefs.ValueOrDefault(spacingKey, VFWSettings.DefaultSpacing);
+            prefs[spacingKey] = _spacing;
 
-            var field = targetType.GetMemberFromAll("_serializationData", Flags.InstancePrivate);
-            if (field == null)
-            {
-                if (targetType.IsA<BetterBehaviour>() || targetType.IsA<BetterScriptableObject>())
-                    throw new vMemberNotFound(targetType, "_serializationData");
-            }
-            else _serializationData = EditorMember.WrapMember(field, target, target, id);
+            FieldInfo field;
 
             field = targetType.GetField("dbg", Flags.InstanceAnyVisibility);
             if (field == null)
-                throw new vMemberNotFound(targetType, "dbg");
+                ErrorHelper.MemberNotFound(targetType, "dbg");
 
             _debug = EditorMember.WrapMember(field, target, target, id);
 
@@ -367,14 +370,14 @@ namespace Vexe.Editor.Editors
                 using (gui.Horizontal(EditorStyles.toolbarButton))
                 {
                     gui.Space(10f);
-                    foldouts[scriptKey] = gui.Foldout(foldouts[scriptKey]);
+                    prefs[scriptKey] = gui.Foldout(prefs.ValueOrDefault(scriptKey, false));
                     gui.Space(-12f);
 
                     if (ScriptField()) // script changed? exit!
                         return;
                 }
 
-                if (foldouts[scriptKey])
+                if (prefs[scriptKey])
                 {
                     gui.Space(2f);
 
@@ -391,7 +394,7 @@ namespace Vexe.Editor.Editors
                             {
                                 _display = newValue;
                                 var displayKey = RuntimeHelper.CombineHashCodes(id, "display");
-                                prefs.Ints[displayKey] = mask;
+                                prefs[displayKey] = mask;
                             }
                         }
 
@@ -399,12 +402,10 @@ namespace Vexe.Editor.Editors
                         if (_spacing != spacing)
                         {
                             _spacing = spacing;
-                            prefs.Ints[id + "spacing".GetHashCode()] = _spacing;
+                            int spacingKey = RuntimeHelper.CombineHashCodes(id, "spacing");
+                            prefs[spacingKey] = _spacing;
                             gui.RequestResetIfRabbit();
                         }
-
-                        if (_serializationData != null)
-                            gui.Member(_serializationData, true);
                     }
                 }
             }
@@ -413,7 +414,7 @@ namespace Vexe.Editor.Editors
 
             for (int i = 0; i < _categories.Count; i++)
             {
-                var cat     = _categories[i];
+                var cat = _categories[i];
                 cat.Display = _display;
                 cat.Spacing = _spacing;
                 cat.gui = gui;

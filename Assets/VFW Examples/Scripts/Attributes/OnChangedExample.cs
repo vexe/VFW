@@ -4,7 +4,7 @@ using Vexe.Runtime.Types;
 
 namespace VFWExamples
 {
-	public class OnChangedExample : BetterBehaviour
+	public class OnChangedExample : BaseBehaviour
 	{
 		// when this string changes, set the `tag` property to the new value and log it
 		[Tags, OnChanged(Set = "tag", Call = "Log")] // could have also written OnChanged("Log", Set = "tag")

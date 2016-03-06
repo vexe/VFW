@@ -4,7 +4,7 @@ using Vexe.Runtime.Types;
 
 namespace VFWExamples
 {
-	public class EnumsExample : BetterBehaviour
+	public class EnumsExample : BaseBehaviour
 	{
 		// you can use the 'id' number to determine which drawer to draw first, the filter or the selection button
 		// a drawer with a lower number gets drawn first

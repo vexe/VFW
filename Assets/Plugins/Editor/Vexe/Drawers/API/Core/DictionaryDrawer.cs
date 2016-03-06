@@ -72,7 +72,7 @@ namespace Vexe.Editor.Drawers
             _originalDisplay = displayText;
 
             if (_options.Filter)
-                _filter = new TextFilter(null, id, true, null);
+                _filter = new TextFilter(null, id, true, prefs, null);
 
             if (memberValue == null && !_options.ManualAlloc)
                 memberValue = memberType.Instance<IDictionary<TK, TV>>();
@@ -249,14 +249,14 @@ namespace Vexe.Editor.Drawers
                         {
                             if (pairStr == null)
                                 pairStr = FormatPair(dKey, dValue);
-                            foldouts[entryKey] = gui.Foldout(pairStr, foldouts[entryKey], Layout.Auto);
+                            prefs[entryKey] = gui.Foldout(pairStr, prefs[entryKey], Layout.Auto);
                         }
 
                         #if PROFILE
                         Profiler.EndSample();
                         #endif
 
-                        if (!foldouts[entryKey] && !_options.HorizontalPairs)
+                        if (!prefs[entryKey] && !_options.HorizontalPairs)
                             continue;
 
                         #if PROFILE
@@ -501,7 +501,7 @@ namespace Vexe.Editor.Drawers
                 memberValue.Add(key, value);
 
                 var eKey = RuntimeHelper.CombineHashCodes(id, (_kvpList.Count - 1), "entry");
-                foldouts[eKey] = true;
+                prefs[eKey] = true;
                 foldout = true;
 
                 if (_options.TempKey)
