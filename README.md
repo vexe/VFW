@@ -107,13 +107,8 @@ public class TestBehaviour : BaseBehaviour
 1. [Intro / API Overview](https://www.youtube.com/watch?v=9AnTNGKjAK0)
 1. [Attributes 1](https://www.youtube.com/watch?v=jsNXBY2VJ6g)
 1. [Attributes 2](https://www.youtube.com/watch?v=y3XJKnOCrcU)
-1. [Serialization](https://www.youtube.com/watch?v=CmbOEYQoV7Q)
 1. [Member Categories](https://www.youtube.com/watch?v=c9PDvJOZXGU)
-1. [Delegates 1](https://www.youtube.com/watch?v=NBSMIURbfmY)
-1. [Delegates 2](https://www.youtube.com/watch?v=iPhY08o-X2g)
 1. [Misc Features, and some minor issues](https://www.youtube.com/watch?v=rlGqavcPNuE)
-1. [Full Serializer Integration](https://www.youtube.com/watch?v=7V4vIBBq03g)
-1. [EventSystem & BetterAnimator](https://www.youtube.com/watch?v=c3SJ0vWSIjs)
 
 ### Known Issues:
 1. Undo isn't 100% perfect still, (although it has been improved in 1.3)
