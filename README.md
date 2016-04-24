@@ -1,5 +1,7 @@
 ## Vexe Framework (VFW)
 
+### Custom Serialization is no longer supported: https://github.com/vexe/VFW/issues/88
+
 ### Contents
 
 - [What](#what)
