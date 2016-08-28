@@ -33,7 +33,7 @@ Custom Serialization is no longer supported: https://github.com/vexe/VFW/issues/
  
 ### Usage:
   - Download and extract the .Zip from github. You will see 3 folders: Plugins, VFW Examples and VFW Deprecated, all you need is the Plugins folder.
-  - Inherit BaseBehaviour instead of MonoBehaviour and BaseScriptableObject instead of ScriptableObject, and don't forget to add your using statement. See the examples that come with the packagefor more details.
+  - Inherit BaseBehaviour instead of MonoBehaviour and BaseScriptableObject instead of ScriptableObject, and don't forget to add your using statement. See the examples that come with the package for more details.
 
 ```csharp
 using Vexe.Runtime.Types;
