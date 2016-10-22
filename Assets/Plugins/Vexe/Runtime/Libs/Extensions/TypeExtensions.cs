@@ -262,7 +262,11 @@ namespace Vexe.Runtime.Extensions
                     var builder = new StringBuilder();
                     var name = type.Name;
                     var index = name.IndexOf("`");
-                    builder.Append(name.Substring(0, index));
+                    if (index >= 0) {
+                        builder.Append(name.Substring(0, index));
+                    } else {
+                        builder.Append(name);
+                    }
                     builder.Append('<');
                     var args = type.GetGenericArguments();
                     for (int i = 0; i < args.Length; i++)
