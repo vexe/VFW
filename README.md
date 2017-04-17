@@ -55,7 +55,7 @@ public class TestBehaviour : BaseBehaviour
 
 ### Here's a bird's eye-view for some of the features:
 
-####1- <a name="feature-drawing-api">A new drawing API that has the following features</a>:
+#### 1- <a name="feature-drawing-api">A new drawing API that has the following features</a>:
 1. You can write drawers for pretty much 'any' System.Type!
 1. Can be applied on any 'member' (method, property or field) You can write a single drawer and apply it on fields or properties! DRY!
 1. The API is strongly typed (uses generics). You get a strong reference to attribute you're writing your drawer for
@@ -71,12 +71,12 @@ public class TestBehaviour : BaseBehaviour
 1. Custom/shorter attributes to show/hide things: [Show], [Hide]
 1. Focus on writing your drawers' logic without having to write any type-checks/validation to make sure your attributes are applied on the right field/property type. Apply a Popup on a GameObject field, it just gets ignored.
 
-####3- <a name="feature-helper-types">Helper types</a>:
+#### 3- <a name="feature-helper-types">Helper types</a>:
 1. SelectionMemorizer: memorizes your objects selections. Ctrl.Shift.- to go back, Ctrl.Shift.+ to go forward.
 1. BetterUndo: a simple undo system implemented via the command pattern that lets you take direct control of what is it to be done, and how it is to be undone
 1. RabbitGUI: A much faster and cleaner GUI layouting system than Unity's GUILayout/EditorGUILayout with similar API and some extra features.
 
-####4- <a name="feature-property-attributes">Tons of property attributes</a>:
+#### 4- <a name="feature-property-attributes">Tons of property attributes</a>:
 1. **Constraints**: *Min*, *Max*, *Regex*, *IP*, *NumericClamp*, *StringClamp*
 1. **Decorates**: *Comment*, *WhiteSpace*
 1. **Enums**: *EnumMask* (one that works! - credits to Bunny83), *SelectEnum* (gives you the ability to right-click an enum to show the values in a selection window - useful for enums with large values)
