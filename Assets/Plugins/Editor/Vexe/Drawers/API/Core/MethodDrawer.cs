@@ -1,8 +1,8 @@
 //#define DBG
 
 using System;
-using System.Reflection;
 using System.Collections;
+using System.Reflection;
 using UnityEngine;
 using Vexe.Editor.GUIs;
 using Vexe.Editor.Types;
@@ -11,9 +11,8 @@ using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Types;
 using UnityObject = UnityEngine.Object;
 
-namespace Vexe.Editor.Drawers
-{
-	public class MethodDrawer
+namespace Vexe.Editor.Drawers {
+    public class MethodDrawer
 	{
 		private EditorMember[] argMembers;
 		private MethodCaller<object, object> invoke;
@@ -51,7 +50,7 @@ namespace Vexe.Editor.Drawers
 
             isCoroutine = method.ReturnType == typeof(IEnumerator);
 
-            var commentAttr = method.GetCustomAttribute<CommentAttribute>();
+            var commentAttr = MemberInfoExtensions.GetCustomAttribute<CommentAttribute>(method);
             if (commentAttr != null)
                 comment = commentAttr.comment;
 

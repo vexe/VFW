@@ -8,8 +8,7 @@ using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Types;
 using UnityObject = UnityEngine.Object;
 
-namespace Vexe.Editor.Visibility
-{
+namespace Vexe.Editor.Visibility {
     public static class VisibilityLogic
     {
         public static readonly VisibilityAttributes Attributes;
@@ -36,7 +35,7 @@ namespace Vexe.Editor.Visibility
 
         public static float GetMemberDisplayOrder(MemberInfo member)
         {
-            var attribute = member.GetCustomAttribute<DisplayAttribute>();
+            var attribute = MemberInfoExtensions.GetCustomAttribute<DisplayAttribute>(member);
             if (attribute != null && attribute.DisplayOrder.HasValue)
                 return attribute.Order;
 
@@ -60,15 +59,15 @@ namespace Vexe.Editor.Visibility
         public static bool IsVisibleMember(MemberInfo member)
         {
             if (member is MethodInfo)
-                return Attributes.Show.Any(member.IsDefined);
+                return Attributes.Show.Any((t) => MemberInfoExtensions.IsDefined(member, t));
 
             var field = member as FieldInfo;
             if (field != null)
             {
-                if (Attributes.Hide.Any(field.IsDefined))
+                if (Attributes.Hide.Any((t) => MemberInfoExtensions.IsDefined(field, t)))
                     return false;
 
-                if (Attributes.Show.Any(field.IsDefined))
+                if (Attributes.Show.Any((t) => MemberInfoExtensions.IsDefined(field, t)))
                     return true;
 
                 if (field.IsDefined<SerializeField>())
@@ -78,7 +77,7 @@ namespace Vexe.Editor.Visibility
             }
 
             var property = member as PropertyInfo;
-            if (property == null || Attributes.Hide.Any(property.IsDefined))
+            if (property == null || Attributes.Hide.Any((t) => MemberInfoExtensions.IsDefined(property, t)))
                 return false;
 
             // accept properties such as transform.position, rigidbody.mass, etc
@@ -90,7 +89,7 @@ namespace Vexe.Editor.Visibility
             if (unityProp)
                 return true;
 
-            if (Attributes.Show.Any(property.IsDefined))
+            if (Attributes.Show.Any((t) => MemberInfoExtensions.IsDefined(property, t)))
                 return true;
 
             return false;

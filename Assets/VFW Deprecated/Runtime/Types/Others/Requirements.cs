@@ -8,14 +8,16 @@ using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Serialization;
 using UnityObject = UnityEngine.Object;
 
-#if UNITY_EDITOR
-using UnityEditor;
-using System.Text.RegularExpressions;
+#if UNITY_2017_1_OR_NEWER
+using UnityEngine.Profiling;
 #endif
 
-namespace Vexe.Runtime.Types
-{ 
-	[AttributeUsage(AttributeTargets.Class, Inherited = true)]
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+namespace Vexe.Runtime.Types {
+    [AttributeUsage(AttributeTargets.Class, Inherited = true)]
 	public class HasRequirementsAttribute : Attribute
 	{
 	}
@@ -61,7 +63,7 @@ namespace Vexe.Runtime.Types
 				if (!member.Type.IsA<UnityObject>())
 				{
 					if (member.Type.IsDefined<HasRequirementsAttribute>(true))
-					{ 
+					{
 #if dbg
 						Debug.Log("recursively resolving non-UnityObject " + member.Type.Name + " in " + target);
 #endif
@@ -76,7 +78,7 @@ namespace Vexe.Runtime.Types
 					continue;
 
 				if (!member.Value.IsObjectNull())
-				{ 
+				{
 #if dbg
 					Debug.Log("ignoring member " + member.Name + " cause it's not null. no need to resolve");
 #endif
@@ -133,7 +135,7 @@ namespace Vexe.Runtime.Types
 			if (c == null)
 			{
 				if ((attribute as RequiredFromThisAttribute).Add)
-				{ 
+				{
 #if dbg
 					Debug.Log("adding component " + memberType.Name + " to " + gameObject.name);
 #endif
@@ -270,12 +272,12 @@ namespace Vexe.Runtime.Types
 				[MenuItem("Tools/Vexe/Requirements/ResolveScene")]
 				public static void ResolveSceneRequirments()
 				{
-					Profiler.BeginSample("ResolveSceneReq");
+                    Profiler.BeginSample("ResolveSceneReq");
 					Requirements.ResolveScene();
-					Profiler.EndSample();
-				}
+                    Profiler.EndSample();
+                }
 
-				[MenuItem("Tools/Vexe/Requirements/Manual")]
+                [MenuItem("Tools/Vexe/Requirements/Manual")]
 				public static void Manual()
 				{
 					EditorPrefs.SetBool(kReqAuto, false);
@@ -289,5 +291,5 @@ namespace Vexe.Runtime.Types
 			}
 		}
 #endif
-	}
+    }
 }

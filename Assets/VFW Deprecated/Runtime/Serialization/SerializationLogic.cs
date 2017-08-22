@@ -8,8 +8,7 @@ using Vexe.Runtime.Helpers;
 using Vexe.Runtime.Types;
 using UnityObject = UnityEngine.Object;
 
-namespace Vexe.Runtime.Serialization
-{
+namespace Vexe.Runtime.Serialization {
     /// <summary>
     /// Defines a serialization logic interface that specifies whether a field, property or type is serializable or not
     /// </summary>
@@ -136,13 +135,13 @@ namespace Vexe.Runtime.Serialization
         /// </summary>
         public override bool IsSerializableField(FieldInfo field)
         {
-            if (DontSerializeMember.Any(field.IsDefined))
+            if (DontSerializeMember.Any((t) => MemberInfoExtensions.IsDefined(field, t)))
                 return false;
 
             if (field.IsLiteral)
                 return false;
 
-            if (!(field.IsPublic || SerializeMember.Any(field.IsDefined)))
+            if (!(field.IsPublic || SerializeMember.Any((t) => MemberInfoExtensions.IsDefined(field, t))))
                 return false;
 
             bool serializable = IsSerializableType(field.FieldType);
@@ -160,7 +159,7 @@ namespace Vexe.Runtime.Serialization
         /// </summary>
         public override bool IsSerializableProperty(PropertyInfo property)
         {
-            if (DontSerializeMember.Any(property.IsDefined))
+            if (DontSerializeMember.Any((t) => MemberInfoExtensions.IsDefined(property, t)))
                 return false;
 
             if (!property.IsAutoProperty())
@@ -168,7 +167,7 @@ namespace Vexe.Runtime.Serialization
 
             if (!(property.GetGetMethod(true).IsPublic ||
                   property.GetSetMethod(true).IsPublic ||
-                  SerializeMember.Any(property.IsDefined)))
+                  SerializeMember.Any((t) => MemberInfoExtensions.IsDefined(property, t))))
                 return false;
 
             bool serializable = IsSerializableType(property.PropertyType);
