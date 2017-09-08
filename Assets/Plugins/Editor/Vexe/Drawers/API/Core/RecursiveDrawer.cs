@@ -23,11 +23,11 @@ namespace Vexe.Editor.Drawers
         private bool _isToStringImpl;
         private Type _polymorphicType;
         private string _nullString;
-        private Tab[] _tabs;
+        private Vexe.Editor.Windows.Tab[] _tabs;
         private Predicate<UnityObject[]> _isDropAccepted;
         private Func<UnityObject[], UnityObject> _getDraggedObject;
-        private Func<Func<Type[]>, Action<Type>, string, Tab> _newTypeTab;
-        private Func<Func<UnityObject[]>, string, Tab> _newUnityTab;
+        private Func<Func<Type[]>, Action<Type>, string, Vexe.Editor.Windows.Tab> _newTypeTab;
+        private Func<Func<UnityObject[]>, string, Vexe.Editor.Windows.Tab> _newUnityTab;
         private bool _disablePicker, _autoAlloc;
 
         protected override void Initialize()
@@ -69,7 +69,7 @@ namespace Vexe.Editor.Drawers
             _isDropAccepted = objs => _getDraggedObject(objs) != null;
 
             _newTypeTab = (getValues, create, title) =>
-                new Tab<Type>(
+                new Vexe.Editor.Windows.Tab<Type>(
                     @getValues: getValues,
                     @getCurrent: () => { var x = memberValue; return x == null ? null : x.GetType(); },
                     @setTarget: newType => { if (newType == null) memberValue = memberType.GetDefaultValueEmptyIfString(); else create(newType); },
@@ -78,7 +78,7 @@ namespace Vexe.Editor.Drawers
                 );
 
             _newUnityTab = (getValues, title) =>
-                new Tab<UnityObject>(
+                new Vexe.Editor.Windows.Tab<UnityObject>(
                     @getValues: getValues,
                     @getCurrent: member.As<UnityObject>,
                     @setTarget: member.Set,
@@ -89,7 +89,7 @@ namespace Vexe.Editor.Drawers
             int idx = 0;
             if (memberType.IsInterface)
             {
-                _tabs = new Tab[4];
+                _tabs = new Vexe.Editor.Windows.Tab[4];
 
                 _tabs[idx++] = _newUnityTab(() => UnityObject.FindObjectsOfType<UnityObject>()
                                               .OfType(memberType)
@@ -102,7 +102,7 @@ namespace Vexe.Editor.Drawers
                                     .Where(t => t.IsA<MonoBehaviour>() && !t.IsAbstract)
                                     .ToArray(), TryCreateInstanceInGO, "New Behaviour");
             }
-            else _tabs = new Tab[1];
+            else _tabs = new Vexe.Editor.Windows.Tab[1];
 
             var systemTypes = ReflectionHelper.GetAllUserTypesOf(memberType)
                                 .Where(t => !t.IsA<UnityObject>() && !t.IsAbstract)
