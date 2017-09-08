@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace Vexe.Runtime.Extensions
 {
@@ -149,10 +150,15 @@ namespace Vexe.Runtime.Extensions
 		/// </summary>
 		public static string ToProperCase(this string text)
 		{
-			System.Globalization.CultureInfo cultureInfo = System.Threading.Thread.CurrentThread.CurrentCulture;
+#if NETFX_CORE
+            Debug.Assert(false, "not implemented yet");
+            return "";
+#else
+            System.Globalization.CultureInfo cultureInfo = System.Threading.Thread.CurrentThread.CurrentCulture;
 			System.Globalization.TextInfo textInfo = cultureInfo.TextInfo;
 			return textInfo.ToTitleCase(text);
-		}
+#endif
+        }
 
 		/// <summary>
 		/// Ex: "thisIsCamelCase" -> "this Is Camel Case"

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using UnityEngine;
 
 namespace Vexe.Runtime.Extensions
 {
@@ -34,6 +35,10 @@ namespace Vexe.Runtime.Extensions
         /// </summary>
         public static CtorInvoker<T> DelegateForCtor<T>(this Type type, params Type[] paramTypes)
         {
+#if NETFX_CORE
+            Debug.Assert(false, "do not reach");
+            return null;
+#else
             int key = kCtorInvokerName.GetHashCode() ^ type.GetHashCode();
             for (int i = 0; i < paramTypes.Length; i++)
                 key ^= paramTypes[i].GetHashCode();
@@ -51,6 +56,7 @@ namespace Vexe.Runtime.Extensions
             result = dynMethod.CreateDelegate(typeof(CtorInvoker<T>));
             cache[key] = result;
             return (CtorInvoker<T>)result;
+#endif
         }
 
         /// <summary>
@@ -231,6 +237,9 @@ namespace Vexe.Runtime.Extensions
         /// </summary>
         public static void GenDebugAssembly<TTarget>(string name, FieldInfo field, PropertyInfo property, MethodInfo method, Type targetType, Type[] ctorParamTypes)
         {
+#if NETFX_CORE
+            Debug.Assert(false, "not implemented yet");
+#else
             var asmName = new AssemblyName("Asm");
             var asmBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(asmName, AssemblyBuilderAccess.RunAndSave);
             var modBuilder = asmBuilder.DefineDynamicModule("Mod", name);
@@ -280,6 +289,7 @@ namespace Vexe.Runtime.Extensions
 
             typeBuilder.CreateType();
             asmBuilder.Save(name);
+#endif
         }
 
         static int GetKey<T, R>(MemberInfo member, string dynMethodName)
@@ -292,6 +302,10 @@ namespace Vexe.Runtime.Extensions
             where TMember : MemberInfo
             where TDelegate : class
         {
+#if NETFX_CORE
+            Debug.Assert(false, "not implemented yet");
+            return null;
+#else
             var dynMethod = new DynamicMethod(dynMethodName, returnType, paramTypes, true);
 
             emit.il = dynMethod.GetILGenerator();
@@ -300,10 +314,14 @@ namespace Vexe.Runtime.Extensions
             var result = dynMethod.CreateDelegate(typeof(TDelegate));
             cache[key] = result;
             return (TDelegate)(object)result;
+#endif
         }
 
         static void GenCtor<T>(Type type, Type[] paramTypes)
         {
+#if NETFX_CORE
+            Debug.Assert(false, "not implemented yet");
+#else
             // arg0: object[] arguments
             // goal: return new T(arguments)
             Type targetType = typeof(T) == typeof(object) ? type : typeof(T);
@@ -340,10 +358,14 @@ namespace Vexe.Runtime.Extensions
                 emit.box(targetType);
 
             emit.ret();
+#endif
         }
 
         static void GenMethodInvocation<TTarget>(MethodInfo method)
         {
+#if NETFX_CORE
+            Debug.Assert(false, "not implemented yet");
+#else
             var weaklyTyped = typeof(TTarget) == typeof(object);
 
             // push target if not static (instance-method. in that case first arg is always 'this')
@@ -405,25 +427,37 @@ namespace Vexe.Runtime.Extensions
                 emit.ifvaluetype_box(method.ReturnType);
 
             emit.ret();
+#endif
         }
 
         static void GenFieldGetter<TTarget>(FieldInfo field)
         {
+#if NETFX_CORE
+            Debug.Assert(false, "not implemented yet");
+#else
             GenMemberGetter<TTarget>(field, field.FieldType, field.IsStatic,
                 (e, f) => e.lodfld((FieldInfo)f)
             );
+#endif
         }
 
         static void GenPropertyGetter<TTarget>(PropertyInfo property)
         {
+#if NETFX_CORE
+            Debug.Assert(false, "not implemented yet");
+#else
             GenMemberGetter<TTarget>(property, property.PropertyType,
                 property.GetGetMethod(true).IsStatic,
                 (e, p) => e.callorvirt(((PropertyInfo)p).GetGetMethod(true))
             );
+#endif
         }
 
         static void GenMemberGetter<TTarget>(MemberInfo member, Type memberType, bool isStatic, Action<ILEmitter, MemberInfo> get)
         {
+#if NETFX_CORE
+            Debug.Assert(false, "not implemented yet");
+#else
             if (typeof(TTarget) == typeof(object)) // weakly-typed?
             {
                 // if we're static immediately load member and return value
@@ -446,25 +480,37 @@ namespace Vexe.Runtime.Extensions
             }
 
             emit.ret();
+#endif
         }
 
         static void GenFieldSetter<TTarget>(FieldInfo field)
         {
+#if NETFX_CORE
+            Debug.Assert(false, "not implemented yet");
+#else
             GenMemberSetter<TTarget>(field, field.FieldType, field.IsStatic,
                 (e, f) => e.setfld((FieldInfo)f)
             );
+#endif
         }
 
         static void GenPropertySetter<TTarget>(PropertyInfo property)
         {
+#if NETFX_CORE
+            Debug.Assert(false, "not implemented yet");
+#else
             GenMemberSetter<TTarget>(property, property.PropertyType,
                 property.GetSetMethod(true).IsStatic, (e, p) =>
                 e.callorvirt(((PropertyInfo)p).GetSetMethod(true))
             );
+#endif
         }
 
         static void GenMemberSetter<TTarget>(MemberInfo member, Type memberType, bool isStatic, Action<ILEmitter, MemberInfo> set)
         {
+#if NETFX_CORE
+            Debug.Assert(false, "not implemented yet");
+#else
             var targetType = typeof(TTarget);
             var stronglyTyped = targetType != typeof(object);
 
@@ -529,10 +575,12 @@ namespace Vexe.Runtime.Extensions
                 .box(targetType)
                 .stind_ref()
                 .ret();
+#endif
         }
 
         private class ILEmitter
         {
+#if !NETFX_CORE
             public ILGenerator il;
 
             public ILEmitter ret()                                 { il.Emit(OpCodes.Ret); return this; }
@@ -598,6 +646,7 @@ namespace Vexe.Runtime.Extensions
             public ILEmitter ifclass_ldloc_else_ldloca(int idx, Type type) { if (type.IsValueType) emit.ldloca(idx); else emit.ldloc(idx); return this; }
             public ILEmitter perform(Action<ILEmitter, MemberInfo> action, MemberInfo member) { action(this, member); return this; }
             public ILEmitter ifbyref_ldloca_else_ldloc(LocalBuilder local, Type type) { if (type.IsByRef) ldloca(local); else ldloc(local); return this; }
+#endif
         }
     }
 }

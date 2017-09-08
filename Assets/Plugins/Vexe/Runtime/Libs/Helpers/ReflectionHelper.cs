@@ -5,6 +5,7 @@ using System.Reflection;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
 using UnityObject = UnityEngine.Object;
+using UnityEngine;
 
 namespace Vexe.Runtime.Helpers
 {
@@ -72,6 +73,8 @@ namespace Vexe.Runtime.Helpers
                 return members[0];
             }).Memoize();
 
+#if !NETFX_CORE
+            // app domain 이 없어서 우회
             CachedGetRuntimeTypes = new Func<Type[]>(() =>
             {
                 Predicate<string> isIgnoredAssembly = name =>
@@ -82,6 +85,7 @@ namespace Vexe.Runtime.Helpers
                                               .SelectMany(x => x.GetTypes())
                                               .ToArray();
             }).Memoize();
+#endif
         }
 
         static IEnumerable<MemberInfo> GetMembers(Type type)
@@ -110,7 +114,7 @@ namespace Vexe.Runtime.Helpers
         /// </summary>
         public static Assembly GetUnityEngineAssembly()
         {
-            return typeof(UnityObject).Assembly;
+            return typeof(UnityObject).GetTypeInfo().Assembly;
         }
 
         /// <summary>
@@ -174,7 +178,12 @@ namespace Vexe.Runtime.Helpers
         /// </summary>
         public static IEnumerable<Type> GetAllTypes()
         {
+#if NETFX_CORE
+            Debug.Assert(false, "not implemeted yet");
+            return null;
+#else
             return AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes());
+#endif
         }
     }
 }

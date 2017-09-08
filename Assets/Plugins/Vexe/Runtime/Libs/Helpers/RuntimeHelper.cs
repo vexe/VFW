@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
 using UnityObject = UnityEngine.Object;
+using Debug = UnityEngine.Debug;
 
 namespace Vexe.Runtime.Helpers
 {
@@ -73,6 +74,10 @@ namespace Vexe.Runtime.Helpers
 
         public static string GetCallStack(bool verbose)
         {
+#if NETFX_CORE
+            Debug.Assert(false, "not implemented yet");
+            return "";
+#else
             if (verbose)
             {
                 return string.Join(" -> \r\n", new StackTrace()
@@ -91,6 +96,7 @@ namespace Vexe.Runtime.Helpers
                          .GetFrames()
                          .Select(x => x.GetMethod().Name)
                          .ToArray());
+#endif
         }
 
         public static void Swap<T>(ref T value0, ref T value1)

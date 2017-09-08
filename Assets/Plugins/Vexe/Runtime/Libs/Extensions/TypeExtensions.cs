@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Vexe.Runtime.Extensions
 {
@@ -15,7 +16,7 @@ namespace Vexe.Runtime.Extensions
         {
             if (type == typeof(bool) || type == typeof(char))
                 return false;
-            return type.IsPrimitive;
+            return type.GetTypeInfo().IsPrimitive;
         }
 
         public static bool TryGetSequenceElementType(this Type type, out Type element)
@@ -38,7 +39,7 @@ namespace Vexe.Runtime.Extensions
 
         public static bool IsStatic(this Type type)
         {
-            return type.IsSealed && type.IsAbstract;
+            return type.GetTypeInfo().IsSealed && type.GetTypeInfo().IsAbstract;
         }
 
         public static object Instance(this Type type)
@@ -60,11 +61,15 @@ namespace Vexe.Runtime.Extensions
 
         public static MethodCaller<object, object> DelegateForCall(this Type type, string name, BindingFlags flags, params Type[] paramTypes)
         {
-            var method = type.GetMethod(name, flags, null, paramTypes, null);
+#if NETFX_CORE
+            Debug.Assert(false, "not implemented yet");
+            return null;
+#else
+            var method = type.GetTypeInfo().GetMethod(name, flags, null, paramTypes, null);
             if (method == null)
                 throw new Exception("Method not found " + name);
-
             return method.DelegateForCall();
+#endif
         }
 
         public static MethodCaller<object, object> DelegateForCall(this Type type, string name, params Type[] paramTypes)
@@ -106,7 +111,7 @@ namespace Vexe.Runtime.Extensions
             if (type == null || type == peak)
                 return Enumerable.Empty<MemberInfo>();
 
-            return type.GetMembers(flags).Concat(GetAllMembers(type.BaseType, peak, flags));
+            return type.GetMembers(flags).Concat(GetAllMembers(type.GetTypeInfo().BaseType, peak, flags));
         }
 
         public static IEnumerable<MemberInfo> GetAllMembers(this Type type, Type peak)
@@ -147,7 +152,7 @@ namespace Vexe.Runtime.Extensions
 
         public static bool IsConstructedGenType(this Type type)
         {
-            return !(string.IsNullOrEmpty(type.FullName) && !type.IsGenericTypeDefinition && type.ContainsGenericParameters);
+            return !(string.IsNullOrEmpty(type.FullName) && !type.GetTypeInfo().IsGenericTypeDefinition && type.GetTypeInfo().ContainsGenericParameters);
         }
 
         /// <summary>
@@ -156,7 +161,7 @@ namespace Vexe.Runtime.Extensions
         public static Type[] GetParentGenericArguments(this Type type, Type parentDefinition)
         {
             return type.GetBaseClasses()
-                          .First(c => c.IsGenericType && c.GetGenericTypeDefinition() == parentDefinition)
+                          .First(c => c.GetTypeInfo().IsGenericType && c.GetTypeInfo().GetGenericTypeDefinition() == parentDefinition)
                           .GetGenericArguments();
         }
 
@@ -173,7 +178,7 @@ namespace Vexe.Runtime.Extensions
         /// </summary>
         public static Type[] FirstBaseGenArgs(this Type type)
         {
-            var genBase = GetBaseClasses(type).FirstOrDefault(t => t.IsGenericType);
+            var genBase = GetBaseClasses(type).FirstOrDefault(t => t.GetTypeInfo().IsGenericType);
             return genBase == null ? Type.EmptyTypes : genBase.GetGenericArguments();
         }
 
@@ -190,14 +195,14 @@ namespace Vexe.Runtime.Extensions
         /// </summary>
         public static IEnumerable<Type> GetBaseClasses(this Type type)
         {
-            if (type == null || type.BaseType == null)
+            if (type == null || type.GetTypeInfo().BaseType == null)
                 yield break;
 
-            var current = type.BaseType;
+            var current = type.GetTypeInfo().BaseType;
             while (current != null)
             {
                 yield return current;
-                current = current.BaseType;
+                current = current.GetTypeInfo().BaseType;
             }
         }
 
@@ -206,7 +211,7 @@ namespace Vexe.Runtime.Extensions
         /// </summary>
         public static bool IsAbstractNotInterface(this Type type)
         {
-            return type.IsAbstract && !type.IsInterface;
+            return type.GetTypeInfo().IsAbstract && !type.GetTypeInfo().IsInterface;
         }
 
         public static readonly Dictionary<string, string> TypeNameAlternatives = new Dictionary<string, string>()
@@ -256,13 +261,17 @@ namespace Vexe.Runtime.Extensions
                     if (type.IsSubclassOfRawGeneric(typeof(Nullable<>)))
                         return type.GetGenericArguments()[0].GetNiceName() + "?";
 
-                    if (type.IsGenericParameter || !type.IsGenericType)
+                    if (type.IsGenericParameter || !type.GetTypeInfo().IsGenericType)
                         return TypeNameGauntlet(type);
 
                     var builder = new StringBuilder();
                     var name = type.Name;
                     var index = name.IndexOf("`");
-                    builder.Append(name.Substring(0, index));
+                    if (index >= 0) {
+                        builder.Append(name.Substring(0, index));
+                    } else {
+                        builder.Append(name);
+                    }
                     builder.Append('<');
                     var args = type.GetGenericArguments();
                     for (int i = 0; i < args.Length; i++)
@@ -294,7 +303,7 @@ namespace Vexe.Runtime.Extensions
         /// </summary>
         public static bool IsStruct(this Type type)
         {
-            return type.IsValueType && !type.IsEnum && !type.IsPrimitive;
+            return type.GetTypeInfo().IsValueType && !type.GetTypeInfo().IsEnum && !type.GetTypeInfo().IsPrimitive;
         }
 
         /// <summary>
@@ -310,7 +319,7 @@ namespace Vexe.Runtime.Extensions
         /// </summary>
         public static bool IsSubclassOf<T>(this Type type)
         {
-            return type.IsSubclassOf(typeof(T));
+            return type.GetTypeInfo().IsSubclassOf(typeof(T));
         }
 
         /// <summary>
@@ -338,7 +347,7 @@ namespace Vexe.Runtime.Extensions
         /// </summary>
         public static IEnumerable<MemberInfo> GetMembersBeneath(this Type type, Type other, BindingFlags flags, bool includeGenArgMembers = false)
         {
-            return type.GetMembers(flags).Where(m => includeGenArgMembers ? m.DeclaringType.IsA(other) : m.DeclaringType.IsSubclassOf(other));
+            return type.GetMembers(flags).Where(m => includeGenArgMembers ? m.DeclaringType.IsA(other) : m.DeclaringType.GetTypeInfo().IsSubclassOf(other));
         }
 
         /// <summary>
@@ -395,7 +404,7 @@ namespace Vexe.Runtime.Extensions
 
         public static IEnumerable<T> GetCustomAttributes<T>(this Type type, bool inherit) where T : Attribute
         {
-            return type.GetCustomAttributes(typeof(T), inherit).Cast<T>();
+            return type.GetTypeInfo().GetCustomAttributes(typeof(T), inherit).Cast<T>();
         }
 
         /// <summary>
@@ -403,7 +412,7 @@ namespace Vexe.Runtime.Extensions
         /// </summary>
         public static bool IsDefined<T>(this Type type) where T : Attribute
         {
-            return type.IsDefined(typeof(T));
+            return type.GetTypeInfo().IsDefined(typeof(T));
         }
 
         /// <summary>
@@ -417,10 +426,10 @@ namespace Vexe.Runtime.Extensions
         {
             while (toCheck != typeof(object) && toCheck != null)
             {
-                Type current = toCheck.IsGenericType ? toCheck.GetGenericTypeDefinition() : toCheck;
+                Type current = toCheck.GetTypeInfo().IsGenericType ? toCheck.GetTypeInfo().GetGenericTypeDefinition() : toCheck;
                 if (current == baseType)
                     return true;
-                toCheck = toCheck.BaseType;
+                toCheck = toCheck.GetTypeInfo().BaseType;
             }
             return false;
         }
@@ -433,7 +442,7 @@ namespace Vexe.Runtime.Extensions
         {
             return type.GetInterfaces().Any(interfaceType =>
             {
-                var current = interfaceType.IsGenericType ? interfaceType.GetGenericTypeDefinition() : interfaceType;
+                var current = interfaceType.GetTypeInfo().IsGenericType ? interfaceType.GetTypeInfo().GetGenericTypeDefinition() : interfaceType;
                 return current == baseType;
             });
         }
@@ -449,7 +458,7 @@ namespace Vexe.Runtime.Extensions
         // http://stackoverflow.com/questions/2490244/default-value-of-a-type-at-runtime
         public static object GetDefaultValue(this Type t)
         {
-            return t.IsValueType ? Activator.CreateInstance(t) : null;
+            return t.GetTypeInfo().IsValueType ? Activator.CreateInstance(t) : null;
         }
 
         public static object GetDefaultValueEmptyIfString(this Type t)
@@ -464,8 +473,8 @@ namespace Vexe.Runtime.Extensions
 
         public static Type[] GetGenericArgsInThisOrAbove(this Type type)
         {
-            while (!type.IsGenericType && type != typeof(object))
-                type = type.BaseType;
+            while (!type.GetTypeInfo().IsGenericType && type != typeof(object))
+                type = type.GetTypeInfo().BaseType;
 
             if (type == typeof(object))
                 return Type.EmptyTypes;
@@ -474,20 +483,25 @@ namespace Vexe.Runtime.Extensions
 
         public static Type[] GetGenericArgsInRawParents(this Type source, Type rawParentType)
         {
-            if (!rawParentType.IsGenericTypeDefinition)
+            if (!rawParentType.GetTypeInfo().IsGenericTypeDefinition)
                 return Type.EmptyTypes;
 
-            Type baseType = source.BaseType;
+            Type baseType = source.GetTypeInfo().BaseType;
 
             while (baseType.GetGenericTypeDefinition() != rawParentType && baseType != typeof(object))
-                baseType = baseType.BaseType;
+                baseType = baseType.GetTypeInfo().BaseType;
 
             return baseType == typeof(object) ? Type.EmptyTypes : baseType.GetGenericArguments();
         }
 
         public static MethodInfo GetMethod(this Type source, string methodName, Type[] paramTypes, BindingFlags flags)
         {
-            return source.GetMethod(methodName, flags, null, paramTypes, null);
+#if NETFX_CORE
+            Debug.Assert(false, "not implemented yet");
+            return null;
+#else
+            return source.GetTypeInfo().GetMethod(methodName, flags, null, paramTypes, null);
+#endif
         }
 
         public static IEnumerable<MethodInfo> GetExtensionMethods(
@@ -507,7 +521,7 @@ namespace Vexe.Runtime.Extensions
             BindingFlags modifiers, bool exactBinding)
         {
             return asm.GetTypes()
-                .Where(t => t.IsSealed && !t.IsGenericType && !t.IsNested)
+                .Where(t => t.GetTypeInfo().IsSealed && !t.GetTypeInfo().IsGenericType && !t.IsNested)
                 .SelectMany(t => t.GetMethods(BindingFlags.Static | modifiers))
                 .Where(m => m.IsDefined(typeof(ExtensionAttribute), false))
                 .Where(m => m.ReturnType == returnType)
@@ -570,7 +584,7 @@ namespace Vexe.Runtime.Extensions
         /// </summary>
         public static IEnumerable<Type> GetChildren(this Type type, Assembly from, bool directlyUnder = false)
         {
-            return from.GetTypes().Where(t => t.IsA(type) && (!directlyUnder || t.BaseType == type)).Disinclude(type);
+            return from.GetTypes().Where(t => t.IsA(type) && (!directlyUnder || t.GetTypeInfo().BaseType == type)).Disinclude(type);
         }
 
         /// <summary>
@@ -579,7 +593,7 @@ namespace Vexe.Runtime.Extensions
         /// </summary>
         public static IEnumerable<Type> GetChildren(this Type type, bool directlyUnder = false)
         {
-            return GetChildren(type, type.Assembly, directlyUnder);
+            return GetChildren(type, type.GetTypeInfo().Assembly, directlyUnder);
         }
 
         /// <summary>
@@ -588,7 +602,7 @@ namespace Vexe.Runtime.Extensions
         /// </summary>
         public static IEnumerable<Type> GetConcreteChildren(this Type type, Assembly from, bool directlyUnder = false)
         {
-            return GetChildren(type, from, directlyUnder).Where(c => !c.IsAbstract);
+            return GetChildren(type, from, directlyUnder).Where(c => !c.GetTypeInfo().IsAbstract);
         }
 
         /// <summary>
@@ -597,7 +611,7 @@ namespace Vexe.Runtime.Extensions
         /// </summary>
         public static IEnumerable<Type> GetConcreteChildren(this Type type, bool directlyUnder = false)
         {
-            return GetConcreteChildren(type, type.Assembly, directlyUnder);
+            return GetConcreteChildren(type, type.GetTypeInfo().Assembly, directlyUnder);
         }
 
         public static Type[] GetConcreteChildren(this Type type, string[] dlls)
@@ -605,11 +619,15 @@ namespace Vexe.Runtime.Extensions
             List<Type> allTypes = new List<Type>();
             foreach (var dll in dlls)
             {
+#if NETFX_CORE
+                Debug.Assert(false, "not implemented yet");
+#else
                 var types = type.GetConcreteChildren(Assembly.LoadFile(dll));
                 foreach (var t in types)
                 {
                     allTypes.Add(t);
                 }
+#endif
             }
             return allTypes.ToArray();
         }

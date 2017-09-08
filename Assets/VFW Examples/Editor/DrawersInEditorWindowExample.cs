@@ -5,7 +5,6 @@ using UnityEditor;
 using UnityEngine;
 using Vexe.Editor.GUIs;
 using Vexe.Editor.Visibility;
-using Vexe.Runtime.Serialization;
 using Vexe.Runtime.Types;
 
 namespace VFWExamples

@@ -7,8 +7,7 @@ using Vexe.Runtime.Extensions;
 using Vexe.Runtime.Types;
 using MembersList = System.Collections.Generic.List<System.Reflection.MemberInfo>;
 
-namespace Vexe.Editor.Internal
-{
+namespace Vexe.Editor.Internal {
     /// <summary>
     /// Responsible for the resolution of a category definition (what members are categorized in that cateogry)
     /// and determining how the members are combined in that category (united or intersected)
@@ -29,10 +28,10 @@ namespace Vexe.Editor.Internal
 				var output = new MembersList();
 				output.AddRange(input.Where(m =>
 				{
-					var caetgory = m.GetCustomAttribute<CategoryAttribute>();
+					var caetgory = MemberInfoExtensions.GetCustomAttribute<CategoryAttribute>(m);
 					if (caetgory != null && caetgory.name == def.FullPath)
                         return true;
-                    var show = m.GetCustomAttribute<ShowAttribute>();
+                    var show = MemberInfoExtensions.GetCustomAttribute<ShowAttribute>(m);
 					return show != null && show.Category == def.FullPath;
 				}));
 				return output;

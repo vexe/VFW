@@ -6,7 +6,7 @@ namespace VFWExamples
 	// only the types in this example are currently supported for inlining.
 	// if you want to add support to more built-in types, have a look at InlineDrawer,
 	// it's very simple to do so...
-    [HasRequirements]
+    //[HasRequirements]
 	public class InlineExample : BaseBehaviour
 	{
 		[Inline] public Transform trans;

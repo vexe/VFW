@@ -18,7 +18,7 @@ namespace Vexe.Editor.Internal
             {
                 //Debug.Log("Building delegate for conditionally visible member: " + member.Name);
 
-                var attr = member.GetCustomAttribute<VisibleWhenAttribute>();
+                var attr = MemberInfoExtensions.GetCustomAttribute<VisibleWhenAttribute>(member);
                 if (attr == null)
                 {
                     _isVisibleCache[member] = AlwaysVisible;
