@@ -25,7 +25,8 @@ namespace Vexe.Runtime.Extensions
         {
             foreach (BindingFlags flag in Enum.GetValues(typeof(BindingFlags)))
             {
-                if (flag != BindingFlags.Default)
+                //if (flag != BindingFlags.Default)
+                if (flag != 0)
                 {
                     flagNames[new Flags((long)flag)] = flag.ToString();
                 }
@@ -41,7 +42,8 @@ namespace Vexe.Runtime.Extensions
         /// <summary>
         /// This value corresponds to the <see href="BindingFlags.Default"/> value.
         /// </summary>
-        public static readonly Flags None = new Flags((long)BindingFlags.Default);
+        //public static readonly Flags None = new Flags((long)BindingFlags.Default);
+        public static readonly Flags None = new Flags((long)0);
 
         /// <summary>
         /// This value corresponds to the <see href="BindingFlags.IgnoreCase"/> value.
@@ -57,7 +59,8 @@ namespace Vexe.Runtime.Extensions
         /// This value corresponds to the <see href="BindingFlags.ExactBinding"/> value. 
         /// Note that this value is respected even in cases where normal Reflection calls would ignore it.
         /// </summary>
-        public static readonly Flags ExactBinding = new Flags((long)BindingFlags.ExactBinding);
+        //public static readonly Flags ExactBinding = new Flags((long)BindingFlags.ExactBinding);
+        public static readonly Flags ExactBinding = new Flags((long)65536);
 
         /// <summary>
         /// This value corresponds to the <see href="BindingFlags.Public"/> value.

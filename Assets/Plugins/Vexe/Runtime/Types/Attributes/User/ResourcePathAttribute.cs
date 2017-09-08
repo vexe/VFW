@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityObject = UnityEngine.Object;
+using System.Reflection;
 
 namespace Vexe.Runtime.Types
 {
@@ -12,7 +13,7 @@ namespace Vexe.Runtime.Types
 
         public ResourcePathAttribute(Type objectType = null) 
         {
-	        if (objectType == null || !typeof(UnityObject).IsAssignableFrom(objectType))
+	        if (objectType == null || !typeof(UnityObject).GetTypeInfo().IsAssignableFrom(objectType.GetTypeInfo()))
 	            ResourceType = typeof(UnityObject);
 	        else
 	            ResourceType = objectType;

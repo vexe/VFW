@@ -102,7 +102,7 @@ namespace Vexe.Editor.Visibility {
 
         public static bool IsSerializableType(Type type)
         {
-            if (type.IsPrimitive || type.IsEnum || type == typeof(string)
+            if (type.GetTypeInfo().IsPrimitive || type.GetTypeInfo().IsEnum || type == typeof(string)
                 || type.IsA<UnityObject>()
                 || IsUnityStructType(type))
                 return true;

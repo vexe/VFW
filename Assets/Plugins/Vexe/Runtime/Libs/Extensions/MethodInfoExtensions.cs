@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Debug = UnityEngine.Debug;
 
 namespace Vexe.Runtime.Extensions
 {
@@ -70,8 +71,13 @@ namespace Vexe.Runtime.Extensions
         // http://stackoverflow.com/questions/4168489/methodinfo-equality-for-declaring-type
         public static bool AreMethodsEqualForDeclaringType(this MethodInfo first, MethodInfo second)
         {
+#if NETFX_CORE
+            Debug.Assert(false, "not implemented yet");
+            return false;
+#else
             first = first.ReflectedType == first.DeclaringType ? first : first.DeclaringType.GetMethod(first.Name, first.GetParameters().Select(p => p.ParameterType).ToArray());
             second = second.ReflectedType == second.DeclaringType ? second : second.DeclaringType.GetMethod(second.Name, second.GetParameters().Select(p => p.ParameterType).ToArray());
+#endif
             return first == second;
         }
 
@@ -83,8 +89,8 @@ namespace Vexe.Runtime.Extensions
         public static bool IsExtensionMethod(this MethodInfo method)
         {
             var mType = method.DeclaringType;
-            return mType.IsSealed &&
-                !mType.IsGenericType &&
+            return mType.GetTypeInfo().IsSealed &&
+                !mType.GetTypeInfo().IsGenericType &&
                 !mType.IsNested &&
                 method.IsDefined(typeof(ExtensionAttribute), false);
         }

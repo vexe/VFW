@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Debug = UnityEngine.Debug;
 
 namespace Vexe.Runtime.Extensions
 {
@@ -118,11 +119,15 @@ namespace Vexe.Runtime.Extensions
             if (method != null)
                 return method.IsStatic;
 
+#if NETFX_CORE
+            Debug.Assert(false, "not implemented");
+            throw new NotSupportedException("not implemented");
+#else
             string message = string.Format("Unable to determine IsStatic for member {0}.{1}" +
                 "MemberType was {2} but only fields, properties and methods are supported.",
                 member.Name, member.MemberType, Environment.NewLine);
-
             throw new NotSupportedException(message);
+#endif
         }
     }
 }

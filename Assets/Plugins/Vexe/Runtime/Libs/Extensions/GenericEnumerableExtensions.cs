@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Reflection;
 
 namespace Vexe.Runtime.Extensions
 {
@@ -48,7 +49,7 @@ namespace Vexe.Runtime.Extensions
 		{
 			foreach(var item in items)
 			{
-				if (item != null && ofType.IsAssignableFrom(item.GetType()))
+				if (item != null && ofType.GetTypeInfo().IsAssignableFrom(item.GetType().GetTypeInfo()))
 				{
 					yield return item;
 				}
